@@ -116,8 +116,8 @@ for flag in $argv
 		case -h --help
 			echo -e 'Usage: depls [options]\n'
 			echo 'options:'
-			echo '  -a,   --all             also print installed dependencies'
-			echo '  -t,   --tree            print using tree view'
+			echo '  -a,   --all             also list installed dependencies'
+			echo '  -t,   --tree            list using tree view'
 			echo '  -h,   --help            print help and exit'
 			exit 0
 		case -a --all

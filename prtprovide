@@ -1,0 +1,68 @@
+#!/bin/fish
+#
+# prtl - Search 
+# onodera, https://github.com/onodera-punpun
+
+## CONFIGURATION
+
+# Config location
+set config (cat /etc/prt.conf)
+
+
+## FUNCTIONS
+
+# This function prints the port location
+function location
+	set location (string match -r ".*/$argv\$" $ports)
+
+	# Order ports
+	if test (count $location) -ge 2
+		for repo in $order
+			set locationrepo (string match -r "^$repo/.*" $location)
+
+			if test -n "$locationrepo"
+				set location $locationrepo
+				break
+			end
+		end
+	end
+
+	# Alias ports
+	if string match -q -r "^$location " $alias
+		set location (string match -r "^$location .*" $alias | cut -d ' ' -f 2)
+	end
+
+	if test -n "$location"
+		echo $location
+	else
+		echo 'Could not find port.'
+		exit
+	end
+end
+
+
+## EXECUTE
+
+if test (count $argv) -ge 1
+	for flag in $argv
+		switch $flag
+			case -h --help
+				echo -e 'Usage: prtloc [port]\n'
+				echo 'options:'
+				echo '  -h,   --help            print help and exit'
+				exit 0
+			case '*'
+				# Get aliases and order of ports/repos
+				set order (string match -r '^order .*' $config | cut -d ' ' -f 2-)
+				set alias (string match -r '^alias .*' $config | cut -d ' ' -f 2-)
+
+				# Get all ports
+				set ports (ports -l)
+
+				location $argv
+		end
+	end
+else
+	echo 'Please specify a port.'
+	exit 1
+end
