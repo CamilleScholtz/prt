@@ -1,7 +1,7 @@
 function cdp
 	set location (prtloc $argv)
 	if test $status -eq 0
-		cd $location
+		cd /usr/ports/$location
 	else
 		cd /usr/ports
 	end
