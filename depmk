@@ -1,0 +1,97 @@
+#!/bin/fish
+#
+# depmk - Install dependencies recursivly
+# onodera, https://github.com/onodera-punpun
+
+## CONFIGURATION
+
+# Config location
+set config (cat /etc/prt.conf)
+
+
+## FUNCTIONS
+
+# This function reads the Pkgfile
+function pkgfile
+	if test -f ./Pkgfile
+		cat ./Pkgfile
+	else
+		echo 'Pkgfile not found.' >/dev/stderr
+		exit 1
+	end
+end
+
+
+## EXECUTE
+
+# Initialize variables
+set script true
+set readme true
+
+if test (count $argv) -ge 1
+	switch $argv
+		case -h --help
+			echo -e 'Usage: depmk [options]\n'
+			echo 'options:'
+			echo '  -s,   --script          disable execution of pre- and post-install'
+			echo '  -r,   --readme          disable opening of readmes'
+			echo '  -h,   --help            print help and exit'
+			exit 0
+		case -s --script
+			set script false
+		case -r --readme
+			set readme false
+		case '*'
+			echo 'Invalid option, use -h for help.'
+			exit 1
+	end
+end
+
+set makecommand (string match -r '^makecommand .*' $config | cut -d ' ' -f 2-)
+
+for port in (depls)
+	cd /usr/ports/$port
+
+	# Open REAMDE
+	if test $readme = true
+		if test -f ./README
+			eval $EDITOR ./README
+		end
+	end
+
+	# Execute pre-install
+	if test $script = true
+		if test -f ./pre-install
+			./pre-install
+			if test $status -eq 0
+				echo "Executed $port pre-install."
+			else
+				echo "Failed to execute $port pre-install."
+				exit 1
+			end
+		end
+	end
+
+	# Make and install port
+	eval $makecommand
+	if test $status -eq 0
+		echo "Installed $port."
+	else
+		echo "Failed to install $port."
+		exit 1
+	end
+
+	# Execute post-install
+	if test $script = true
+		if test -f ./post-install
+			./post-install
+
+			if test $status -eq 0
+				echo "Executed $port post-install."
+			else
+				echo "Failed to execute $port post-install."
+				exit 1
+			end
+		end
+	end
+end

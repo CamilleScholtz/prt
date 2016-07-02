@@ -1,0 +1,55 @@
+#!/bin/fish
+#
+# prtprint - Prints port information
+# onodera, https://github.com/onodera-punpun
+
+## FUNCTIONS
+
+# This function reads the Pkgfile
+function pkgfile
+	if test -f ./Pkgfile
+		cat ./Pkgfile
+	else
+		echo 'Pkgfile not found.' >/dev/stderr
+		exit 1
+	end
+end
+
+
+## EXECUTE
+
+if test (count $argv) -ge 1
+	for flag in $argv
+		switch $flag
+			case -h --help
+				echo -e 'Usage: prtprint [options]\n'
+				echo 'options:'
+				echo '  -d,   --description     print description'
+				echo '  -u,   --url             print url'
+				echo '  -m,   --maintainer      print maintainer'
+				echo '  -v,   --version         print version'
+				echo '  -r,   --release         print release'
+				echo '  -h,   --help            print help and exit'
+				exit 0
+			case -d --description
+				echo 'Description: '(pkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
+			case -u --url
+				echo 'URL: '(pkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
+			case -m --maintainer
+				echo 'Maintainer: '(pkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
+			case -v --version
+				echo 'Version: '(pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
+			case -r --release
+				echo 'Release: '(pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
+			case '*'
+				echo 'Invalid option, use -h for help.'
+				exit 1
+		end
+	end
+else
+	echo 'Description: '(pkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
+	echo 'URL: '(pkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
+	echo 'Maintainer: '(pkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
+	echo 'Version: '(pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
+	echo 'Release: '(pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
+end
