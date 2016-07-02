@@ -11,6 +11,7 @@ install:
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
 	$(INSTALL_DIR) $(DESTDIR)/etc
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/fish/completions
+	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/fish/functions
 	$(INSTALL_PROG) depls $(DESTDIR)$(PREFIX)/bin/depls
 	$(INSTALL_PROG) depmk $(DESTDIR)$(PREFIX)/bin/depmk
 	$(INSTALL_PROG) prtloc $(DESTDIR)$(PREFIX)/bin/prtloc
@@ -20,6 +21,7 @@ install:
 	$(INSTALL_FILE) completions/depmk.fish $(DESTDIR)$(PREFIX)/share/fish/completions/depmk.fish
 	$(INSTALL_FILE) completions/prtloc.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtloc.fish
 	$(INSTALL_FILE) completions/prtprint.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtprint.fish
+	$(INSTALL_FILE) functions/cdp.fish $(DESTDIR)$(PREFIX)/share/fish/functions/cdp.fish
 
 uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/bin/depls
@@ -31,4 +33,4 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/depmk.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtloc.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtprint.fish
-	
+	$(RM) $(DESTDIR)$(PREFIX)/share/fish/functions/cdp.fish
