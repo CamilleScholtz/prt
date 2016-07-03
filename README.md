@@ -88,3 +88,16 @@ Options:
 `-r` Print release.
 
 `-h` Print help and exit.
+
+
+# prtprovide
+
+Search ports for files they provide.
+
+## Usage
+
+prtprovide [query]
+
+Options:
+
+`-h` Print help and exit.
