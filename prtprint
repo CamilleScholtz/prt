@@ -32,24 +32,24 @@ if test (count $argv) -ge 1
 				echo '  -h,   --help            print help and exit'
 				exit 0
 			case -d --description
-				echo 'Description '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
+				echo 'Description: '(pkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
 			case -u --url
-				echo 'URL '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
+				echo 'URL: '(pkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
 			case -m --maintainer
-				echo 'Maintainer '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
+				echo 'Maintainer: '(pkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
 			case -v --version
-				echo 'Version '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
+				echo 'Version: '(pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
 			case -r --release
-				echo 'Release '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
+				echo 'Release: '(pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 			case '*'
 				echo 'Invalid option, use -h for help.' >/dev/stderr
 				exit 1
 		end
 	end
 else
-	echo 'Description '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
-	echo 'URL '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
-	echo 'Maintainer '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
-	echo 'Version '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
-	echo 'Release '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
+	echo 'Description: '(pkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
+	echo 'URL: '(pkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
+	echo 'Maintainer: '(pkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
+	echo 'Version: '(pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
+	echo 'Release: '(pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 end

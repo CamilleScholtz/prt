@@ -1,0 +1,71 @@
+#!/bin/fish
+#
+# prtpull - Pull in ports
+# onodera, https://github.com/onodera-punpun
+
+## CONFIGURATION
+
+# Set config dir location
+set configdir /etc/prtstuff
+
+# Set repo file location
+set pull $configdir/pull
+
+## FUNCTIONS
+
+# This function checks if the uses has root acces
+function isroot
+	if test (id -u) -ge 1
+		echo "Only root can pull in ports." >/dev/stderr
+		exit 1
+	end
+end
+
+# This function pulls updates from git
+function gitpull
+	if test (count $argv) -ge 1
+		set repos (find $pull -type f | string match -r '.*/'(string replace -a ' ' '$|.*/' "$argv")'$')
+	else
+		set repos (find $pull -type f | sort)
+	end
+
+	for file in $repos
+		source $file
+
+		echo "Updating collection $name."
+
+		cd $portdir/$name >/dev/null
+		if test $status -eq 0
+			git checkout -q $branch
+			git fetch -q --depth 1
+			git diff --pretty=format: --name-status $branch origin/$branch | sed 's/M\t/'(set_color black --bold)'-> '(set_color normal)'Edit /g; s/A\t/'(set_color black --bold)'-> '(set_color normal)'Checkout /g; s/D\t/'(set_color black --bold)'-> '(set_color normal)'MCÿ>Delete /g' | sort
+			git clean -q -f
+			git reset -q --hard origin/$branch
+		else
+			git clone -q --depth 1 -b $branch $url $portdir/$name
+			ls $portdir/$name | sed 's/^/'(set_color black --bold)'-> '(set_color normal)'Checkout /g'
+		end
+	end
+end
+
+
+## EXECUTE
+
+# Load config
+source $configdir/config
+
+if test (count $argv) -ge 1
+	switch "$argv"
+		case -h --help
+			echo -e 'Usage: prtpull [repo]\n'
+			echo 'options:'
+			echo '  -h,   --help            print help and exit'
+			exit 0
+		case '*'
+			isroot
+			gitpull $argv
+	end
+else
+	isroot
+	gitpull
+end

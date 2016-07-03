@@ -11,6 +11,14 @@ set configdir /etc/prtstuff
 
 ## FUNCTIONS
 
+# This function checks if the uses has root acces
+function isroot
+	if test (id -u) -ge 1
+		echo "Only root can install ports." >/dev/stderr
+		exit 1
+	end
+end
+
 # This function reads the Pkgfile
 function pkgfile
 	if test -f ./Pkgfile
@@ -54,8 +62,10 @@ if test (count $argv) -ge 1
 	end
 end
 
+isroot
+
 for port in (depls)
-	cd /usr/ports/$port
+	cd $portdir/$port
 
 	# Open REAMDE
 	if test $readme = true

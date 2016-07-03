@@ -17,6 +17,7 @@ install:
 	$(INSTALL_PROG) prtloc $(DESTDIR)$(PREFIX)/bin/prtloc
 	$(INSTALL_PROG) prtprint $(DESTDIR)$(PREFIX)/bin/prtprint
 	$(INSTALL_PROG) prtprovide $(DESTDIR)$(PREFIX)/bin/prtprovide
+	$(INSTALL_PROG) prtpull $(DESTDIR)$(PREFIX)/bin/prtpull
 	$(INSTALL_PROG) prts $(DESTDIR)$(PREFIX)/bin/prts
 	$(INSTALL_FILE) config/config $(DESTDIR)/etc/prtstuff/config
 	$(INSTALL_FILE) config/pull/* $(DESTDIR)/etc/prtstuff/pull
@@ -26,6 +27,7 @@ install:
 	$(INSTALL_FILE) completions/prtloc.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtloc.fish
 	$(INSTALL_FILE) completions/prtprint.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtprint.fish
 	$(INSTALL_FILE) completions/prtprovide.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtprovide.fish
+	$(INSTALL_FILE) completions/prtpull.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtpull.fish
 	$(INSTALL_FILE) functions/cdp.fish $(DESTDIR)$(PREFIX)/share/fish/functions/cdp.fish
 
 uninstall:
@@ -35,6 +37,7 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprint
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprovide
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prts
+	$(RM) $(DESTDIR)$(PREFIX)/bin/prtpull
 	$(RM) -r $(DESTDIR)/etc/prtstuff
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/cdp.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/depls.fish
@@ -42,4 +45,5 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtloc.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtprint.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtprovide.fish
+	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtpull.fish
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/functions/cdp.fish

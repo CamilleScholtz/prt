@@ -6,7 +6,16 @@
 # TODO: -> /usr/lib/libconfig++.so -> /-> -> /libconfig++.so.9.2.0
 # TODO:-> /usr/lib/libconfig++.so.9 -> /-> -> /libconfig++.so.9.2.0
 
+## CONFIGURATION
+
+# Set config dir location
+set configdir /etc/prtstuff
+
+
 ## EXECUTE
+
+# Load config
+source $configdir/config
 
 if test (count $argv) -ge 1
 	for flag in $argv
@@ -17,11 +26,11 @@ if test (count $argv) -ge 1
 				echo '  -h,   --help            print help and exit'
 				exit 0
 			case '*'
-				set results (find /usr/ports -type f -name .footprint | xargs grep -i $argv)
+				set results (find $portdir -type f -name .footprint | xargs grep -i $argv)
 
 				for line in $results
-					if test "$port" != (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace '/usr/ports' '' | string trim -c '/')
-						set port (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace '/usr/ports' '' | string trim -c '/')
+					if test "$port" != (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace $portdir '' | string trim -c '/')
+						set port (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace $portdir '' | string trim -c '/')
 						echo $port
 					end
 
