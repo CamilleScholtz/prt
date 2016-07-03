@@ -9,7 +9,7 @@ all:
 
 install:
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
-	$(INSTALL_DIR) $(DESTDIR)/etc/prtstuff
+	$(INSTALL_DIR) $(DESTDIR)/etc/prtstuff/pull
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/fish/completions
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/fish/functions
 	$(INSTALL_PROG) depls $(DESTDIR)$(PREFIX)/bin/depls
@@ -18,7 +18,8 @@ install:
 	$(INSTALL_PROG) prtprint $(DESTDIR)$(PREFIX)/bin/prtprint
 	$(INSTALL_PROG) prtprovide $(DESTDIR)$(PREFIX)/bin/prtprovide
 	$(INSTALL_PROG) prts $(DESTDIR)$(PREFIX)/bin/prts
-	$(INSTALL_FILE) config/* $(DESTDIR)/etc/prtstuff/
+	$(INSTALL_FILE) config/config $(DESTDIR)/etc/prtstuff/config
+	$(INSTALL_FILE) config/pull/* $(DESTDIR)/etc/prtstuff/pull
 	$(INSTALL_FILE) completions/cdp.fish $(DESTDIR)$(PREFIX)/share/fish/completions/cdp.fish
 	$(INSTALL_FILE) completions/depls.fish $(DESTDIR)$(PREFIX)/share/fish/completions/depls.fish
 	$(INSTALL_FILE) completions/depmk.fish $(DESTDIR)$(PREFIX)/share/fish/completions/depmk.fish
