@@ -57,7 +57,7 @@ source $configdir/config
 if test (count $argv) -ge 1
 	switch "$argv"
 		case -h --help
-			echo -e 'Usage: prtpull [repo]\n'
+			echo -e 'Usage: prtpull [repos]\n'
 			echo 'options:'
 			echo '  -h,   --help            print help and exit'
 			exit 0

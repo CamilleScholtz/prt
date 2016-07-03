@@ -1,1 +1,1 @@
-complete -c cdp -x -a "(ports -l | cut -d '/' -f 2)"
+complete -c cdp -x -a "(prtls | cut -d '/' -f 2)"

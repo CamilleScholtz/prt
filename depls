@@ -135,8 +135,7 @@ for flag in $argv
 end
 
 # Get all and installed ports
-# TODO: Replace these
-set ports (ports -l)
-set installed (pkginfo -i | cut -d ' ' -f 1)
+set ports (prtls)
+set installed (prtls -i)
 
 recursive

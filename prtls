@@ -1,0 +1,36 @@
+#!/bin/fish
+#
+# prtls - List repos and ports
+# onodera, https://github.com/onodera-punpun
+
+## CONFIGURATION
+
+# Set config dir location
+set configdir /etc/prtstuff
+
+
+## EXECUTE
+
+# Load config
+source $configdir/config
+
+if test (count $argv) -eq 1
+	switch $argv
+		case -h --help
+			echo -e 'Usage: prtls [options]\n'
+			echo 'options:'
+			echo '  -r,   --repos           list repos'
+			echo '  -i,   --installed       list installed ports'
+			echo '  -h,   --help            print help and exit'
+			exit 0
+		case -r --repos
+			find $portdir -mindepth 1 -maxdepth 1 -type d | string replace "$portdir/" '' | sort
+		case -i --installed
+			grep -A 1 '^$' /var/lib/pkg/db | string match -v -r '^$|--'
+		case '*'
+			echo 'Invalid option, use -h for help.' >/dev/stderr
+			exit 1
+	end
+else
+	find $portdir -mindepth 2 -maxdepth 2 -type d | string replace "$portdir/" '' | sort
+end
