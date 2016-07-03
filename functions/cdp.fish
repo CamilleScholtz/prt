@@ -1,6 +1,5 @@
 function cdp
-	# Set config dir location
-	set configdir /etc/prtstuff
+	source /etc/prtstuff/config
 
 	set location (prtloc $argv)
 	if test $status -eq 0
