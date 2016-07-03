@@ -3,6 +3,9 @@
 # prtprovide - Search ports for files they provide
 # onodera, https://github.com/onodera-punpun
 
+# TODO: -> /usr/lib/libconfig++.so -> /-> -> /libconfig++.so.9.2.0
+# TODO:-> /usr/lib/libconfig++.so.9 -> /-> -> /libconfig++.so.9.2.0
+
 ## EXECUTE
 
 if test (count $argv) -ge 1
@@ -17,8 +20,12 @@ if test (count $argv) -ge 1
 				set results (find /usr/ports -type f -name .footprint | xargs grep -i $argv)
 
 				for line in $results
-					echo -n (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace '/usr/ports' '' | string trim -c '/')
-					echo ' '(echo $line | cut -d \t -f 3 | tr ' ' '\n' | sed 's/^/'(set_color black --bold)'->'(set_color normal)' \//g')
+					if test "$port" != (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace '/usr/ports' '' | string trim -c '/')
+						set port (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace '/usr/ports' '' | string trim -c '/')
+						echo $port
+					end
+
+					echo (echo $line | cut -d \t -f 3 | tr ' ' '\n' | sed 's/^/'(set_color black --bold)'-> '(set_color normal)'\//g')
 				end
 		end
 	end

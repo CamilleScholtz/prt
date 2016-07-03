@@ -6,7 +6,7 @@
 ## CONFIGURATION
 
 # Config location
-set config (cat /etc/prt.conf)
+set config (cat /etc/prtstuff/config)
 
 
 ## FUNCTIONS

@@ -5,15 +5,15 @@
 
 ## CONFIGURATION
 
-# Config location
-set config (cat /etc/prt.conf)
+# Set config dir location
+set configdir /etc/prtstuff
 
 
 ## FUNCTIONS
 
 # This function reads the Pkgfile
 function pkgfile
-	if test -z $argv
+	if set -q argv
 		if test -f ./Pkgfile
 			cat ./Pkgfile
 		else
@@ -106,6 +106,9 @@ end
 
 
 ## EXECUTE
+
+# Load config
+source $configdir/config
 
 # Initialize variables
 set all false

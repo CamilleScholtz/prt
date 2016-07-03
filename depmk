@@ -6,7 +6,7 @@
 ## CONFIGURATION
 
 # Config location
-set config (cat /etc/prt.conf)
+set config (cat /etc/prtstuff/config)
 
 
 ## FUNCTIONS
@@ -73,7 +73,7 @@ for port in (depls)
 	end
 
 	# Make and install port
-	eval $makecommand
+	eval {$makecommand}
 	if test $status -eq 0
 		echo "Installed $port."
 	else

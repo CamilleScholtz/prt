@@ -1,0 +1,64 @@
+#!/bin/fish
+#
+# prtpull - Pull in ports
+# onodera, https://github.com/onodera-punpun
+
+## CONFIGURATION
+
+# Config location
+set config (cat /etc/prtstuff/config)
+
+# Set repo file directory
+set pull (cat /etc/prtstuff/pull)
+
+
+## FUNCTIONS
+
+# This function pulls in new ports using git
+function gitpull
+	for file in $pull
+		source $file
+
+		echo "Fetching updates from $url."
+		echo "Updating collection $name."
+
+		cd /usr/ports/$name >/dev/null
+		if test status -eq 0
+			git checkout -q $branch
+			git fetch -q --depth 1
+			git diff --pretty=format: --name-status $branch origin/$branch | sed 's/M\t/ Edit /g; s/A\t/ Checkout /g; s/D\t/ Delete /g' | sort
+			git clean -q -f
+			git reset -q --hard origin/$branch
+		else
+			git clone -q --depth 1 -b $branch $url /usr/ports/$name
+			ls /usr/ports/$NAME | sed 's/^/'(set_color black --bold)'-> '(set_color normal)'Checkout /g'
+		end
+
+		echo 'Finished successfully.'
+	end
+end
+
+
+## EXECUTE
+
+if test (count $argv) -ge 1
+	for flag in $argv
+		switch $flag
+			case -h --help
+				echo -e 'Usage: prtprovide [query]\n'
+				echo 'options:'
+				echo '  -h,   --help            print help and exit'
+				exit 0
+			case '*'
+				set results (find /usr/ports -type f -name .footprint | xargs grep -i $argv)
+
+				for line in $results
+					echo -n (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace '/usr/ports' '' | string trim -c '/')
+					echo ' '(echo $line | cut -d \t -f 3 | tr ' ' '\n' | sed 's/^/'(set_color black --bold)'->'(set_color normal)' \//g')
+				end
+		end
+	end
+else
+	echo 'Please specify a query.'
+	exit 1
+end
