@@ -18,7 +18,6 @@ install:
 	$(INSTALL_PROG) prtprint $(DESTDIR)$(PREFIX)/bin/prtprint
 	$(INSTALL_PROG) prtprovide $(DESTDIR)$(PREFIX)/bin/prtprovide
 	$(INSTALL_PROG) prtpull $(DESTDIR)$(PREFIX)/bin/prtpull
-	$(INSTALL_PROG) prts $(DESTDIR)$(PREFIX)/bin/prts
 	$(INSTALL_FILE) config/config $(DESTDIR)/etc/prtstuff/config
 	$(INSTALL_FILE) config/pull/* $(DESTDIR)/etc/prtstuff/pull
 	$(INSTALL_FILE) completions/cdp.fish $(DESTDIR)$(PREFIX)/share/fish/completions/cdp.fish
@@ -36,7 +35,6 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtloc
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprint
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprovide
-	$(RM) $(DESTDIR)$(PREFIX)/bin/prts
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtpull
 	$(RM) -r $(DESTDIR)/etc/prtstuff
 	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/cdp.fish
