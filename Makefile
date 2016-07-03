@@ -15,7 +15,7 @@ install:
 	$(INSTALL_PROG) depls $(DESTDIR)$(PREFIX)/bin/depls
 	$(INSTALL_PROG) depmk $(DESTDIR)$(PREFIX)/bin/depmk
 	$(INSTALL_PROG) prtloc $(DESTDIR)$(PREFIX)/bin/prtloc
-	$(INSTALL_PROG) prtls $(DESTDIR)$(PREFIX)/bin/prtloc
+	$(INSTALL_PROG) prtls $(DESTDIR)$(PREFIX)/bin/prtls
 	$(INSTALL_PROG) prtprint $(DESTDIR)$(PREFIX)/bin/prtprint
 	$(INSTALL_PROG) prtprovide $(DESTDIR)$(PREFIX)/bin/prtprovide
 	$(INSTALL_PROG) prtpull $(DESTDIR)$(PREFIX)/bin/prtpull
@@ -35,7 +35,7 @@ uninstall:
 	$(RM) $(DESTDIR)$(PREFIX)/bin/depls
 	$(RM) $(DESTDIR)$(PREFIX)/bin/depmk
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtloc
-	$(RM) $(DESTDIR)$(PREFIX)/bin/ls
+	$(RM) $(DESTDIR)$(PREFIX)/bin/prtls
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprint
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprovide
 	$(RM) $(DESTDIR)$(PREFIX)/bin/prtpull
