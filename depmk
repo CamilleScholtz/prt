@@ -5,8 +5,8 @@
 
 ## CONFIGURATION
 
-# Config location
-set config (cat /etc/prtstuff/config)
+# Set config dir location
+set configdir /etc/prtstuff
 
 
 ## FUNCTIONS
@@ -24,30 +24,35 @@ end
 
 ## EXECUTE
 
-# Initialize variables
-set script true
-set readme true
+# Load config
+source $configdir/config
 
 if test (count $argv) -ge 1
 	switch $argv
 		case -h --help
 			echo -e 'Usage: depmk [options]\n'
 			echo 'options:'
-			echo '  -s,   --script          disable execution of pre- and post-install'
-			echo '  -r,   --readme          disable opening of readmes'
+			echo '  -s,   --script          toggle execution of pre- and post-install'
+			echo '  -r,   --readme          toggle opening of readmes'
 			echo '  -h,   --help            print help and exit'
 			exit 0
 		case -s --script
-			set script false
+			if test $script = true
+				set script false
+			else
+				set script true
+			end
 		case -r --readme
-			set readme false
+			if test $readme = true
+				set readme false
+			else
+				set readme true
+			end
 		case '*'
-			echo 'Invalid option, use -h for help.'
+			echo 'Invalid option, use -h for help.' >/dev/stderr
 			exit 1
 	end
 end
-
-set makecommand (string match -r '^makecommand .*' $config | cut -d ' ' -f 2-)
 
 for port in (depls)
 	cd /usr/ports/$port
@@ -66,7 +71,7 @@ for port in (depls)
 			if test $status -eq 0
 				echo "Executed $port pre-install."
 			else
-				echo "Failed to execute $port pre-install."
+				echo "Failed to execute $port pre-install." >/dev/stderr
 				exit 1
 			end
 		end
@@ -77,7 +82,7 @@ for port in (depls)
 	if test $status -eq 0
 		echo "Installed $port."
 	else
-		echo "Failed to install $port."
+		echo "Failed to install $port." >/dev/stderr
 		exit 1
 	end
 
@@ -89,7 +94,7 @@ for port in (depls)
 			if test $status -eq 0
 				echo "Executed $port post-install."
 			else
-				echo "Failed to execute $port post-install."
+				echo "Failed to execute $port post-install." >/dev/stderr
 				exit 1
 			end
 		end

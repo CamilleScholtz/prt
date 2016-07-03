@@ -30,6 +30,6 @@ if test (count $argv) -ge 1
 		end
 	end
 else
-	echo 'Please specify a query.'
+	echo 'Please specify a query.' >/dev/stderr
 	exit 1
 end

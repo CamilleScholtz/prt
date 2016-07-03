@@ -42,7 +42,7 @@ if test (count $argv) -ge 1
 			case -r --release
 				echo 'Release '(set_color black --bold)'->'(set_color normal)' '(pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 			case '*'
-				echo 'Invalid option, use -h for help.'
+				echo 'Invalid option, use -h for help.' >/dev/stderr
 				exit 1
 		end
 	end

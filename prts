@@ -5,11 +5,11 @@
 
 ## CONFIGURATION
 
-# Config location
-set config (cat /etc/prtstuff/config)
+# Set config dir location
+set configdir /etc/prtstuff
 
-# Set repo file directory
-set pull (cat /etc/prtstuff/pull)
+# Set repo file location
+set pull $configdir/pull
 
 
 ## FUNCTIONS

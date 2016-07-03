@@ -34,9 +34,9 @@ depmk [options]
 
 Options:
 
-`-s` Disable execution of pre- and post-install.
+`-s` Toggle execution of pre- and post-install.
 
-`-r` Disable opening of READMEs.
+`-r` Toggle opening of READMEs.
 
 `-h` Print help and exit.
 

@@ -13,7 +13,7 @@ set configdir /etc/prtstuff
 
 # This function reads the Pkgfile
 function pkgfile
-	if set -q argv
+	if test -z $argv
 		if test -f ./Pkgfile
 			cat ./Pkgfile
 		else
@@ -69,8 +69,8 @@ function recursive
 		end
 
 		# Alias ports
-		if string match -q -r "^$port " $alias
-			set port (string match -r "^$port .*" $alias | cut -d ' ' -f 2)
+		if string match -q -r "^$port=" $alias
+			set port (string match -r "^$port=.*" $alias | cut -d '=' -f 2)
 		end
 
 		# Continue if already installed
@@ -95,7 +95,7 @@ function recursive
 		echo $port
 
 		# Change location and loop again
-		set -g location /usr/ports/$port
+		set -g location $portdir/$port
 		recursive
 
 		if test $tree = true
@@ -107,12 +107,12 @@ end
 
 ## EXECUTE
 
-# Load config
-source $configdir/config
-
-# Initialize variables
+# Initialize values
 set all false
 set tree false
+
+# Load config
+source $configdir/config
 
 for flag in $argv
 	switch $flag
@@ -126,19 +126,16 @@ for flag in $argv
 		case -a --all
 			set all true
 		case -t --tree
-			set iteration 0
 			set tree true
+			set iteration 0
 		case '*'
-			echo 'Invalid option, use -h for help.'
+			echo 'Invalid option, use -h for help.' >/dev/stderr
 			exit 1
 	end
 end
 
-# Get aliases and order of ports/repos
-set order (string match -r '^order .*' $config | cut -d ' ' -f 2-)
-set alias (string match -r '^alias .*' $config | cut -d ' ' -f 2-)
-
 # Get all and installed ports
+# TODO: Replace these
 set ports (ports -l)
 set installed (pkginfo -i | cut -d ' ' -f 1)
 
