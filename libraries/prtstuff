@@ -23,8 +23,8 @@ function prtpkgfile
 			exit 1
 		end
 	else
-		if test -f $argv/Pkgfile
-			cat $argv/Pkgfile
+		if test -f $portdir/$argv/Pkgfile
+			cat $portdir/$argv/Pkgfile
 		else
 			echo "Pkgfile $bright$argv$foreground not found." >/dev/stderr
 			exit 1

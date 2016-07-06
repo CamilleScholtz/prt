@@ -21,9 +21,15 @@ if test (count $argv) -eq 1
 	end
 end
 
-# Get all and installed ports
-set ports (prtls)
-set installed (prtls -i | cut -d ' ' -f 1)
-set installedver (prtls -i | cut -d ' ' -f 2)
+# Get installed ports
+set installed (prtls -i)
 
-prtloc $installed
+for port in $installed
+	set name (echo $port | cut -d ' ' -f 1)
+
+	set availversion (prtpkgfile (prtloc $name))
+	set instversion (echo $port | cut -d ' ' -f 2)
+
+	echo $name
+	echo $instversion $availverion
+end

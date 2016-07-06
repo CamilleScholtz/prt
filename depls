@@ -12,6 +12,7 @@ end
 
 # This function prints port locations
 # I don't use prtloc because it's to slow to prtls every iteration
+# TODO: Use prtloc somehow?
 function prtlocation
 	for port in $argv
 		set location (string match -r ".*/$port\$" $ports)
@@ -73,7 +74,7 @@ function prtrecursive
 		echo $port
 
 		# Change location and loop again
-		set -g location $portdir/$port
+		set -g location $port
 		prtrecursive
 
 		if test $tree = true
