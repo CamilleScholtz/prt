@@ -16,7 +16,6 @@ all:
 
 install:
 	@echo "Installing binaries."
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin/
 	@for binary in $(BINARIES); do \
 		$(INSTALL_FILE) $$binary $(DESTDIR)$(PREFIX)/bin/$$binary; \
 	done
@@ -25,16 +24,12 @@ install:
 	cd functions; $(MAKE) install
 	cd libraries; $(MAKE) install
 
-
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/fish/functions
-
-
 uninstall:
 	@echo "Uninstalling binaries."
 	@for binary in $(BINARIES); do \
-		$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/$$binary; \
+		$(RM) $(DESTDIR)$(PREFIX)/bin/$$binary; \
 	done
-	cd configs; $(MAKE) install
-	cd completions; $(MAKE) install
+	cd configs; $(MAKE) uninstall
+	cd completions; $(MAKE) uninstall
 	cd functions; $(MAKE) uninstall
 	cd libraries; $(MAKE) uninstall

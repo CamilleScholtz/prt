@@ -1,5 +1,4 @@
 PREFIX       ?=  /usr
-INSTALL_DIR  ?=  install -m755 -d
-INSTALL_PROG ?=  install -m755
-INSTALL_FILE ?=  install -m644
+INSTALL_PROG ?=  install -m755 -d
+INSTALL_FILE ?=  install -m644 -d
 RM           ?=  rm -f

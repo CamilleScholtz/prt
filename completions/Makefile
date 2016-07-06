@@ -14,7 +14,6 @@ COMPLETIONS = \
 
 install:
 	@echo "Installing completions."
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/usr/share/fish/completions/
 	@for completion in $(COMPLETIONS); do \
 		$(INSTALL_FILE) $$completion $(DESTDIR)$(PREFIX)/share/fish/completions/$$completion; \
 	done

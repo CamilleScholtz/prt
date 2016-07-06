@@ -5,7 +5,6 @@ LIBRARIES = \
 
 install:
 	@echo "Installing libraries."
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/usr/share/fish/completions/
 	@for library in $(LIBRARIES); do \
 		$(INSTALL_FILE) $$library $(DESTDIR)$(PREFIX)/include/$$library; \
 	done

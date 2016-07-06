@@ -5,13 +5,12 @@ FUNCTIONS = \
 
 install:
 	@echo "Installing functions."
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/usr/share/fish/completions/
 	@for function in $(FUNCTIONS); do \
-		$(INSTALL_FILE) $$function $(DESTDIR)/etc/prtstuff/pull/$$function; \
+		$(INSTALL_FILE) $$function $(DESTDIR)$(PREFIX)/share/fish/functions/$$function; \
 	done
 
 uninstall:
 	@echo "Uninstalling functions."
 	@for function in $(FUNCTIONS); do \
-		$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/$$function; \
+		$(RM) $(DESTDIR)$(PREFIX)/share/fish/functions/$$function; \
 	done
