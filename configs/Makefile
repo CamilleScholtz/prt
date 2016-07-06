@@ -1,7 +1,7 @@
 include ../config.mk
 
 CONFIGS = \
-	config
+	config \
 	pull/6c37 \
 	pull/6c37-git \
 	pull/contrib \
