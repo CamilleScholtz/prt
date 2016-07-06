@@ -1,4 +1,4 @@
 PREFIX       ?=  /usr
-INSTALL_PROG ?=  install -D -m 755
-INSTALL_FILE ?=  install -D -m 644
+INSTALL_PROG ?=  install -D -m755
+INSTALL_FILE ?=  install -D -m644
 RM           ?=  rm -f
