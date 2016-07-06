@@ -6,7 +6,7 @@ LIBRARIES = \
 install:
 	@echo "Installing libraries."
 	@for library in $(LIBRARIES); do \
-		$(INSTALL_FILE) $$library $(DESTDIR)$(PREFIX)/include/; \
+		$(INSTALL_FILE) $$library $(DESTDIR)$(PREFIX)/include/$$library; \
 	done
 
 uninstall:

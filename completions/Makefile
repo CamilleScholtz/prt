@@ -15,7 +15,7 @@ COMPLETIONS = \
 install:
 	@echo "Installing completions."
 	@for completion in $(COMPLETIONS); do \
-		$(INSTALL_FILE) $$completion $(DESTDIR)$(PREFIX)/share/fish/completions/; \
+		$(INSTALL_FILE) $$completion $(DESTDIR)$(PREFIX)/share/fish/completions/$$completion; \
 	done
 
 uninstall:

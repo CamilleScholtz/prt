@@ -6,7 +6,7 @@ FUNCTIONS = \
 install:
 	@echo "Installing functions."
 	@for function in $(FUNCTIONS); do \
-		$(INSTALL_FILE) $$function $(DESTDIR)$(PREFIX)/share/fish/functions/; \
+		$(INSTALL_FILE) $$function $(DESTDIR)$(PREFIX)/share/fish/functions/$$function; \
 	done
 
 uninstall:
