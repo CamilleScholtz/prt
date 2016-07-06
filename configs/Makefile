@@ -12,7 +12,7 @@ CONFIGS = \
 install:
 	@echo "Installing configs."
 	@for config in $(CONFIGS); do \
-		$(INSTALL_FILE) $$config $(DESTDIR)/etc/prtstuff/$$config; \
+		$(INSTALL_FILE) $$config $(DESTDIR)/etc/prtstuff/; \
 	done
 
 uninstall:

@@ -17,7 +17,7 @@ all:
 install:
 	@echo "Installing binaries."
 	@for binary in $(BINARIES); do \
-		$(INSTALL_FILE) $$binary $(DESTDIR)$(PREFIX)/bin/$$binary; \
+		$(INSTALL_FILE) $$binary $(DESTDIR)$(PREFIX)/bin/; \
 	done
 	cd configs; $(MAKE) install
 	cd completions; $(MAKE) install
