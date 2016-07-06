@@ -57,7 +57,7 @@ end
 # Load library
 source /usr/include/prtstuff
 
-# Initialize option values
+# Initialize default option values
 set all false
 set tree false
 

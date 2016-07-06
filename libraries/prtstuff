@@ -5,37 +5,6 @@
 
 ## FUNCTIONS
 
-# The following declarations are needed:
-# set ports (prtls)
-#
-# This function prints port locations
-function prtlocation
-	for port in $argv
-		set location (string match -r ".*/$port\$" $ports)
-
-		# Order ports
-		if test (count $location) -ge 2
-			for repo in $order
-				set locationrepo (string match -r "^$repo/.*" $location)
-
-				if test -n "$locationrepo"
-					set location $locationrepo
-					break
-				end
-			end
-		end
-
-		# Alias ports
-		if string match -q -r "^$location=" $alias
-			set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
-		end
-
-		if test -n "$location"
-			echo $location
-		end
-	end
-end
-
 # This function checks if the uses has root access
 function prtonlyroot
 	if test (id -u) -ge 1

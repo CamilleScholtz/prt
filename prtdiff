@@ -1,18 +1,12 @@
 #!/bin/fish
 #
-# prtdiff - List the difference between installed ports and ports your repos
+# prtdiff - List the difference between installed ports and ports in your repos
 # onodera, https://github.com/onodera-punpun
-
-## CONFIGURATION
-
-# Set config dir location
-set configdir /etc/prtstuff
-
 
 ## EXECUTE
 
-# Load config
-source $configdir/config
+# Load library
+source /usr/include/prtstuff
 
 if test (count $argv) -eq 1
 	switch $argv
@@ -27,10 +21,9 @@ if test (count $argv) -eq 1
 	end
 end
 
-for port in (prtls -i)
-	set name (echo $port | cut -d ' ' -f 1)
-	set installed (echo $port | cut -d ' ' -f 2)
-	set available (cat $portdir/(prtloc $name)/Pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
+# Get all and installed ports
+set ports (prtls)
+set installed (prtls -i | cut -d ' ' -f 1)
+set installedver (prtls -i | cut -d ' ' -f 2)
 
-
-end
+prtloc $installed

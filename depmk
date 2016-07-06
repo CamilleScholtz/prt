@@ -37,7 +37,7 @@ end
 
 prtonlyroot 'install ports'
 
-# Initialize values and set ports
+# Initialize values and get dependencies
 set ports (depls)
 set current 0
 set total (echo $ports | wc -l)

@@ -22,7 +22,7 @@ function prtpull
 		if test $status -eq 0
 			git checkout -q $branch
 			git fetch -q --depth 1
-			git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> {$foreground}Edit /g; s/A\t/$dark-> {$foreground}Checkout /g; s/D\t/$dark-> {$foreground}Delete /g" | sort
+			git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> "$foreground"Edit /g; s/A\t/$dark-> "$foreground"Checkout /g; s/D\t/$dark-> "$foreground"Delete /g" | sort
 			git clean -q -f
 			git reset -q --hard origin/$branch
 		else
