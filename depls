@@ -10,6 +10,37 @@ function prtdependencies
 	string match -r '# Depends on:.*' $argv | string replace '# Depends on:' '' | string trim | string split ' ' | string trim -c ','
 end
 
+# This function prints port locations
+# I don't use prtloc because it's to slow to prtls every iteration
+function prtlocation
+	for port in $argv
+		set location (string match -r ".*/$port\$" $ports)
+
+		# Order ports
+		if test (count $location) -ge 2
+			for repo in $order
+				set locationrepo (string match -r "^$repo/.*" $location)
+
+				if test -n "$locationrepo"
+					set location $locationrepo
+					break
+				end
+			end
+
+		end
+
+		# Alias ports
+		if string match -q -r "^$location=" $alias
+			set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
+		end
+
+		# Finally print the location :)
+		if test -n "$location"
+			echo $location
+		end
+	end
+end
+
 # This function prints dependencies recursivly
 function prtrecursive
 	for port in (prtlocation (prtdependencies (prtpkgfile $location)))

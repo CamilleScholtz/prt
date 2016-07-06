@@ -14,6 +14,10 @@ function prtlocation
 
 		# Order ports
 		if test (count $location) -ge 2
+			if test $duplicate = true
+				set oldlocation $location
+			end
+
 			for repo in $order
 				set locationrepo (string match -r "^$repo/.*" $location)
 
@@ -22,6 +26,7 @@ function prtlocation
 					break
 				end
 			end
+
 		end
 
 		# Alias ports
@@ -29,8 +34,33 @@ function prtlocation
 			set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
 		end
 
+		# Finally print the location :)
 		if test -n "$location"
 			echo $location
+		end
+
+		# Print duplicate tree
+		if test $duplicate = true
+			if test (count $oldlocation) -ge 2
+				set current 0
+
+				for repo in $order
+					set locationrepo (string match -r "^$repo/.*" $oldlocation)
+
+					if test -n "$locationrepo"
+						if test $current -ge 1
+							echo -n $dark
+							printf '-> %.0s' (seq $current)
+							echo -n $foreground
+							echo $locationrepo
+						end
+
+						set current (math $current + 1)
+					end
+				end
+
+				set -e oldlocation
+			end
 		end
 	end
 end
@@ -50,7 +80,7 @@ if test (count $argv) -ge 1
 			case -h --help
 				echo -e 'Usage: prtloc [options] [ports]\n'
 				echo 'options:'
-				echo '  -d,   --duplicate       list duplicate ports'
+				echo '  -d,   --duplicate       list duplicate ports as well'
 				echo '  -h,   --help            print help and exit'
 				exit 0
 			case -d --duplicate
