@@ -3,63 +3,23 @@
 # prtl - Prints port location
 # onodera, https://github.com/onodera-punpun
 
-## CONFIGURATION
-
-# Set config dir location
-set configdir /etc/prtstuff
-
-
-## FUNCTIONS
-
-# This function prints the port location
-function location
-	set location (string match -r ".*/$argv\$" $ports)
-
-	# Order ports
-	if test (count $location) -ge 2
-		for repo in $order
-			set locationrepo (string match -r "^$repo/.*" $location)
-
-			if test -n "$locationrepo"
-				set location $locationrepo
-				break
-			end
-		end
-	end
-
-	# Alias ports
-	if string match -q -r "^$location=" $alias
-		set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
-	end
-
-	if test -n "$location"
-		echo $location
-	else
-		echo 'Could not find port.' >/dev/stderr
-		exit 1
-	end
-end
-
-
 ## EXECUTE
 
-# Load config
-source $configdir/config
+# Load library
+source /usr/include/prtstuff
 
 if test (count $argv) -ge 1
-	for flag in $argv
-		switch $flag
-			case -h --help
-				echo -e 'Usage: prtloc [port]\n'
-				echo 'options:'
-				echo '  -h,   --help            print help and exit'
-				exit 0
-			case '*'
-				# Get all ports
-				set ports (prtls)
+	switch "$argv"
+		case -h --help
+			echo -e 'Usage: prtloc [options] [ports]\n'
+			echo 'options:'
+			echo '  -h,   --help            print help and exit'
+			exit 0
+		case '*'
+			# Get all ports
+			set ports (prtls)
 
-				location $argv
-		end
+			prtlocation $argv
 	end
 else
 	echo 'Please specify a port.' >/dev/stderr

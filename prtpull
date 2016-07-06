@@ -3,47 +3,31 @@
 # prtpull - Pull in ports
 # onodera, https://github.com/onodera-punpun
 
-## CONFIGURATION
-
-# Set config dir location
-set configdir /etc/prtstuff
-
-# Set repo file location
-set pull $configdir/pull
-
-## FUNCTIONS
-
-# This function checks if the uses has root acces
-function isroot
-	if test (id -u) -ge 1
-		echo "Only root can pull in ports." >/dev/stderr
-		exit 1
-	end
-end
-
 # This function pulls updates from git
-function gitpull
+function prtpull
 	if test (count $argv) -ge 1
-		set repos (find $pull -type f | string match -r '.*/'(string replace -a ' ' '$|.*/' "$argv")'$')
+		set repos (find /etc/prtstuff/pull -type f | string match -r '.*/'(string replace -a ' ' '$|.*/' "$argv")'$')
 	else
-		set repos (find $pull -type f | sort)
+		set repos (find /etc/prtstuff/pull -type f | sort)
 	end
 
 	for file in $repos
 		source $file
 
-		echo "Updating collection $name."
+		set current (math $current + 1)
+		set total (count $repos)
+		echo "Updating collection $current/$total, $bright$name$foreground."
 
 		cd $portdir/$name >/dev/null
 		if test $status -eq 0
 			git checkout -q $branch
 			git fetch -q --depth 1
-			git diff --pretty=format: --name-status $branch origin/$branch | sed 's/M\t/'(set_color black --bold)'-> '(set_color normal)'Edit /g; s/A\t/'(set_color black --bold)'-> '(set_color normal)'Checkout /g; s/D\t/'(set_color black --bold)'-> '(set_color normal)'MCÿ>Delete /g' | sort
+			git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> {$foreground}Edit /g; s/A\t/$dark-> {$foreground}Checkout /g; s/D\t/$dark-> {$foreground}Delete /g" | sort
 			git clean -q -f
 			git reset -q --hard origin/$branch
 		else
 			git clone -q --depth 1 -b $branch $url $portdir/$name
-			ls $portdir/$name | sed 's/^/'(set_color black --bold)'-> '(set_color normal)'Checkout /g'
+			ls $portdir/$name | sed "s/^/$dark-> {$foreground}Checkout /g"
 		end
 	end
 end
@@ -51,21 +35,26 @@ end
 
 ## EXECUTE
 
-# Load config
-source $configdir/config
+# Load library
+source /usr/include/prtstuff
+
+# Initialize values
+set current 0
 
 if test (count $argv) -ge 1
 	switch "$argv"
 		case -h --help
-			echo -e 'Usage: prtpull [repos]\n'
+			echo -e 'Usage: prtpull [options] [repos]\n'
 			echo 'options:'
 			echo '  -h,   --help            print help and exit'
 			exit 0
 		case '*'
-			isroot
-			gitpull $argv
+			prtonlyroot 'pull in ports'
+
+			prtpull $argv
 	end
 else
-	isroot
-	gitpull
+	prtonlyroot 'pull in ports'
+
+	prtpull
 end

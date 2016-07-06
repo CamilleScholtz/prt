@@ -6,26 +6,20 @@
 # TODO: -> /usr/lib/libconfig++.so -> /-> -> /libconfig++.so.9.2.0
 # TODO:-> /usr/lib/libconfig++.so.9 -> /-> -> /libconfig++.so.9.2.0
 
-## CONFIGURATION
-
-# Set config dir location
-set configdir /etc/prtstuff
-
-
 ## EXECUTE
 
-# Load config
-source $configdir/config
+# Load library
+source /usr/include/prtstuff
 
 if test (count $argv) -ge 1
-	for flag in $argv
-		switch $flag
-			case -h --help
-				echo -e 'Usage: prtprovide [query]\n'
-				echo 'options:'
-				echo '  -h,   --help            print help and exit'
-				exit 0
-			case '*'
+	switch "$argv"
+		case -h --help
+			echo -e 'Usage: prtprovide [options] [query]\n'
+			echo 'options:'
+			echo '  -h,   --help            print help and exit'
+			exit 0
+		case '*'
+			for port in $argv
 				set results (find $portdir -type f -name .footprint | xargs grep -i $argv)
 
 				for line in $results
@@ -34,9 +28,9 @@ if test (count $argv) -ge 1
 						echo $port
 					end
 
-					echo (echo $line | cut -d \t -f 3 | tr ' ' '\n' | sed 's/^/'(set_color black --bold)'-> '(set_color normal)'\//g')
+					echo (echo $line | cut -d \t -f 3 | tr ' ' '\n' | sed "s/^/$dark-> $foreground\//g")
 				end
-		end
+			end
 	end
 else
 	echo 'Please specify a query.' >/dev/stderr

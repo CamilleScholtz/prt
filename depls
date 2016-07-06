@@ -3,74 +3,21 @@
 # depls - List dependencies recursively
 # onodera, https://github.com/onodera-punpun
 
-## CONFIGURATION
-
-# Set config dir location
-set configdir /etc/prtstuff
-
-
 ## FUNCTIONS
 
-# This function reads the Pkgfile
-function pkgfile
-	if test -z $argv
-		if test -f ./Pkgfile
-			cat ./Pkgfile
-		else
-			echo 'Pkgfile not found.' >/dev/stderr
-			exit 1
-		end
-	else
-		if test -f $argv/Pkgfile
-			cat $argv/Pkgfile
-		else
-			echo "Dependency '$argv' not found." >/dev/stderr
-			exit 1
-		end
-	end
-end
-
 # This function prints the Pkgfile dependencies
-function dependencies
+function prtdependencies
 	string match -r '# Depends on:.*' $argv | string replace '# Depends on:' '' | string trim | string split ' ' | string trim -c ','
 end
 
-# This function prints the dependency location
-function location
-	for dep in $argv
-		set location (string match -r ".*/$dep\$" $ports)
-
-		# Order ports
-		if test (count $location) -ge 2
-			for repo in $order
-				set locationrepo (string match -r "^$repo/.*" $location)
-
-				if test -n "$locationrepo"
-					set location $locationrepo
-					break
-				end
-			end
-		end
-
-		if test -n "$location"
-			echo $location
-		end
-	end
-end
-
 # This function prints dependencies recursivly
-function recursive
-	for port in (location (dependencies (pkgfile $location)))
+function prtrecursive
+	for port in (prtlocation (prtdependencies (prtpkgfile $location)))
 		# Continue if already checked
 		if string match -q -r "^$port\$" $checked
 			continue
 		else
 			set -g checked $port $checked
-		end
-
-		# Alias ports
-		if string match -q -r "^$port=" $alias
-			set port (string match -r "^$port=.*" $alias | cut -d '=' -f 2)
 		end
 
 		# Continue if already installed
@@ -83,9 +30,9 @@ function recursive
 		# Print tree
 		if test $tree = true
 			if test $iteration -ge 1
-				set_color black --bold
+				echo -n $dark
 				printf '-> %.0s' (seq $iteration)
-				set_color normal
+				echo -n $foreground
 			end
 
 			set -g iteration (math $iteration + 1)
@@ -96,7 +43,7 @@ function recursive
 
 		# Change location and loop again
 		set -g location $portdir/$port
-		recursive
+		prtrecursive
 
 		if test $tree = true
 			set -g iteration (math $iteration - 1)
@@ -107,12 +54,12 @@ end
 
 ## EXECUTE
 
-# Initialize values
+# Load library
+source /usr/include/prtstuff
+
+# Initialize option values
 set all false
 set tree false
-
-# Load config
-source $configdir/config
 
 for flag in $argv
 	switch $flag
@@ -136,6 +83,6 @@ end
 
 # Get all and installed ports
 set ports (prtls)
-set installed (prtls -i)
+set installed (prtls -i | cut -d ' ' -f 1)
 
-recursive
+prtrecursive

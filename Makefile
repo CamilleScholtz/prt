@@ -1,51 +1,40 @@
-PREFIX        ?=  /usr
-RM            ?=  rm -f
-INSTALL_DIR   ?=  install -m755 -d
-INSTALL_PROG  ?=  install -m755
-INSTALL_FILE  ?=  install -m644
+include config.mk
+
+BINARIES = \
+	depls \
+	depmk \
+	prtdiff \
+	prtloc \
+	prtls \
+	prtpatch \
+	prtprint \
+	prtprovide \
+	prtpull
 
 all:
 	@echo Run \'make install\' to install prtstuff.
 
 install:
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin
-	$(INSTALL_DIR) $(DESTDIR)/etc/prtstuff/pull
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/fish/completions
+	@echo "Installing binaries."
+	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/bin/
+	@for binary in $(BINARIES); do \
+		$(INSTALL_FILE) $$binary $(DESTDIR)$(PREFIX)/bin/$$binary; \
+	done
+	cd configs; $(MAKE) install
+	cd completions; $(MAKE) install
+	cd functions; $(MAKE) install
+	cd libraries; $(MAKE) install
+
+
 	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)/share/fish/functions
-	$(INSTALL_PROG) depls $(DESTDIR)$(PREFIX)/bin/depls
-	$(INSTALL_PROG) depmk $(DESTDIR)$(PREFIX)/bin/depmk
-	$(INSTALL_PROG) prtloc $(DESTDIR)$(PREFIX)/bin/prtloc
-	$(INSTALL_PROG) prtls $(DESTDIR)$(PREFIX)/bin/prtls
-	$(INSTALL_PROG) prtprint $(DESTDIR)$(PREFIX)/bin/prtprint
-	$(INSTALL_PROG) prtprovide $(DESTDIR)$(PREFIX)/bin/prtprovide
-	$(INSTALL_PROG) prtpull $(DESTDIR)$(PREFIX)/bin/prtpull
-	$(INSTALL_FILE) config/config $(DESTDIR)/etc/prtstuff/config
-	$(INSTALL_FILE) config/pull/* $(DESTDIR)/etc/prtstuff/pull
-	$(INSTALL_FILE) completions/cdp.fish $(DESTDIR)$(PREFIX)/share/fish/completions/cdp.fish
-	$(INSTALL_FILE) completions/depls.fish $(DESTDIR)$(PREFIX)/share/fish/completions/depls.fish
-	$(INSTALL_FILE) completions/depmk.fish $(DESTDIR)$(PREFIX)/share/fish/completions/depmk.fish
-	$(INSTALL_FILE) completions/prtloc.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtloc.fish
-	$(INSTALL_FILE) completions/prtls.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtls.fish
-	$(INSTALL_FILE) completions/prtprint.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtprint.fish
-	$(INSTALL_FILE) completions/prtprovide.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtprovide.fish
-	$(INSTALL_FILE) completions/prtpull.fish $(DESTDIR)$(PREFIX)/share/fish/completions/prtpull.fish
-	$(INSTALL_FILE) functions/cdp.fish $(DESTDIR)$(PREFIX)/share/fish/functions/cdp.fish
+
 
 uninstall:
-	$(RM) $(DESTDIR)$(PREFIX)/bin/depls
-	$(RM) $(DESTDIR)$(PREFIX)/bin/depmk
-	$(RM) $(DESTDIR)$(PREFIX)/bin/prtloc
-	$(RM) $(DESTDIR)$(PREFIX)/bin/prtls
-	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprint
-	$(RM) $(DESTDIR)$(PREFIX)/bin/prtprovide
-	$(RM) $(DESTDIR)$(PREFIX)/bin/prtpull
-	$(RM) -r $(DESTDIR)/etc/prtstuff
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/cdp.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/depls.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/depmk.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtloc.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtls.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtprint.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtprovide.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/prtpull.fish
-	$(RM) $(DESTDIR)$(PREFIX)/share/fish/functions/cdp.fish
+	@echo "Uninstalling binaries."
+	@for binary in $(BINARIES); do \
+		$(RM) $(DESTDIR)$(PREFIX)/share/fish/completions/$$binary; \
+	done
+	cd configs; $(MAKE) install
+	cd completions; $(MAKE) install
+	cd functions; $(MAKE) uninstall
+	cd libraries; $(MAKE) uninstall

@@ -20,3 +20,8 @@ set script true
 
 # Open READMEs
 set readme true
+
+# Set colors
+set foreground normal
+set bright yellow --bold
+set dark black --bold

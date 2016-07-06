@@ -3,40 +3,13 @@
 # depmk - Install dependencies recursivly
 # onodera, https://github.com/onodera-punpun
 
-## CONFIGURATION
-
-# Set config dir location
-set configdir /etc/prtstuff
-
-
-## FUNCTIONS
-
-# This function checks if the uses has root acces
-function isroot
-	if test (id -u) -ge 1
-		echo "Only root can install ports." >/dev/stderr
-		exit 1
-	end
-end
-
-# This function reads the Pkgfile
-function pkgfile
-	if test -f ./Pkgfile
-		cat ./Pkgfile
-	else
-		echo 'Pkgfile not found.' >/dev/stderr
-		exit 1
-	end
-end
-
-
 ## EXECUTE
 
-# Load config
-source $configdir/config
+# Load library
+source /usr/include/prtstuff
 
-if test (count $argv) -ge 1
-	switch $argv
+for flag in $argv
+	switch $flag
 		case -h --help
 			echo -e 'Usage: depmk [options]\n'
 			echo 'options:'
@@ -62,9 +35,14 @@ if test (count $argv) -ge 1
 	end
 end
 
-isroot
+prtonlyroot 'install ports'
 
-for port in (depls)
+# Initialize values and set ports
+set ports (depls)
+set current 0
+set total (echo $ports | wc -l)
+
+for port in $ports
 	cd $portdir/$port
 
 	# Open REAMDE
@@ -79,20 +57,22 @@ for port in (depls)
 		if test -f ./pre-install
 			./pre-install
 			if test $status -eq 0
-				echo "Executed $port pre-install."
+				echo "Executed $bright$port$foreground pre-install."
 			else
-				echo "Failed to execute $port pre-install." >/dev/stderr
+				echo "Failed to execute $bright$port$foreground pre-install." >/dev/stderr
 				exit 1
 			end
 		end
 	end
 
-	# Make and install port
+	set current (math $current + 1)
+	echo "Compiling port $current/$total, $bright$port$foreground."
+
 	eval {$makecommand}
 	if test $status -eq 0
-		echo "Installed $port."
+		echo "Installed port $current/$total, $bright$port$foreground."
 	else
-		echo "Failed to install $port." >/dev/stderr
+		echo "Failed to install $bright$port$foreground." >/dev/stderr
 		exit 1
 	end
 
@@ -102,9 +82,9 @@ for port in (depls)
 			./post-install
 
 			if test $status -eq 0
-				echo "Executed $port post-install."
+				echo "Executed $bright$port$foreground post-install."
 			else
-				echo "Failed to execute $port post-install." >/dev/stderr
+				echo "Failed to execute $bright$port$foreground post-install." >/dev/stderr
 				exit 1
 			end
 		end
