@@ -43,7 +43,7 @@ set current 0
 
 getopts $argv | while read -l opt val
 	switch $opt
-		case -h --help
+		case h help
 			echo -e 'Usage: prtpull [options] [repos]\n'
 			echo 'options:'
 			echo '  -h,   --help            print help and exit'
