@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtpull - Pull in ports
+# prtpull - Pull in ports using git
 # onodera, https://github.com/onodera-punpun
 
 # This function pulls updates from git

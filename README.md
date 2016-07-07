@@ -1,103 +1,155 @@
-# cdp
+prtstuff
+========
 
-Wrapper for prtloc, cd's to port location.
-
-## Usage
-
-cdp [port]
+Consitent CRUX port utilities writtin in fish, aiming to replace prt-get, ports, and pkgutils.
 
 
-# depls
+----
+
+
+depls
+=====
 
 List dependencies recursively.
 
-## Usage
 
-depls [options]
+Help
+----
 
-Options:
+```
+Usage: depls [options]
 
-`-a` Also list installed dependencies.
+options:
+  -a,   --all             also list installed dependencies
+  -t,   --tree            list using tree view
+  -h,   --help            print help and exit
+```
 
-`-t` List using tree view.
 
-`-h` Print help and exit.
-
-
-# depmk
+depmk
+=====
 
 Install dependencies recursivly.
 
-## Usage
 
-depmk [options]
+Help
+----
 
-Options:
+```
+Usage: depmk [options]
 
-`-s` Toggle execution of pre- and post-install.
+options:
+  -s,   --script          toggle execution of pre- and post-install
+  -r,   --readme          toggle opening of readmes
+  -h,   --help            print help and exit
+```
 
-`-r` Toggle opening of READMEs.
 
-`-h` Print help and exit.
-
-
-# prtloc
+prtloc
+======
 
 Prints port location.
 
-## Usage
 
-prtpatch [port]
+Help
+----
 
-Options:
+```
+Usage: prtloc [options] [ports]
 
-`-h` Print help and exit.
+options:
+  -d,   --duplicate       list duplicate ports as well
+  -h,   --help            print help and exit
+```
 
 
-# prtpatch
+prtls
+======
+
+List repos and ports.
+
+
+Help
+----
+
+```
+Usage: prtls [options]
+
+options:
+  -r,   --repos           list repos
+  -i,   --installed       list installed ports
+  -h,   --help            print help and exit
+```
+
+
+prtpatch
+========
 
 Patches ports.
 
-## Usage
 
-prtpatch [options]
+Help
+----
 
-Options:
+```
+Usage: prtpatch [ports]
 
-`-h` Print help and exit.
+options:
+  -h,   --help            print help and exit
+```
 
 
-# prtprint
+prtprint
+========
 
 Prints port information.
 
-## Usage
 
-prtprint [options]
+Help
+----
 
-Options:
+```
+Usage: prtprint [options]
 
-`-d` Print description.
-
-`-u` Print URL.
-
-`-m` Print maintainer.
-
-`-v` Print version.
-
-`-r` Print release.
-
-`-h` Print help and exit.
+options:
+  -d,   --description     print description
+  -u,   --url             print url
+  -m,   --maintainer      print maintainer
+  -v,   --version         print version
+  -r,   --release         print release
+  -h,   --help            print help and exit
+```
 
 
-# prtprovide
+prtprovide
+==========
 
 Search ports for files they provide.
 
-## Usage
 
-prtprovide [query]
+Help
+----
 
-Options:
+```
+Usage: prtprovide [options] [query]
 
-`-h` Print help and exit.
+options:
+  -h,   --help            print help and exit
+```
+
+
+prtpull
+=======
+
+Pull in ports using git.
+
+
+Help
+----
+
+```
+Usage: prtpull [options] [repos]
+
+options:
+  -h,   --help            print help and exit
+```
