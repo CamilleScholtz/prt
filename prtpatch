@@ -8,9 +8,9 @@
 # Load library
 source /usr/include/prtstuff
 
-if test (count $argv) -ge 1
-	switch "$argv"
-		case -h --help
+getopts $argv | while read -l opt val
+	switch $opt
+		case h help
 			echo -e 'Usage: prtpatch [ports]\n'
 			echo 'options:'
 			echo '  -h,   --help            print help and exit'

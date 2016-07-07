@@ -33,7 +33,7 @@ function prtpkgfile
 end
 
 
-## Execute
+## EXECUTE
 
 # Load config
 source /etc/prtstuff/config

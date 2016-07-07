@@ -9,21 +9,25 @@
 source /usr/include/prtstuff
 
 if test (count $argv) -ge 1
-	switch "$argv"
-		case -h --help
-			echo -e 'Usage: prtls [options]\n'
-			echo 'options:'
-			echo '  -r,   --repos           list repos'
-			echo '  -i,   --installed       list installed ports'
-			echo '  -h,   --help            print help and exit'
-			exit 0
-		case -r --repos
-			find $portdir -mindepth 1 -maxdepth 1 -type d | string replace "$portdir/" '' | sort
-		case -i --installed
-			grep -A 2 '^$' /var/lib/pkg/db | 'tr' \n ' ' | string replace -r -a '\-\-' '\n' | string trim | head -n -1
-		case '*'
-			echo 'Invalid option, use -h for help.' >/dev/stderr
-			exit 1
+	getopts $argv | while read -l opt val
+		switch $opt
+			case h help
+				echo -e 'Usage: prtls [options]\n'
+				echo 'options:'
+				echo '  -i,   --installed       list installed ports'
+				echo '  -r,   --repos           list repos'
+				echo '  -h,   --help            print help and exit'
+				exit 0
+			case i installed
+				grep -A 2 '^$' /var/lib/pkg/db | 'tr' \n ' ' | string replace -r -a '\-\-' '\n' | string trim | head -n -1
+				exit 0
+			case r repos
+				find $portdir -mindepth 1 -maxdepth 1 -type d | string replace "$portdir/" '' | sort
+				exit 0
+			case '*'
+				echo 'Invalid option, use -h for help.' >/dev/stderr
+				exit 1
+		end
 	end
 else
 	find $portdir -mindepth 2 -maxdepth 2 -type d | string replace "$portdir/" '' | sort

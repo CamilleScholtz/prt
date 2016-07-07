@@ -8,26 +8,26 @@
 # Load library
 source /usr/include/prtstuff
 
-for flag in $argv
-	switch $flag
-		case -h --help
+getopts $argv | while read -l opt val
+	switch $opt
+		case h help
 			echo -e 'Usage: depmk [options]\n'
 			echo 'options:'
-			echo '  -s,   --script          toggle execution of pre- and post-install'
 			echo '  -r,   --readme          toggle opening of readmes'
+			echo '  -s,   --script          toggle execution of pre- and post-install'
 			echo '  -h,   --help            print help and exit'
 			exit 0
-		case -s --script
-			if test $script = true
-				set script false
-			else
-				set script true
-			end
-		case -r --readme
+		case r readme
 			if test $readme = true
 				set readme false
 			else
 				set readme true
+			end
+		case s script
+			if test $script = true
+				set script false
+			else
+				set script true
 			end
 		case '*'
 			echo 'Invalid option, use -h for help.' >/dev/stderr

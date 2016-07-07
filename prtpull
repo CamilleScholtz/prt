@@ -41,20 +41,17 @@ source /usr/include/prtstuff
 # Initialize values
 set current 0
 
-if test (count $argv) -ge 1
-	switch "$argv"
+getopts $argv | while read -l opt val
+	switch $opt
 		case -h --help
 			echo -e 'Usage: prtpull [options] [repos]\n'
 			echo 'options:'
 			echo '  -h,   --help            print help and exit'
 			exit 0
 		case '*'
-			prtonlyroot 'pull in ports'
-
-			prtpull $argv
+			set repos $repos $val
 	end
-else
-	prtonlyroot 'pull in ports'
-
-	prtpull
 end
+
+prtonlyroot 'pull in ports'
+prtpull $repos

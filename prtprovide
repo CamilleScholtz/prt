@@ -12,25 +12,29 @@
 source /usr/include/prtstuff
 
 if test (count $argv) -ge 1
-	switch "$argv"
-		case -h --help
-			echo -e 'Usage: prtprovide [options] [query]\n'
-			echo 'options:'
-			echo '  -h,   --help            print help and exit'
-			exit 0
-		case '*'
-			for port in $argv
-				set results (find $portdir -type f -name .footprint | xargs grep -i $argv)
+	getopts $argv | while read -l opt val
+		switch $opt
+			case h help
+				echo -e 'Usage: prtprovide [options] [query]\n'
+				echo 'options:'
+				echo '  -h,   --help            print help and exit'
+				exit 0
+			case '*'
+				set results (find $portdir -type f -name .footprint | xargs grep -i $val)
 
 				for line in $results
-					if test "$port" != (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace $portdir '' | string trim -c '/')
-						set port (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace $portdir '' | string trim -c '/')
-						echo $port
+					if test $val != (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace $portdir '' | string trim -c '/')
+						set val (echo $line | cut -d \t -f 1 | cut -d '.' -f 1 | string replace $portdir '' | string trim -c '/')
+						if test $status -ge 1
+							exit 1
+						end
+
+						echo $val
 					end
 
 					echo (echo $line | cut -d \t -f 3 | tr ' ' '\n' | sed "s/^/$dark-> $foreground\//g")
 				end
-			end
+		end
 	end
 else
 	echo 'Please specify a query.' >/dev/stderr

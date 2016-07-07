@@ -93,18 +93,18 @@ source /usr/include/prtstuff
 set all false
 set tree false
 
-for flag in $argv
-	switch $flag
-		case -h --help
+getopts $argv | while read -l opt val
+	switch $opt
+		case h help
 			echo -e 'Usage: depls [options]\n'
 			echo 'options:'
 			echo '  -a,   --all             also list installed dependencies'
 			echo '  -t,   --tree            list using tree view'
 			echo '  -h,   --help            print help and exit'
 			exit 0
-		case -a --all
+		case a all
 			set all true
-		case -t --tree
+		case t tree
 			set tree true
 			set iteration 0
 		case '*'

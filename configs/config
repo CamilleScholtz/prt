@@ -13,7 +13,7 @@ set order core 6c37-git 6c37 opt xorg contrib
 #set alias $alias core/openssl=6c37/libressl
 
 # make command
-set makecommand pkgmk
+set makecommand pkgmk -i
 
 # Execute pre- and post-install
 set script true

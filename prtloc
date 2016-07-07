@@ -75,18 +75,18 @@ source /usr/include/prtstuff
 set duplicate false
 
 if test (count $argv) -ge 1
-	for flag in $argv
-		switch $flag
-			case -h --help
+	getopts $argv | while read -l opt val
+		switch $opt
+			case h help
 				echo -e 'Usage: prtloc [options] [ports]\n'
 				echo 'options:'
 				echo '  -d,   --duplicate       list duplicate ports as well'
 				echo '  -h,   --help            print help and exit'
 				exit 0
-			case -d --duplicate
+			case d duplicate
 				set duplicate true
 			case '*'
-				set ports $ports $flag
+				set ports $ports $val
 		end
 	end
 else

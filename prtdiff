@@ -3,14 +3,16 @@
 # prtdiff - List the difference between installed ports and ports in your repos
 # onodera, https://github.com/onodera-punpun
 
+# TODO: Fucks up if there are ports installed that are not in portdir
+
 ## EXECUTE
 
 # Load library
 source /usr/include/prtstuff
 
-if test (count $argv) -eq 1
-	switch $argv
-		case -h --help
+getopts $argv | while read -l opt val
+	switch $opt
+		case h help
 			echo -e 'Usage: prtdiff [options]\n'
 			echo 'options:'
 			echo '  -h,   --help            print help and exit'
@@ -23,13 +25,13 @@ end
 
 # Get installed ports
 set installed (prtls -i)
+set locations (prtloc (echo $installed | string split ' '))
 
-for port in $installed
-	set name (echo $port | cut -d ' ' -f 1)
+for port in (seq (count $installed))
+	set availversion (prtpkgfile $location[$count] | string match -r '^version=.*|^release=.*' | string replace -r '^version=|^release=' '' | string join '-')
+	set instversion (echo $installed[$count] | cut -d ' ' -f 2)
 
-	set availversion (prtpkgfile (prtloc $name))
-	set instversion (echo $port | cut -d ' ' -f 2)
-
-	echo $name
-	echo $instversion $availverion
+	if test $availversion != $instversion
+		echo (echo $installed[$count] | cut -d ' ' -f 1)
+	end
 end
