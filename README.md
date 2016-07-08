@@ -217,7 +217,30 @@ Patches ports.
 Usage
 -----
 
-TODO
+`prtpatch` uses files in `/etc/prtstuff/patch` to get information about what ports to path.
+Here is an example of how to patch `opt/libpcre2` to add a configure flag:
+First create the path in `/etc/prtstuff/patch`, in this case that will be `opt/libpcre2` (so `/etc/prtstuff/patch/opt/libpcre2`).
+Secondly create the a `Pkgfile.patch` file with the following content:
+
+```diff
+--- Pkgfile	2016-03-20 02:01:46.054976416 +0100
++++ new	2016-03-20 02:02:52.534979140 +0100
+@@ -13,7 +13,8 @@
+     cd pcre2-$version
+ 
+     ./configure --prefix=/usr \
+-                --enable-jit
++                --enable-jit \
++                --enable-pcre2-32
+ 
+     make
+     make DESTDIR=$PKG install
+```
+
+And now run `prtpatch`, which will do all the patching itself.
+
+All files in the patch directory ending with the `.patch` filetype will be used by `prtpatch`,
+say you want to patch `.footprint` you would create a `.footprint.patch` file.
 
 
 Help
@@ -311,6 +334,12 @@ prtpull
 Pull in ports using git.
 
 
+Usage
+-----
+
+`prtpull` uses files in `/etc/prtstuff/pull` to get information about what repositories to pull.
+
+
 Help
 ----
 
@@ -362,7 +391,7 @@ Run `make install` inside the `prtstuff` directory to install the scripts.
 
 Edit `/etc/prtstuff/config` to your liking.
 
-If use use CRUX (you probably do) you can also install using this port: https://github.com/6c37/crux-ports-git/tree/3.2/prtstuff
+If you use CRUX (you probably do) you can also install using this port: https://github.com/6c37/crux-ports-git/tree/3.2/prtstuff
 
 
 Notes
