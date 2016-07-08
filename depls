@@ -31,8 +31,10 @@ function prtlocation
 		end
 
 		# Alias ports
-		if string match -q -r "^$location=" $alias
-			set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
+		if test $aliasing = true
+			if string match -q -r "^$location=" $alias
+				set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
+			end
 		end
 
 		# Finally print the location :)
@@ -91,6 +93,7 @@ source /usr/include/prtstuff
 
 # Initialize default option values
 set all false
+set aliasing true
 set tree false
 
 getopts $argv | while read -l opt val
@@ -99,11 +102,14 @@ getopts $argv | while read -l opt val
 			echo -e 'Usage: depls [options]\n'
 			echo 'options:'
 			echo '  -a,   --all             also list installed dependencies'
+			echo '  -n,   --no-alias        disable aliasing'
 			echo '  -t,   --tree            list using tree view'
 			echo '  -h,   --help            print help and exit'
 			exit 0
 		case a all
 			set all true
+		case n no-alias
+			set aliasing false
 		case t tree
 			set tree true
 			set iteration 0

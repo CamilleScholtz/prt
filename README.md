@@ -1,7 +1,7 @@
 prtstuff
 ========
 
-Consitent CRUX port utilities writtin in fish, aiming to replace prt-get, ports, and pkgutils.
+Consitent CRUX port utilities written in `fish`, aiming to replace, or at least, be used in combination `prt-get`, `ports`, some `pkgutils` and maybe `pkgmk` in the future.
 
 
 ----
@@ -21,6 +21,7 @@ Usage: depls [options]
 
 options:
   -a,   --all             also list installed dependencies
+  -n,   --no-alias        disable aliasing
   -t,   --tree            list using tree view
   -h,   --help            print help and exit
 ```
@@ -35,10 +36,10 @@ Install dependencies recursivly.
 Usage
 -----
 
-By changing `set makecommand` in `/etc/prtstuff/config` you can use an `pkgmk` alternative. I don't
+By changing `set makecommand` in `/etc/prtstuff/config` you can use a `pkgmk` alternative. I don't
 know about any, but I want to rewrite `pkgmk` in fish in the future.
 
-Set the `set readme` and `set script` to either `false` or `true` to change the default behavoir
+Set the `set readme` and `set script` to either `true` or `false` to change the default behavoir
 of `depmk` in `/etc/prtstuff/config`, you can toggle these values using the `-s` and `-r` flags.
 
 
@@ -68,8 +69,8 @@ Help
 Usage: prtloc [options] [ports]
 
 options:
-  -a,   --aliasing        Disable aliasing
   -d,   --duplicate       list duplicate ports as well
+  -n,   --noalias         disable aliasing
   -h,   --help            print help and exit
 ```
 
@@ -98,11 +99,11 @@ punpun/openbox
 -> contrib/mpv
 ```
 
-Like most other utils, `prtloc` does aliasing, however, this can be disabled with the `-a` flag:
+Like most other utils, `prtloc` does aliasing, however, this can be disabled with the `-n` flag:
 ```
 $ prtloc openssl
 6c37/libressl
-$ prtloc -a openssl
+$ prtloc -n openssl
 core/openssl
 ```
 
@@ -123,6 +124,33 @@ options:
   -r,   --repos           list repos
   -i,   --installed       list installed ports
   -h,   --help            print help and exit
+```
+
+
+Examples
+--------
+
+List all ports in the ports tree:
+```
+$ prtls
+6c37/abduco
+6c37/arandr
+6c37/atari800
+6c37/atool
+6c37/audacity
+...
+```
+
+List all installed ports:
+```
+$ prtls -i
+alsa-lib 1.1.0-1
+alsa-plugins 1.1.1-1
+alsa-utils 1.1.0-2
+aspell 0.60.6.1-1
+aspell-en 2016.06.26-0-1
+atk 2.20.0-1
+...
 ```
 
 
