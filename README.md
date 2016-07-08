@@ -217,10 +217,10 @@ Patches ports.
 Usage
 -----
 
-`prtpatch` uses files in `/etc/prtstuff/patch` to get information about what ports to path.
+`prtpatch` uses files in `/etc/prtstuff/patch` to get information about what ports to patch.
 Here is an example of how to patch `opt/libpcre2` to add a configure flag:
-First create the path in `/etc/prtstuff/patch`, in this case that will be `opt/libpcre2` (so `/etc/prtstuff/patch/opt/libpcre2`).
-Secondly create the a `Pkgfile.patch` file with the following content:
+first create the path in `/etc/prtstuff/patch`, in this case that will be `opt/libpcre2` (so `/etc/prtstuff/patch/opt/libpcre2`).
+Secondly create a `Pkgfile.patch` file with the following content:
 
 ```diff
 --- Pkgfile	2016-03-20 02:01:46.054976416 +0100
@@ -237,9 +237,9 @@ Secondly create the a `Pkgfile.patch` file with the following content:
      make DESTDIR=$PKG install
 ```
 
-And now run `prtpatch`, which will do all the patching itself.
+And now run `prtpatch`, which will do all the patching.
 
-All files in the patch directory ending with the `.patch` filetype will be used by `prtpatch`,
+Only files in the patch directory ending with a `.patch` filetype will be used by `prtpatch`,
 say you want to patch `.footprint` you would create a `.footprint.patch` file.
 
 
