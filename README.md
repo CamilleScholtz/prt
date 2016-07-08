@@ -27,6 +27,37 @@ options:
 ```
 
 
+Examples
+--------
+
+List all uninstalled dependencies:
+```
+$ depls
+opt/mplayer
+opt/qt4
+opt/libmng
+```
+
+List all uninstalled dependencies in tree view:
+```
+$ depls -t
+opt/mplayer
+opt/qt4
+-> opt/libmng
+```
+
+List all dependencies without aliasing in tree view:
+```
+depls -tna
+opt/mplayer
+-> opt/expat
+-> opt/freetype
+-> -> core/zlib
+-> -> opt/libpng
+...
+```
+
+
 depmk
 =====
 
@@ -70,7 +101,7 @@ Usage: prtloc [options] [ports]
 
 options:
   -d,   --duplicate       list duplicate ports as well
-  -n,   --noalias         disable aliasing
+  -n,   --no-alias        disable aliasing
   -h,   --help            print help and exit
 ```
 
