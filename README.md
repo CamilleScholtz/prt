@@ -405,7 +405,7 @@ Run `make install` inside the `prtstuff` directory to install the scripts.
 
 Edit `/etc/prtstuff/config` to your liking.
 
-If you use CRUX (you probably do) you can also install using this port: https://github.com/6c37/crux-ports-git/tree/3.2/prtstuff
+If you use CRUX (you probably do) you can also install using this port: https://github.com/onodera-punpun/crux-ports-git/tree/3.2/prtstuff
 
 
 Notes
