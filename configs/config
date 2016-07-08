@@ -15,11 +15,11 @@ set order core 6c37-git 6c37 opt xorg contrib
 # make command
 set makecommand pkgmk -i
 
-# Execute pre- and post-install
-set script true
-
 # Open READMEs
 set readme true
+
+# Execute pre- and post-install
+set script true
 
 # Set colors
 set foreground normal
