@@ -15,16 +15,14 @@ You might ask why I'm rewriting all these utils that work perfectly fine? One re
   I definitely like they way `pkgmk` does it, so almost all prtstuff utils work this way.
   In combination with `cdp` it makes managing ports a breeze.
 
-* prtstuff uses one config file that sets ordering, aliasing, colors, and more for all `prtstuff` utils.
+* prtstuff uses one config file that sets ordering, aliasing, colors, and more for all prtstuff utils.
 
 * prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
   `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies, etcetera.
 
-*  With fish being my main shell, and prtutils being written in fish, I could add a few nifty things:
-   for example completions, and a function called `cdp` that uses `prtloc` to cd to ports, for example
-   `cdp mpv` cds to `/usr/port/6c37-git/mpv`.
-   
-   
+* With fish being my main shell, and prtutils being written in fish, I could add a few nifty things:
+  for example completions, and a function called `cdp` that uses `prtloc` to cd to ports, for example
+  `cdp mpv` cds to `/usr/port/6c37-git/mpv`.
 
 
 ----
