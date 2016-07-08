@@ -30,8 +30,10 @@ function prtlocation
 		end
 
 		# Alias ports
-		if string match -q -r "^$location=" $alias
-			set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
+		if test $aliasing = true
+			if string match -q -r "^$location=" $alias
+				set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
+			end
 		end
 
 		# Finally print the location :)
@@ -72,6 +74,7 @@ end
 source /usr/include/prtstuff
 
 # Initialize default option values
+set aliasing true
 set duplicate false
 
 if test (count $argv) -ge 1
@@ -80,9 +83,12 @@ if test (count $argv) -ge 1
 			case h help
 				echo -e 'Usage: prtloc [options] [ports]\n'
 				echo 'options:'
+				echo '  -a,   --aliasing        Disable aliasing'
 				echo '  -d,   --duplicate       list duplicate ports as well'
 				echo '  -h,   --help            print help and exit'
 				exit 0
+			case a aliasing
+				set aliasing false
 			case d duplicate
 				set duplicate true
 			case '*'

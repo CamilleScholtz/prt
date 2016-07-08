@@ -56,7 +56,7 @@ options:
 
 
 prtloc
-------
+======
 
 Prints port location.
 
@@ -68,6 +68,7 @@ Help
 Usage: prtloc [options] [ports]
 
 options:
+  -a,   --aliasing        Disable aliasing
   -d,   --duplicate       list duplicate ports as well
   -h,   --help            print help and exit
 ```
@@ -87,9 +88,27 @@ opt/aspell-en
 ...
 ```
 
+List duplicate ports in the order they are used:
+```
+$ prtloc -d openbox mpv
+punpun/openbox
+-> 6c37-git/openbox
+-> -> opt/openbox
+6c37-git/mpv
+-> contrib/mpv
+```
+
+Like most other utils, `prtloc` does aliasing, however, this can be disabled with the `-a` flag:
+```
+$ prtloc openssl
+6c37/libressl
+$ prtloc -a openssl
+core/openssl
+```
+
 
 prtls
-------
+=====
 
 List repos and ports.
 
@@ -108,7 +127,7 @@ options:
 
 
 prtpatch
---------
+========
 
 Patches ports.
 
@@ -131,7 +150,7 @@ options:
 
 
 prtprint
---------
+========
 
 Prints port information.
 
@@ -153,7 +172,7 @@ options:
 
 
 prtprovide
-----------
+==========
 
 Search ports for files they provide.
 
@@ -168,9 +187,23 @@ options:
   -h,   --help            print help and exit
 ```
 
+Examples
+--------
+
+Search multiple terms at once for files they provide:
+```
+$ prtprovide lemonbar.1 n30f
+6c37-git/lemonbar-xft
+-> /usr/share/man/man1/lemonbar.1.gz
+6c37/lemonbar
+-> /usr/share/man/man1/lemonbar.1.gz
+6c37/n30f
+-> /usr/bin/n30f
+```
+
 
 prtpull
--------
+=======
 
 Pull in ports using git.
 
