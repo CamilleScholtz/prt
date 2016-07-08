@@ -1,26 +1,26 @@
 prtstuff
 ========
 
-Consitent CRUX port utilities written in `fish`, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, some `pkgutils` and maybe `pkgmk` in the future.
+Consitent CRUX port utilities written in fish, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, some `pkgutils` and maybe `pkgmk` in the future.
 
 You might ask why I'm rewriting all these utils that work perfectly fine? One reason if for fun, a few others are:
 
 * I'm kind of a perfectionst, I want all my terminal programs to have the exact same style of output.
-  all the `--help` outputs of the `prtstuff` utils use the same kind of spacing, identation is
+  all the `--help` outputs of the prtstuff utils use the same kind of spacing, identation is
   always done with a black arrow (`->`), for example in `depls`, `prtpull`, `prtprovide`, etcetera.
   All utils use the same colors, same kind of flags, etcetera.
 
 * Another inconsitency is how `pkgmk` only works in a directory with a `Pkgfile`, but `prt-get` is
   the other way around and only works by providing a port name. This has always really bugged me.
-  I definitely like they way `pkgmk` does it, so almost all `prtstuff` utils work this way.
+  I definitely like they way `pkgmk` does it, so almost all prtstuff utils work this way.
   In combination with `cdp` it makes managing ports a breeze.
 
-* `prtstuff` uses one config file that sets ordering, aliasing, colors, and more for all `prtstuff` utils.
+* prtstuff uses one config file that sets ordering, aliasing, colors, and more for all `prtstuff` utils.
 
-* `prtstuff` tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
+* prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
   `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies, etcetera.
 
-*  With `fish` being my main shell, and `prtutils` being written in fish, I could add a few nifty things:
+*  With fish being my main shell, and prtutils being written in fish, I could add a few nifty things:
    for example completions, and a function called `cdp` that uses `prtloc` to cd to ports, for example
    `cdp mpv` cds to `/usr/port/6c37-git/mpv`.
    
@@ -401,7 +401,7 @@ Installation
 ------------
 
 Run `make install` inside the `prtstuff` directory to install the scripts.
-`prtstuff` can be uninstalled easily using `make uninstall`.
+prtstuff can be uninstalled easily using `make uninstall`.
 
 Edit `/etc/prtstuff/config` to your liking.
 
