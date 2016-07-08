@@ -1,7 +1,7 @@
 prtstuff
 ========
 
-Consitent CRUX port utilities written in `fish`, aiming to replace, or at least, be used in combination `prt-get`, `ports`, some `pkgutils` and maybe `pkgmk` in the future.
+Consitent CRUX port utilities written in `fish`, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, some `pkgutils` and maybe `pkgmk` in the future.
 
 You might ask why I'm rewriting all these utils that work perfectly fine? One reason if for fun, a few others are:
 
@@ -13,7 +13,7 @@ You might ask why I'm rewriting all these utils that work perfectly fine? One re
 * Another inconsitency is how `pkgmk` only works in a directory with a `Pkgfile`, but `prt-get` is
   the other way around and only works by providing a port name. This has always really bugged me.
   I definitely like they way `pkgmk` does it, so almost all `prtstuff` utils work this way.
-  In combination with `cdp` it makes managing ports breeze.
+  In combination with `cdp` it makes managing ports a breeze.
 
 * `prtstuff` uses one config file that sets ordering, aliasing, colors, and more for all `prtstuff` utils.
 
