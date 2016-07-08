@@ -230,6 +230,27 @@ options:
 ```
 
 
+Examples
+--------
+
+Print everything:
+```
+$ prtprint
+Description: Mplayer frontend
+URL: http://smplayer.sf.net/
+Maintainer: Alan Mizrahi, alan at mizrahi dot com dot ve
+Version: 15.11.0
+Release: 1
+```
+
+Print only the version and release:
+```
+$ prtprint -v -r
+Version: 15.11.0
+Release: 1
+```
+
+
 prtprovide
 ==========
 
