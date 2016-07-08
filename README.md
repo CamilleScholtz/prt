@@ -110,6 +110,20 @@ options:
 ```
 
 
+prtdiff
+======
+
+List installed ports with a different version available in the portstree.
+
+Help
+----
+
+```
+  -v,   --version         list installed and available version
+  -h,   --help            print help and exit
+```
+
+
 prtloc
 ======
 
