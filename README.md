@@ -53,7 +53,7 @@ options:
 Examples
 --------
 
-List all uninstalled dependencies:
+List all not yet installed dependencies:
 ```
 $ depls
 opt/mplayer
@@ -61,7 +61,7 @@ opt/qt4
 opt/libmng
 ```
 
-List all uninstalled dependencies in tree view:
+List all dependencies in tree view:
 ```
 $ depls -t
 opt/mplayer
