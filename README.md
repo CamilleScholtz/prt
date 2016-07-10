@@ -108,7 +108,7 @@ options:
 ```
 
 
-prtdiff
+diffls
 ======
 
 List installed ports with a different version available in the portstree.
@@ -144,7 +144,7 @@ options:
 Examples
 --------
 
-List the location all installed ports:
+List the location of all installed ports:
 ```
 $ prtloc (prtls -i | cut -d ' ' -f 1)
 opt/alsa-lib
@@ -155,7 +155,7 @@ opt/aspell-en
 ...
 ```
 
-List duplicate ports in the order they are used:
+List eventual duplicate ports in the order they are used:
 ```
 $ prtloc -d openbox mpv
 punpun/openbox
@@ -309,7 +309,7 @@ Release: 1
 ```
 
 
-prtprovide
+prtprov
 ==========
 
 Search ports for files they provide.
@@ -319,7 +319,7 @@ Help
 ----
 
 ```
-Usage: prtprovide [options] [queries]
+Usage: prtprov [options] [queries]
 
 options:
   -h,   --help            print help and exit
@@ -330,7 +330,7 @@ Examples
 
 Search multiple terms at once for files they provide:
 ```
-$ prtprovide lemonbar.1 n30f
+$ prtprov lemonbar.1 n30f
 6c37-git/lemonbar-xft
 -> /usr/share/man/man1/lemonbar.1.gz
 6c37/lemonbar

@@ -5,7 +5,71 @@
 
 ## FUNCTIONS
 
-# This function checks if the uses has root access
+# This function compiles/install ports
+#
+# This function takes a list of ports as argument
+#
+# The function depends on the following variables:
+# readme (true/false)
+# script (true/false)
+function prtinstall
+	# Initialize values
+	set current 0
+	set total (echo $argv | wc -l)
+
+	for port in $argv
+		cd $portdir/$port
+
+		# Open REAMDE
+		if test $readme = true
+			if test -f ./README
+				eval $EDITOR ./README
+			end
+		end
+
+		# Execute pre-install
+		if test $script = true
+			if test -f ./pre-install
+				./pre-install
+				if test $status -eq 0
+					echo "Executed $bright$port$foreground pre-install."
+				else
+					echo "Failed to execute $bright$port$foreground pre-install." >/dev/stderr
+					exit 1
+				end
+			end
+		end
+
+		set current (math $current + 1)
+		echo "Compiling port $current/$total, $bright$port$foreground."
+
+		eval {$makecommand}
+		if test $status -eq 0
+			echo "Installed port $current/$total, $bright$port$foreground."
+		else
+			echo "Failed to install $bright$port$foreground." >/dev/stderr
+			exit 1
+		end
+
+		# Execute post-install
+		if test $script = true
+			if test -f ./post-install
+				./post-install
+
+				if test $status -eq 0
+					echo "Executed $bright$port$foreground post-install."
+				else
+					echo "Failed to execute $bright$port$foreground post-install." >/dev/stderr
+					exit 1
+				end
+			end
+		end
+	end
+end
+
+# This function checks if the uses has root access and fails if that's not the case
+#
+# This function takes a string as arugment, for example "install ports"
 function prtonlyroot
 	if test (id -u) -ge 1
 		echo "Only root can $argv." >/dev/stderr
@@ -13,7 +77,9 @@ function prtonlyroot
 	end
 end
 
-# This function reads the Pkgfile
+# This function outputs the Pkgfile
+#
+# This function optionally takes a Pkgfile location, for example core/openssl
 function prtpkgfile
 	if test -z $argv
 		if test -f $pkgfile

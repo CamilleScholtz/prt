@@ -4,13 +4,15 @@ COMPLETIONS = \
 	cdp.fish \
 	depls.fish \
 	depmk.fish \
-	prtdiff.fish \
+	diffls.fish \
+	diffmk.fish \
 	prtloc.fish \
 	prtls.fish \
 	prtpatch.fish \
 	prtprint.fish \
-	prtprovide.fish \
-	prtpull.fish
+	prtprov.fish \
+	prtpull.fish \
+	prtupd.fish
 
 install:
 	@echo "Installing completions."

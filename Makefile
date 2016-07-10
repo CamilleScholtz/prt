@@ -3,13 +3,15 @@ include config.mk
 BINARIES = \
 	depls \
 	depmk \
-	prtdiff \
+	diffls \
+	diffmk \
 	prtloc \
 	prtls \
 	prtpatch \
 	prtprint \
-	prtprovide \
-	prtpull
+	prtprov \
+	prtpull \
+	prtupd
 
 all:
 	@echo Run \'make install\' to install prtstuff.

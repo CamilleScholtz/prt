@@ -1,9 +1,7 @@
 #!/bin/fish
 #
-# depmk - Install dependencies recursivly
+# diffmk - Update ports that get listed by diffls
 # onodera, https://github.com/onodera-punpun
-
-# TODO: Move to functions
 
 ## EXECUTE
 
@@ -13,7 +11,7 @@ source /usr/include/prtstuff
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: depmk [options]\n'
+			echo -e 'Usage: diffmk [options]\n'
 			echo 'options:'
 			echo '  -r,   --readme          toggle opening of readmes'
 			echo '  -s,   --script          toggle execution of pre- and post-install'
@@ -37,5 +35,5 @@ getopts $argv | while read -l opt val
 	end
 end
 
-prtonlyroot 'install ports'
-prtinstall (depls)
+prtonlyroot 'update ports'
+prtinstall (diffls)
