@@ -11,8 +11,7 @@ COMPLETIONS = \
 	prtpatch.fish \
 	prtprint.fish \
 	prtprov.fish \
-	prtpull.fish \
-	prtupd.fish
+	prtpull.fish
 
 install:
 	@echo "Installing completions."

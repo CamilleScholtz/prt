@@ -10,8 +10,7 @@ BINARIES = \
 	prtpatch \
 	prtprint \
 	prtprov \
-	prtpull \
-	prtupd
+	prtpull
 
 all:
 	@echo Run \'make install\' to install prtstuff.
