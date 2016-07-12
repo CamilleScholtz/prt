@@ -3,36 +3,6 @@
 # prtpull - Pull in ports using git
 # onodera, https://github.com/onodera-punpun
 
-# This function pulls updates from git
-function prtpull
-	if test (count $argv) -ge 1
-		set repos (find /etc/prtstuff/pull -type f | string match -r '.*/'(string replace -a ' ' '$|.*/' "$argv")'$')
-	else
-		set repos (find /etc/prtstuff/pull -type f | sort)
-	end
-
-	for file in $repos
-		source $file
-
-		set current (math $current + 1)
-		set total (count $repos)
-		echo "Updating collection $current/$total, $bright$name$foreground."
-
-		cd $portdir/$name >/dev/null
-		if test $status -eq 0
-			git checkout -q $branch
-			git fetch -q --depth 1
-			git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> "$foreground"Edit /g; s/A\t/$dark-> "$foreground"Checkout /g; s/D\t/$dark-> "$foreground"Delete /g" | sort
-			git clean -q -f
-			git reset -q --hard origin/$branch
-		else
-			git clone -q --depth 1 -b $branch $url $portdir/$name
-			ls $portdir/$name | sed "s/^/$dark-> {$foreground}Checkout /g"
-		end
-	end
-end
-
-
 ## EXECUTE
 
 # Load library
@@ -54,4 +24,29 @@ getopts $argv | while read -l opt val
 end
 
 prtonlyroot 'pull in ports'
-prtpull $repos
+
+if test (count $repos) -ge 1
+	set repos (find /etc/prtstuff/pull -type f | string match -r '.*/'(string replace -a ' ' '$|.*/' "$repos")'$')
+else
+	set repos (find /etc/prtstuff/pull -type f | sort)
+end
+
+for file in $repos
+	source $file
+
+	set current (math $current + 1)
+	set total (count $repos)
+	echo "Updating collection $current/$total, $bright$name$foreground."
+
+	cd $portdir/$name >/dev/null
+	if test $status -eq 0
+		git checkout -q $branch
+		git fetch -q --depth 1
+		git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> "$foreground"Edit /g; s/A\t/$dark-> "$foreground"Checkout /g; s/D\t/$dark-> "$foreground"Delete /g" | sort
+		git clean -q -f
+		git reset -q --hard origin/$branch
+	else
+		git clone -q --depth 1 -b $branch $url $portdir/$name
+		ls $portdir/$name | sed "s/^/$dark-> {$foreground}Checkout /g"
+	end
+end

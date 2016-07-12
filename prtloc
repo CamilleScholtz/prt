@@ -3,71 +3,6 @@
 # prtl - Prints port location
 # onodera, https://github.com/onodera-punpun
 
-## FUNCTIONS
-
-# This function prints port locations
-function prtlocation
-	set ports (prtls)
-
-	for port in $argv
-		set location (string match -r ".*/$port\$" $ports)
-
-		# Order ports
-		if test (count $location) -ge 2
-			if test $duplicate = true
-				set oldlocation $location
-			end
-
-			for repo in $order
-				set locationrepo (string match -r "^$repo/.*" $location)
-
-				if test -n "$locationrepo"
-					set location $locationrepo
-					break
-				end
-			end
-
-		end
-
-		# Alias ports
-		if test $aliasing = true
-			if string match -q -r "^$location=" $alias
-				set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
-			end
-		end
-
-		# Finally print the location :)
-		if test -n "$location"
-			echo $location
-		end
-
-		# Print duplicate tree
-		if test $duplicate = true
-			if test (count $oldlocation) -ge 2
-				set current 0
-
-				for repo in $order
-					set locationrepo (string match -r "^$repo/.*" $oldlocation)
-
-					if test -n "$locationrepo"
-						if test $current -ge 1
-							echo -n $dark
-							printf '-> %.0s' (seq $current)
-							echo -n $foreground
-							echo $locationrepo
-						end
-
-						set current (math $current + 1)
-					end
-				end
-
-				set -e oldlocation
-			end
-		end
-	end
-end
-
-
 ## EXECUTE
 
 # Load library
@@ -100,4 +35,62 @@ else
 	exit 1
 end
 
-prtlocation $ports
+# Get all ports
+set portstree (prtls)
+
+for port in $ports
+	set location (string match -r ".*/$port\$" $portstree)
+
+	# Order ports
+	if test (count $location) -ge 2
+		if test $duplicate = true
+			set oldlocation $location
+		end
+
+		for repo in $order
+			set locationrepo (string match -r "^$repo/.*" $location)
+
+			if test -n "$locationrepo"
+				set location $locationrepo
+				break
+			end
+		end
+
+	end
+
+	# Alias ports
+	if test $aliasing = true
+		if string match -q -r "^$location=" $alias
+			set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
+		end
+	end
+
+	# Finally print the location :)
+	if test -n "$location"
+		echo $location
+	end
+
+	# Print duplicate tree
+	if test $duplicate = true
+		if test (count $oldlocation) -ge 2
+			set current 0
+
+			for repo in $order
+				set locationrepo (string match -r "^$repo/.*" $oldlocation)
+
+				if test -n "$locationrepo"
+					if test $current -ge 1
+						echo -n $dark
+						printf '-> %.0s' (seq $current)
+						echo -n $foreground
+						echo $locationrepo
+					end
+
+					set current (math $current + 1)
+				end
+			end
+
+			set -e oldlocation
+		end
+	end
+end

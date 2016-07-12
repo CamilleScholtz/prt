@@ -15,7 +15,7 @@ end
 # TODO: Use prtloc somehow?
 function prtlocation
 	for port in $argv
-		set location (string match -r ".*/$port\$" $ports)
+		set location (string match -r ".*/$port\$" $portstree)
 
 		# Order ports
 		if test (count $location) -ge 2
@@ -120,7 +120,7 @@ getopts $argv | while read -l opt val
 end
 
 # Get all and installed ports
-set ports (prtls)
+set portstree (prtls)
 set installed (prtls -i | cut -d ' ' -f 1)
 
 prtrecursive

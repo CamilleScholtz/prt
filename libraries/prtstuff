@@ -9,9 +9,10 @@
 #
 # This function takes a list of ports as argument
 #
-# The function depends on the following variables:
+# The function depends on the following pre-defined variables:
 # readme (true/false)
 # script (true/false)
+# verbose (true/false)
 function prtinstall
 	# Initialize values
 	set current 0
@@ -20,33 +21,57 @@ function prtinstall
 	for port in $argv
 		cd $portdir/$port
 
-		# Open REAMDE
+		set current (math $current + 1)
+
+		echo "Installing port $current/$total, $bright$port$foreground."
+
+		# View REAMDE
 		if test $readme = true
 			if test -f ./README
-				eval $EDITOR ./README
+				eval {$EDITOR} ./README
 			end
 		end
 
 		# Execute pre-install
 		if test $script = true
 			if test -f ./pre-install
+				echo "$dark-> "$foreground"Executing pre-install."
 				./pre-install
-				if test $status -eq 0
-					echo "Executed $bright$port$foreground pre-install."
-				else
+				if test $status -ge 1
 					echo "Failed to execute $bright$port$foreground pre-install." >/dev/stderr
 					exit 1
 				end
 			end
 		end
 
-		set current (math $current + 1)
-		echo "Compiling port $current/$total, $bright$port$foreground."
+		# Download port
+		echo "$dark-> "$foreground"Downloading."
+		eval {$downloadcommand} >/dev/null
+		if test $status -ge 1
+			echo "Failed to download $bright$port$foreground." >/dev/stderr
+			exit 1
+		end
 
-		eval {$makecommand}
-		if test $status -eq 0
-			echo "Installed port $current/$total, $bright$port$foreground."
-		else
+		# Extract port
+		echo "$dark-> "$foreground"Extracting."
+		eval {$extractcommand} >/dev/null
+		if test $status -ge 1
+			echo "Failed to extract $bright$port$foreground." >/dev/stderr
+			exit 1
+		end
+
+		# Compile port
+		echo "$dark-> "$foreground"Compiling."
+		eval {$compilecommand} >/dev/null
+		if test $status -ge 1
+			echo "Failed to compile $bright$port$foreground." >/dev/stderr
+			exit 1
+		end
+
+		# Install port
+		echo "$dark-> "$foreground"Installing."
+		eval {$installcommand} >/dev/null
+		if test $status -ge 1
 			echo "Failed to install $bright$port$foreground." >/dev/stderr
 			exit 1
 		end
@@ -54,11 +79,9 @@ function prtinstall
 		# Execute post-install
 		if test $script = true
 			if test -f ./post-install
+				echo "$dark-> "$foreground"Executing post-install."
 				./post-install
-
-				if test $status -eq 0
-					echo "Executed $bright$port$foreground post-install."
-				else
+				if test $status -ge 1
 					echo "Failed to execute $bright$port$foreground post-install." >/dev/stderr
 					exit 1
 				end
@@ -79,7 +102,7 @@ end
 
 # This function outputs the Pkgfile
 #
-# This function optionally takes a Pkgfile location, for example core/openssl
+# This function optionally takes a Pkgfile location, for example "core/openssl"
 function prtpkgfile
 	if test -z $argv
 		if test -f $pkgfile

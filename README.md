@@ -18,8 +18,8 @@ You might ask why I'm rewriting all these utils that work perfectly fine? One re
 * prtstuff uses one config file that sets ordering, aliasing, colors, and more for all prtstuff utils.
 
 * prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
-  `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies, etcetera. prtstuff tries to split up `pkgmk` into
-  multiple tools as well, for example `pkgdl`, `pkgextract`, `pkgcompile`, etc. These can then be used indepentently,
+  `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies. prtstuff tries to split up `pkgmk` into
+  multiple tools as well, for example `pkgdl`, `pkgextract`, `pkgcompile`, These can then be used indepentently,
   or used in a wrapper (see `depmk` and `diffmk` for examples).
 
 * With fish being my main shell, and prtutils being written in fish, I could add a few nifty things:

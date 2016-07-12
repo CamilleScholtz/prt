@@ -12,8 +12,12 @@ set order core 6c37-git 6c37 opt xorg contrib
 #set alias $alias opt/glib=6c37/glib-ahoka
 #set alias $alias core/openssl=6c37/libressl
 
-# make command
-set makecommand pkgmk -i
+# Set make commands
+set downloadcommand pkgmk -do
+set extractcommand pkgmk -eo
+set compilecommand pkgmk
+set installcommand pkgmk -i
+set updatecommand pkgmk -u
 
 # Open READMEs
 set readme true
