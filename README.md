@@ -435,6 +435,7 @@ Pull in new ports for all repos:
 # prtpull
 Updating collection 1/7, 6c37.
 Updating collection 2/7, 6c37-git.
+-> Modifying mpv/Pkgbuild
 Updating collection 3/7, contrib.
 Updating collection 4/7, core.
 Updating collection 5/7, opt.
