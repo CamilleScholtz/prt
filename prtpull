@@ -42,11 +42,11 @@ for file in $repos
 	if test $status -eq 0
 		git checkout -q $branch
 		git fetch -q --depth 1
-		git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> "$foreground"Edited /g; s/A\t/$dark-> "$foreground"Created /g; s/D\t/$dark-> "$foreground"Deleted /g" | sort
+		git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> "$foreground"Editing /g; s/A\t/$dark-> "$foreground"Creating /g; s/D\t/$dark-> "$foreground"Deleting /g" | sort
 		git clean -q -f
 		git reset -q --hard origin/$branch
 	else
 		git clone -q --depth 1 -b $branch $url $portdir/$name
-		ls $portdir/$name | sed "s/^/$dark-> {$foreground}Created /g"
+		ls $portdir/$name | sed "s/^/$dark-> {$foreground}Creating /g"
 	end
 end
