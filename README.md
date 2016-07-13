@@ -8,7 +8,7 @@ You might ask why I'm rewriting all these utils that work perfectly fine? One re
 
 * I'm kind of a perfectionst, I want all my terminal programs to have the exact same style of output.
   all the `--help` outputs of the prtstuff utils use the same kind of spacing, identation is
-  always done with a black arrow (`->`), for example in `depls`, `prtpull`, `prtprovide`, etcetera.
+  always done with a black arrow (`->`), see the `depls`, `prtpull` and `prtprov` output.
   All utils use the same colors, same kind of flags, etcetera.
 
 * Another inconsitency is how `pkgmk` only works in a directory with a `Pkgfile`, but `prt-get` is
