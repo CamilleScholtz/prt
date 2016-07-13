@@ -21,21 +21,20 @@ You might ask why I'm rewriting all these utils that work perfectly fine? One re
 * prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
   `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies.
 
-* With fish being my main shell, and prtutils being written in fish, I could add a few nifty things:
-  for example completions, and a function called `cdp` that uses `prtloc` to cd to ports, for example
-  `cdp mpv` cds to `/usr/port/6c37-git/mpv`.
+* The prtstuff utils have nicer fish integration, for example a function named `cdp` that uses `prtloc` to cd to ports, for example
+  `cdp mpv` cds to `/usr/port/6c37-git/mpv`. Completions for `cdp`, `prtloc`, and more.
 
 
-prtstuff tries to keep the naming of the utils kind of sane, and follows the following rules (WIP):
+prtstuff tries to keep the naming of the utils kind of sane, and follows the following rules:
 
 prefixes:
-* `prt*` for utils that (can) interact with all ports.
+* `prt*` for utils that (can) interact with all ports found in the ports tree.
 * `dep*` for utils that interact with dependencies.
-* `diff*` for utils that interact with ports that have a different installed version from the version in the portstree.
+* `diff*` for utils that interact with ports that have a different installed version from the version in the ports tree.
 
 postfixes:
 * `*ls` for utils that lists things.
-* `*mk` for utils that build ports.
+* `*mk` for utils that build packages.
 
 
 ----
