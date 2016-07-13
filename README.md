@@ -259,6 +259,31 @@ atk 2.20.0-1
 ```
 
 
+prtmk
+======
+
+Install or update ports.
+
+
+Usage
+-----
+
+See `depmk` usage.
+
+
+Help
+----
+
+```
+Usage: prtmk [options]
+
+options:
+  -s,   --script          toggle execution of pre- and post-install
+  -v,   --verbose         enable verbose output
+  -h,   --help            print help and exit
+```
+
+
 prtpatch
 ========
 

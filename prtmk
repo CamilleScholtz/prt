@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtmk - Install port
+# prtmk - Install or update ports
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
