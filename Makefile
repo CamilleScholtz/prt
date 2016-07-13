@@ -7,6 +7,7 @@ BINARIES = \
 	diffmk \
 	prtloc \
 	prtls \
+	prtmk \
 	prtpatch \
 	prtprint \
 	prtprov \

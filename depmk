@@ -1,41 +1,39 @@
 #!/bin/fish
 #
-# depmk - Install dependencies recursivly
+# depmk - Install ports that get listed by depls
 # onodera, https://github.com/onodera-punpun
-
-# TODO: Move to functions
 
 ## EXECUTE
 
 # Load library
 source /usr/include/prtstuff
 
+# Initialize default option values
+set verbose false
+
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
 			echo -e 'Usage: depmk [options]\n'
 			echo 'options:'
-			echo '  -r,   --readme          toggle opening of readmes'
 			echo '  -s,   --script          toggle execution of pre- and post-install'
+			echo '  -v,   --verbose         enable verbose output'
 			echo '  -h,   --help            print help and exit'
 			exit 0
-		case r readme
-			if test $readme = true
-				set readme false
-			else
-				set readme true
-			end
 		case s script
 			if test $script = true
 				set script false
 			else
 				set script true
 			end
+		case v verbose
+			set verbose true
 		case '*'
 			echo 'Invalid option, use -h for help.' >/dev/stderr
 			exit 1
 	end
 end
 
-prtonlyroot 'install ports'
-prtinstall (depls)
+set method install
+prtonlyroot "$method ports"
+prtinstall (depls | tac)

@@ -10,33 +10,35 @@
 # This function takes a list of ports as argument
 #
 # The function depends on the following pre-defined variables:
-# readme (true/false)
 # script (true/false)
 # verbose (true/false)
+# method (install/update)
 function prtinstall
 	# Initialize values
 	set current 0
-	set total (echo $argv | wc -l)
+	set total (count $argv)
 
 	for port in $argv
 		cd $portdir/$port
 
 		set current (math $current + 1)
 
-		echo "Installing port $current/$total, $bright$port$foreground."
+		if test $method = install
+			echo "Installing port $current/$total, $bright$port$foreground."
+		else
+			echo "Updating port $current/$total, $bright$port$foreground."
+		end
 
-		# View REAMDE
-		if test $readme = true
-			if test -f ./README
-				eval {$EDITOR} ./README
-			end
+		# notify about REAMDE
+		if test -f $PWD/README
+			echo "$dark-> "$foreground"This port has a README"
 		end
 
 		# Execute pre-install
 		if test $script = true
-			if test -f ./pre-install
-				echo "$dark-> "$foreground"Executing pre-install."
-				./pre-install
+			if test -f $PWD/pre-install
+				echo "$dark-> "$foreground"Executing pre-install"
+				$PWD/pre-install
 				if test $status -ge 1
 					echo "Failed to execute $bright$port$foreground pre-install." >/dev/stderr
 					exit 1
@@ -45,42 +47,71 @@ function prtinstall
 		end
 
 		# Download port
-		echo "$dark-> "$foreground"Downloading."
-		eval {$downloadcommand} >/dev/null
+		echo "$dark-> "$foreground"Downloading sources"
+		if test $verbose = true
+			pkgmk -do >/dev/null
+		else
+			pkgmk -do >/dev/null ^/dev/null
+		end
 		if test $status -ge 1
 			echo "Failed to download $bright$port$foreground." >/dev/stderr
 			exit 1
 		end
 
 		# Extract port
-		echo "$dark-> "$foreground"Extracting."
-		eval {$extractcommand} >/dev/null
+		echo "$dark-> "$foreground"Extracting sources"
+		if test $verbose = true
+			pkgmk -eo >/dev/null
+		else
+			pkgmk -eo >/dev/null ^/dev/null
+		end
 		if test $status -ge 1
 			echo "Failed to extract $bright$port$foreground." >/dev/stderr
 			exit 1
 		end
 
-		# Compile port
-		echo "$dark-> "$foreground"Compiling."
-		eval {$compilecommand} >/dev/null
+		# Building port
+		echo "$dark-> "$foreground"Creating package"
+		if test $verbose = true
+			pkgmk >/dev/null
+		else
+			pkgmk >/dev/null ^/dev/null
+		end
 		if test $status -ge 1
-			echo "Failed to compile $bright$port$foreground." >/dev/stderr
+			echo "Failed to build $bright$port$foreground." >/dev/stderr
 			exit 1
 		end
 
-		# Install port
-		echo "$dark-> "$foreground"Installing."
-		eval {$installcommand} >/dev/null
-		if test $status -ge 1
-			echo "Failed to install $bright$port$foreground." >/dev/stderr
-			exit 1
+		# Install/update port
+		if test $method = install
+			echo "$dark-> "$foreground"Installing package"
+			if test $verbose = true
+				pkgmk -i >/dev/null
+			else
+				pkgmk -i >/dev/null ^/dev/null
+			end
+			if test $status -ge 1
+				echo "Failed to install $bright$port$foreground." >/dev/stderr
+				exit 1
+			end
+		else
+			echo "$dark-> "$foreground"Updating package"
+			if test $verbose = true
+				pkgmk -u >/dev/null
+			else
+				pkgmk -u >/dev/null ^/dev/null
+			end
+			if test $status -ge 1
+				echo "Failed to update $bright$port$foreground." >/dev/stderr
+				exit 1
+			end
 		end
 
 		# Execute post-install
 		if test $script = true
-			if test -f ./post-install
-				echo "$dark-> "$foreground"Executing post-install."
-				./post-install
+			if test -f $PWD/post-install
+				echo "$dark-> "$foreground"Executing post-install"
+				$PWD/post-install
 				if test $status -ge 1
 					echo "Failed to execute $bright$port$foreground post-install." >/dev/stderr
 					exit 1
@@ -106,7 +137,7 @@ end
 function prtpkgfile
 	if test -z $argv
 		if test -f $pkgfile
-			cat ./Pkgfile
+			cat $PWD/Pkgfile
 		else
 			echo 'Pkgfile not found.' >/dev/stderr
 			exit 1

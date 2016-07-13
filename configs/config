@@ -1,4 +1,4 @@
-# Set location of portdir
+# Location of the ports tree
 set portdir /usr/ports
 
 # Repo order, the port found first is used
@@ -11,16 +11,6 @@ set order core 6c37-git 6c37 opt xorg contrib
 #set alias $alias opt/gtk=6c37/gtk-ahoka
 #set alias $alias opt/glib=6c37/glib-ahoka
 #set alias $alias core/openssl=6c37/libressl
-
-# Set make commands
-set downloadcommand pkgmk -do
-set extractcommand pkgmk -eo
-set compilecommand pkgmk
-set installcommand pkgmk -i
-set updatecommand pkgmk -u
-
-# Open READMEs
-set readme true
 
 # Execute pre- and post-install
 set script true

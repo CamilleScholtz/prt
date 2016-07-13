@@ -8,6 +8,7 @@ COMPLETIONS = \
 	diffmk.fish \
 	prtloc.fish \
 	prtls.fish \
+	prtmk.fish \
 	prtpatch.fish \
 	prtprint.fish \
 	prtprov.fish \

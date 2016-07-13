@@ -1,7 +1,8 @@
 prtstuff
 ========
 
-Consitent CRUX port utilities written in fish, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, some `pkgutils` and maybe `pkgmk` in the future.
+Consitent CRUX port utilities written in fish, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, and some `prt-utils`. These scripts still make use of `pkgmk` and `pkgadd`,
+simply because it's too hard/complex to parse `Pkgfile`s (bash) with fish.
 
 You might ask why I'm rewriting all these utils that work perfectly fine? One reason if for fun, a few others are:
 
@@ -18,9 +19,7 @@ You might ask why I'm rewriting all these utils that work perfectly fine? One re
 * prtstuff uses one config file that sets ordering, aliasing, colors, and more for all prtstuff utils.
 
 * prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
-  `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies. prtstuff tries to split up `pkgmk` into
-  multiple tools as well, for example `pkgdl`, `pkgextract`, `pkgcompile`, These can then be used indepentently,
-  or used in a wrapper (see `depmk` and `diffmk` for examples).
+  `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies.
 
 * With fish being my main shell, and prtutils being written in fish, I could add a few nifty things:
   for example completions, and a function called `cdp` that uses `prtloc` to cd to ports, for example
@@ -33,7 +32,6 @@ prefixes:
 * `prt*` for utils that (can) interact with all ports.
 * `dep*` for utils that interact with dependencies.
 * `diff*` for utils that interact with ports that have a different installed version from the version in the portstree.
-* `pkg*` for utils that aim to replace `pkgmk` and are actually used to build ports.
 
 postfixes:
 * `*ls` for utils that lists things.
@@ -103,11 +101,8 @@ Update ports that get listed by `depls`.
 Usage
 -----
 
-By changing `set makecommand` in `/etc/prtstuff/config` you can use a `pkgmk` alternative. I don't
-know about any, but I want to rewrite `pkgmk` in fish in the future.
-
-Set the `set readme` and `set script` to either `true` or `false` to change the default behavoir
-of `depmk` in `/etc/prtstuff/config`, you can toggle these values using the `-s` and `-r` flags.
+Set `set script` to either `true` or `false` to change the default behavoir
+of `depmk` in `/etc/prtstuff/config`, you can toggle the value using the `-s` flag.
 
 
 Help
@@ -118,7 +113,7 @@ Usage: depmk [options]
 
 options:
   -s,   --script          toggle execution of pre- and post-install
-  -r,   --readme          toggle opening of readmes
+  -v,   --verbose         enable verbose output
   -h,   --help            print help and exit
 ```
 
@@ -160,8 +155,8 @@ Help
 Usage: diffmk [options]
 
 options:
-  -r,   --readme          toggle opening of readmes
   -s,   --script          toggle execution of pre- and post-install
+  -v,   --verbose         enable verbose output
   -h,   --help            print help and exit
 ```
 
@@ -437,6 +432,7 @@ Dependencies
 
 * fish (2.3.0+)
 * getopts (https://github.com/fisherman/getopts)
+* pkgutils
 
 
 Installation
