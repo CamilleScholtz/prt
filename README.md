@@ -4,24 +4,26 @@ prtstuff
 Consitent CRUX port utilities written in fish, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, and some `prt-utils`. These scripts still make use of `pkgmk` and `pkgadd`,
 simply because it's too hard/complex to parse `Pkgfile`s (bash) with fish.
 
-You might ask why I'm rewriting all these utils that work perfectly fine? One reason if for fun, a few others are:
+You might ask why I'm rewriting all these utils that work perfectly fine? One reason if for fun, a few other things that make the prtstuff utils interesting are:
+
+* An inconsitency that really bugs me is how `pkgmk` only works by being in a directory with a `Pkgfile`, but `prt-get` is
+  the other way around and only works by providing a port name.
+  I definitely like they way `pkgmk` does it, so almost all prtstuff utils work this way.
+  In combination with `cdp` it makes managing ports a breeze.
 
 * I'm kind of a perfectionst, I want all my terminal programs to have the exact same style of output.
   all the `--help` outputs of the prtstuff utils use the same kind of spacing, identation is
   always done with a black arrow (`->`), see the `depls`, `prtpull` and `prtprov` output.
   All utils use the same colors, same kind of flags, etcetera.
 
-* Another inconsitency is how `pkgmk` only works in a directory with a `Pkgfile`, but `prt-get` is
-  the other way around and only works by providing a port name. This has always really bugged me.
-  I definitely like they way `pkgmk` does it, so almost all prtstuff utils work this way.
-  In combination with `cdp` it makes managing ports a breeze.
-
 * prtstuff uses one config file that sets ordering, aliasing, colors, and more for all prtstuff utils.
 
 * prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
   `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies.
 
-* The prtstuff utils have nicer fish integration, for example a function named `cdp` that uses `prtloc` to cd to ports, for example
+* None of the prtstuff utils depend on `prt-get`.
+
+* The prtstuff utils have nice fish integration, for example a function named `cdp` that uses `prtloc` to cd to ports, for example
   `cdp mpv` cds to `/usr/port/6c37-git/mpv`. Completions for `cdp`, `prtloc`, and more.
 
 
