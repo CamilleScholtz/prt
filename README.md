@@ -40,6 +40,25 @@ post-fixes:
 
 ----
 
+## cdp
+
+cd to port location, using `locprt`.
+
+### Examples
+
+cd to port locations:
+```
+$ cdp mpv
+$ pwd
+/usr/ports/6c37-git/mpv
+$ cdp
+$ pwd
+/usr/ports
+$ cdp openssl
+$ pwd
+/usr/ports/6c37/libressl
+```
+
 
 ## locprt
 
