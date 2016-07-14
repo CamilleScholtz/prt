@@ -1,5 +1,4 @@
-prtstuff
-========
+# prtstuff
 
 Consitent CRUX port utilities written in fish, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, and some `prt-utils`. These scripts still make use of `pkgmk` and `pkgadd`,
 simply because it's too hard/complex to parse `Pkgfile`s (bash) with fish.
@@ -13,166 +12,44 @@ You might ask why I'm rewriting all these utils that work perfectly fine? One re
 
 * I'm kind of a perfectionst, I want all my terminal programs to have the exact same style of output.
   all the `--help` outputs of the prtstuff utils use the same kind of spacing, identation is
-  always done with a black arrow (`->`), see the `depls`, `prtpull` and `prtprov` output.
+  always done with a black arrow (`->`), see the `lsdep`, `pullprt` and `provprt` output.
   All utils use the same colors, same kind of flags, etcetera.
 
 * prtstuff uses one config file that sets ordering, aliasing, colors, and more for all prtstuff utils.
 
-* prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `prtpull` ONLY pulls in new ports,
-  `prtls` ONLY lists repos or ports, `depls` ONLY lists dependencies.
+* prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `pullprt` ONLY pulls in new ports,
+  `lsprt` ONLY lists repos or ports, `lsdep` ONLY lists dependencies.
 
 * None of the prtstuff utils depend on `prt-get`.
 
-* The prtstuff utils have nice fish integration, for example a function named `cdp` that uses `prtloc` to cd to ports, for example
-  `cdp mpv` cds to `/usr/port/6c37-git/mpv`. Completions for `cdp`, `prtloc`, and more.
+* The prtstuff utils have nice fish integration, for example a function named `cdp` that uses `locprt` to cd to ports, for example
+  `cdp mpv` cds to `/usr/port/6c37-git/mpv`. Completions for `cdp`, `locprt`, and more.
 
 
 prtstuff tries to keep the naming of the utils kind of sane, and follows the following rules:
 
-prefixes:
-* `prt*` for utils that (can) interact with all ports found in the ports tree.
-* `dep*` for utils that interact with dependencies.
-* `diff*` for utils that interact with ports that have a different installed version from the version in the ports tree.
+pre-fixes:
+* `ls*` for utils that lists things.
+* `mk*` for utils that build packages.
 
-postfixes:
-* `*ls` for utils that lists things.
-* `*mk` for utils that build packages.
+post-fixes:
+* `*prt` for utils that (can) interact with all ports found in the ports tree.
+* `*dep` for utils that interact with dependencies.
+* `*diff` for utils that interact with ports that have a different installed version from the version in the ports tree.
 
 
 ----
 
 
-depls
-=====
-
-List dependencies recursively.
-
-
-Help
-----
-
-```
-Usage: depls [options]
-
-options:
-  -a,   --all             also list installed dependencies
-  -n,   --no-alias        disable aliasing
-  -t,   --tree            list using tree view
-  -h,   --help            print help and exit
-```
-
-
-Examples
---------
-
-List all not yet installed dependencies:
-```
-$ depls
-opt/mplayer
-opt/qt4
-opt/libmng
-```
-
-List all dependencies in tree view:
-```
-$ depls -t
-opt/mplayer
-opt/qt4
--> opt/libmng
-```
-
-List all dependencies without aliasing in tree view:
-```
-depls -tna
-opt/mplayer
--> opt/expat
--> opt/freetype
--> -> core/zlib
--> -> opt/libpng
-...
-```
-
-
-depmk
-=====
-
-Update ports that get listed by `depls`.
-
-
-Usage
------
-
-Set `set script` to either `true` or `false` to change the default behavoir
-of `depmk` in `/etc/prtstuff/config`, you can toggle the value using the `-s` flag.
-
-
-Help
-----
-
-```
-Usage: depmk [options]
-
-options:
-  -s,   --script          toggle execution of pre- and post-install
-  -v,   --verbose         enable verbose output
-  -h,   --help            print help and exit
-```
-
-
-diffls
-======
-
-List installed ports with a different version available in the portstree.
-
-
-Help
-----
-
-```
-Usage: diffls [options]
-
-options:
-  -v,   --version         list installed and available version
-  -h,   --help            print help and exit
-```
-
-
-diffmk
-======
-
-Update ports that get listed by `diffls`.
-
-
-Usage
------
-
-See `depmk` usage.
-
-
-Help
-----
-
-```
-Usage: diffmk [options]
-
-options:
-  -s,   --script          toggle execution of pre- and post-install
-  -v,   --verbose         enable verbose output
-  -h,   --help            print help and exit
-```
-
-
-prtloc
-======
+## locprt
 
 Prints port location.
 
 
-Help
-----
+### Help
 
 ```
-Usage: prtloc [options] [ports]
+Usage: locprt [options] [ports]
 
 options:
   -d,   --duplicate       list duplicate ports as well
@@ -181,12 +58,11 @@ options:
 ```
 
 
-Examples
---------
+### Examples
 
 List the location of all installed ports:
 ```
-$ prtloc (prtls -i | cut -d ' ' -f 1)
+$ locprt (lsprt -i | cut -d ' ' -f 1)
 opt/alsa-lib
 opt/alsa-plugins
 opt/alsa-utils
@@ -197,7 +73,7 @@ opt/aspell-en
 
 List eventual duplicate ports in the order they are used:
 ```
-$ prtloc -d openbox mpv
+$ locprt -d openbox mpv
 punpun/openbox
 -> 6c37-git/openbox
 -> -> opt/openbox
@@ -205,26 +81,88 @@ punpun/openbox
 -> contrib/mpv
 ```
 
-Like most other utils, `prtloc` does aliasing, however, this can be disabled with the `-n` flag:
+Like most other utils, `locprt` does aliasing, however, this can be disabled with the `-n` flag:
 ```
-$ prtloc openssl
+$ locprt openssl
 6c37/libressl
-$ prtloc -n openssl
+$ locprt -n openssl
 core/openssl
 ```
 
 
-prtls
-=====
+## lsdep
+
+List dependencies recursively.
+
+
+### Help
+
+```
+Usage: lsdep [options]
+
+options:
+  -a,   --all             also list installed dependencies
+  -n,   --no-alias        disable aliasing
+  -t,   --tree            list using tree view
+  -h,   --help            print help and exit
+```
+
+
+### Examples
+
+List all not-yet-installed dependencies:
+```
+$ lsdep
+opt/mplayer
+opt/qt4
+opt/libmng
+```
+
+List all not-yet-installed dependencies in tree view:
+```
+$ lsdep -t
+opt/mplayer
+opt/qt4
+-> opt/libmng
+```
+
+List all dependencies without aliasing them in tree view:
+```
+$ lsdep -tna
+opt/mplayer
+-> opt/expat
+-> opt/freetype
+-> -> core/zlib
+-> -> opt/libpng
+...
+```
+
+
+## lsdiff
+
+List installed ports with a different version available in the portstree.
+
+
+### Help
+
+```
+Usage: lsdiff [options]
+
+options:
+  -v,   --version         list installed and available version
+  -h,   --help            print help and exit
+```
+
+
+## lsprt
 
 List repos and ports.
 
 
-Help
-----
+### Help
 
 ```
-Usage: prtls [options]
+Usage: lsprt [options]
 
 options:
   -r,   --repos           list repos
@@ -233,12 +171,11 @@ options:
 ```
 
 
-Examples
---------
+### Examples
 
 List all ports in the ports tree:
 ```
-$ prtls
+$ lsprt
 6c37/abduco
 6c37/arandr
 6c37/atari800
@@ -249,7 +186,7 @@ $ prtls
 
 List all installed ports:
 ```
-$ prtls -i
+$ lsprt -i
 alsa-lib 1.1.0-1
 alsa-plugins 1.1.1-1
 alsa-utils 1.1.0-2
@@ -260,23 +197,21 @@ atk 2.20.0-1
 ```
 
 
-prtmk
-======
+## mkdep
 
-Install or update ports.
-
-
-Usage
------
-
-See `depmk` usage.
+Update ports that get listed by `lsdep`.
 
 
-Help
-----
+### Usage
+
+Set `set script` to either `true` or `false` to change the default behavoir
+of `mkdep` in `/etc/prtstuff/config`, you can toggle the value using the `-s` flag.
+
+
+### Help
 
 ```
-Usage: prtmk [options]
+Usage: mkdep [options]
 
 options:
   -s,   --script          toggle execution of pre- and post-install
@@ -285,16 +220,58 @@ options:
 ```
 
 
-prtpatch
-========
+## mkdiff
+
+Update ports that get listed by `lsdiff`.
+
+
+### Usage
+
+See `mkdep` usage.
+
+
+### Help
+
+```
+Usage: mkdiff [options]
+
+options:
+  -s,   --script          toggle execution of pre- and post-install
+  -v,   --verbose         enable verbose output
+  -h,   --help            print help and exit
+```
+
+
+## mkprt
+
+Install or update ports.
+
+
+### Usage
+
+See `mkdep` usage.
+
+
+### Help
+
+```
+Usage: mkprt [options]
+
+options:
+  -s,   --script          toggle execution of pre- and post-install
+  -v,   --verbose         enable verbose output
+  -h,   --help            print help and exit
+```
+
+
+## patchprt
 
 Patches ports.
 
 
-Usage
------
+### Usage
 
-`prtpatch` uses files in `/etc/prtstuff/patch` to get information about what ports to patch.
+`patchprt` uses files in `/etc/prtstuff/patch` to get information about what ports to patch.
 Here is an example of how to patch `opt/libpcre2` to add a configure flag:
 first create the path in `/etc/prtstuff/patch`, in this case that will be `opt/libpcre2` (so `/etc/prtstuff/patch/opt/libpcre2`).
 Secondly create a `Pkgfile.patch` file with the following content:
@@ -314,34 +291,31 @@ Secondly create a `Pkgfile.patch` file with the following content:
      make DESTDIR=$PKG install
 ```
 
-And now run `prtpatch`, which will do all the patching.
+And now run `patchprt`, which will do all the patching.
 
-Only files in the patch directory ending with a `.patch` filetype will be used by `prtpatch`,
+Only files in the patch directory ending with a `.patch` filetype will be used by `patchprt`,
 say you want to patch `.footprint` you would create a `.footprint.patch` file.
 
 
-Help
-----
+### Help
 
 ```
-Usage: prtpatch [ports]
+Usage: patchprt [ports]
 
 options:
   -h,   --help            print help and exit
 ```
 
 
-prtprint
-========
+## printprt
 
 Prints port information.
 
 
-Help
-----
+### Help
 
 ```
-Usage: prtprint [options]
+Usage: printprt [options]
 
 options:
   -d,   --description     print description
@@ -353,12 +327,11 @@ options:
 ```
 
 
-Examples
---------
+### Examples
 
-Print everything:
+Print all port information:
 ```
-$ prtprint
+$ printprt
 Description: Mplayer frontend
 URL: http://smplayer.sf.net/
 Maintainer: Alan Mizrahi, alan at mizrahi dot com dot ve
@@ -368,34 +341,31 @@ Release: 1
 
 Print only the version and release:
 ```
-$ prtprint -v -r
+$ printprt -v -r
 Version: 15.11.0
 Release: 1
 ```
 
 
-prtprov
-==========
+## provprt
 
 Search ports for files they provide.
 
 
-Help
-----
+### Help
 
 ```
-Usage: prtprov [options] [queries]
+Usage: provprt [options] [queries]
 
 options:
   -h,   --help            print help and exit
 ```
 
-Examples
---------
+### Examples
 
 Search multiple terms at once for files they provide:
 ```
-$ prtprov lemonbar.1 n30f
+$ provprt lemonbar.1 n30f
 6c37-git/lemonbar-xft
 -> /usr/share/man/man1/lemonbar.1.gz
 6c37/lemonbar
@@ -405,35 +375,31 @@ $ prtprov lemonbar.1 n30f
 ```
 
 
-prtpull
-=======
+## pullprt
 
 Pull in ports using git.
 
 
-Usage
------
+### Usage
 
-`prtpull` uses files in `/etc/prtstuff/pull` to get information about what repositories to pull.
+`pullprt` uses files in `/etc/prtstuff/pull` to get information about what repositories to pull.
 
 
-Help
-----
+### Help
 
 ```
-Usage: prtpull [options] [repos]
+Usage: pullprt [options] [repos]
 
 options:
   -h,   --help            print help and exit
 ```
 
 
-Examples
---------
+### Examples
 
 Pull in new ports for all repos:
 ```
-# prtpull
+# pullprt
 Updating collection 1/7, 6c37.
 Updating collection 2/7, 6c37-git.
 -> Modifying mpv/Pkgbuild
@@ -444,7 +410,7 @@ Updating collection 4/7, core.
 
 Pull in new ports for specified repos:
 ```
-# prtpull punpun core
+# pullprt punpun core
 Updating collection 1/2, punpun.
 Updating collection 2/2, core.
 ```
@@ -453,16 +419,14 @@ Updating collection 2/2, core.
 ----
 
 
-Dependencies
-------------
+## Dependencies
 
 * fish (2.3.0+)
 * getopts (https://github.com/fisherman/getopts)
 * pkgutils
 
 
-Installation
-------------
+## Installation
 
 Run `make install` inside the `prtstuff` directory to install the scripts.
 prtstuff can be uninstalled easily using `make uninstall`.
@@ -470,12 +434,3 @@ prtstuff can be uninstalled easily using `make uninstall`.
 Edit `/etc/prtstuff/config` to your liking.
 
 If you use CRUX (you probably do) you can also install using this port: https://github.com/onodera-punpun/crux-ports-git/tree/3.2/prtstuff
-
-
-Notes
------
-
-Most of the script only workig in a directory with a `Pkgfile`, just like `pkgmk`.
-
-`prtstuff` ships with a fish function named `cdp`, which cds to a specified port directory.
-It uses `prtloc`, so comes with ordering, and aliasing.

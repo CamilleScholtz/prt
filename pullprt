@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtpull - Pull in ports using git
+# pullprt - Pull in ports using git
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -14,7 +14,7 @@ set current 0
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: prtpull [options] [repos]\n'
+			echo -e 'Usage: pullprt [options] [repos]\n'
 			echo 'options:'
 			echo '  -h,   --help            print help and exit'
 			exit 0

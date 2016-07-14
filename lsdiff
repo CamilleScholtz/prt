@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# diffls - List installed ports with a different version available in the portstree
+# lsdiff - List installed ports with a different version available in the ports tree
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -14,7 +14,7 @@ set oldnew false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: diffls [options]\n'
+			echo -e 'Usage: lsdiff [options]\n'
 			echo 'options:'
 			echo '  -v,   --version         list installed and available version'
 			echo '  -h,   --help            print help and exit'
@@ -25,7 +25,7 @@ getopts $argv | while read -l opt val
 end
 
 # Get installed ports
-set installed (prtls -i)
+set installed (lsprt -i)
 
 # Get versions and locations
 set names (string replace -r ' .*' '' $installed)

@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtprint - Prints port information
+# printprt - Prints port information
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -12,7 +12,7 @@ if test (count $argv) -ge 1
 	getopts $argv | while read -l opt val
 		switch $opt
 			case h help
-				echo -e 'Usage: prtprint [options]\n'
+				echo -e 'Usage: printprt [options]\n'
 				echo 'options:'
 				echo '  -d,   --description     print description'
 				echo '  -u,   --url             print url'

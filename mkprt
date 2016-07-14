@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtmk - Install or update ports
+# mkprt - Install or update ports
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -14,7 +14,7 @@ set verbose false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: prtmk [options]\n'
+			echo -e 'Usage: mkprt [options]\n'
 			echo 'options:'
 			echo '  -s,   --script          toggle execution of pre- and post-install'
 			echo '  -v,   --verbose         enable verbose output'
@@ -34,11 +34,10 @@ getopts $argv | while read -l opt val
 	end
 end
 
-
-if string match -q -r "^$argv " (prtls -i)
+if string match -q -r "^$argv " (lsprt -i)
 	set method update
 else
 	set method install
 end
 prtonlyroot "$method ports"
-prtinstall (depls | tac)
+prtinstall (lsdep | tac)

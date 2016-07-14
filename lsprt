@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtls - List repos and ports
+# lsprt - List repos and ports
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -12,7 +12,7 @@ if test (count $argv) -ge 1
 	getopts $argv | while read -l opt val
 		switch $opt
 			case h help
-				echo -e 'Usage: prtls [options]\n'
+				echo -e 'Usage: lsprt [options]\n'
 				echo 'options:'
 				echo '  -i,   --installed       list installed ports'
 				echo '  -r,   --repos           list repos'

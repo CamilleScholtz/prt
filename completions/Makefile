@@ -2,17 +2,17 @@ include ../config.mk
 
 COMPLETIONS = \
 	cdp.fish \
-	depls.fish \
-	depmk.fish \
-	diffls.fish \
-	diffmk.fish \
-	prtloc.fish \
-	prtls.fish \
-	prtmk.fish \
-	prtpatch.fish \
-	prtprint.fish \
-	prtprov.fish \
-	prtpull.fish
+	locprt.fish \
+	lsdep.fish \
+	lsdiff.fish \
+	lsprt.fish \
+	mkdep.fish \
+	mkdiff.fish \
+	mkprt.fish \
+	patchprt.fish \
+	printprt.fish \
+	provprt.fish \
+	pullprt.fish
 
 install:
 	@echo "Installing completions."

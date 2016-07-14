@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# diffmk - Update ports that get listed by diffls
+# mkdiff - Update ports that get listed by lsdiff
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -14,7 +14,7 @@ set verbose false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: diffmk [options]\n'
+			echo -e 'Usage: mkdiff [options]\n'
 			echo 'options:'
 			echo '  -s,   --script          toggle execution of pre- and post-install'
 			echo '  -v,   --verbose         enable verbose output'
@@ -36,4 +36,4 @@ end
 
 set method update
 prtonlyroot "$method ports"
-prtinstall (diffls)
+prtinstall (lsdiff)

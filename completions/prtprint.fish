@@ -1,6 +1,0 @@
-complete -c prtprint -f -o d -l description -d 'Print description'
-complete -c prtprint -f -o u -l url -d 'Print URL'
-complete -c prtprint -f -o m -l maintainer -d 'Print maintainer'
-complete -c prtprint -f -o v -l version -d 'Print version'
-complete -c prtprint -f -o r -l release -d 'Print release'
-complete -c prtprint -f -o h -l help -d 'Print help and exit'

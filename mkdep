@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# depmk - Install ports that get listed by depls
+# mkdep - Install ports that get listed by lsdepp
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -14,7 +14,7 @@ set verbose false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: depmk [options]\n'
+			echo -e 'Usage: mkdep [options]\n'
 			echo 'options:'
 			echo '  -s,   --script          toggle execution of pre- and post-install'
 			echo '  -v,   --verbose         enable verbose output'
@@ -36,4 +36,4 @@ end
 
 set method install
 prtonlyroot "$method ports"
-prtinstall (depls | tac)
+prtinstall (lsdep | tac)

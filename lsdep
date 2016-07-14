@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# depls - List dependencies recursively
+# lsdep - List dependencies recursively
 # onodera, https://github.com/onodera-punpun
 
 ## FUNCTIONS
@@ -12,8 +12,8 @@ end
 
 # This function prints port locations
 #
-# I don't use prtloc because it's to slow to prtls every iteration
-# TODO: Use prtloc somehow?
+# I don't use locprt because it's to slow to lsprt every iteration
+# TODO: Use locprt somehow?
 function prtlocation
 	for port in $argv
 		set location (string match -r ".*/$port\$" $portstree)
@@ -100,7 +100,7 @@ set tree false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: depls [options]\n'
+			echo -e 'Usage: lsdep [options]\n'
 			echo 'options:'
 			echo '  -a,   --all             also list installed dependencies'
 			echo '  -n,   --no-alias        disable aliasing'
@@ -121,7 +121,7 @@ getopts $argv | while read -l opt val
 end
 
 # Get all and installed ports
-set portstree (prtls)
-set installed (prtls -i | cut -d ' ' -f 1)
+set portstree (lsprt)
+set installed (lsprt -i | cut -d ' ' -f 1)
 
 prtrecursive

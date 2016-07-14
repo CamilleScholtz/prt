@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtl - Prints port location
+# locprt - Prints port location
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
@@ -16,7 +16,7 @@ if test (count $argv) -ge 1
 	getopts $argv | while read -l opt val
 		switch $opt
 			case h help
-				echo -e 'Usage: prtloc [options] [ports]\n'
+				echo -e 'Usage: locprt [options] [ports]\n'
 				echo 'options:'
 				echo '  -d,   --duplicate       list duplicate ports as well'
 				echo '  -n,   --no-alias        disable aliasing'
@@ -36,7 +36,7 @@ else
 end
 
 # Get all ports
-set portstree (prtls)
+set portstree (lsprt)
 
 for port in $ports
 	set location (string match -r ".*/$port\$" $portstree)
