@@ -34,10 +34,10 @@ getopts $argv | while read -l opt val
 	end
 end
 
-if string match -q -r "^$argv " (lsprt -i)
+if string match -q -r (prtpkgfile | string match -r '^name=.*' | cut -d '=' -f 2) (lsprt -i)
 	set method update
 else
 	set method install
 end
 prtonlyroot "$method ports"
-prtinstall (lsdep | tac)
+prtinstall

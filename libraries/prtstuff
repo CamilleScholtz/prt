@@ -18,7 +18,14 @@ function prtinstall
 	set current 0
 	set total (count $argv)
 
-	for port in $argv
+	if test $total -ge 1
+		set ports $argv
+	else
+		set total 1
+		set ports (pwd | string replace $portdir '')
+	end
+
+	for port in $ports
 		cd $portdir/$port
 
 		set current (math $current + 1)
