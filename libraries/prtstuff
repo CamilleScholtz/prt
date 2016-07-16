@@ -7,7 +7,7 @@
 
 # This function compiles/install ports
 #
-# This function takes a list of ports as argument
+# This function optionally takes a list of ports as argument
 #
 # The function depends on the following pre-defined variables:
 # script (true/false)
@@ -18,11 +18,12 @@ function prtinstall
 	set current 0
 	set total (count $argv)
 
+	# Use $PWD/Pkgfile if no ports have been given
 	if test $total -ge 1
 		set ports $argv
 	else
 		set total 1
-		set ports (pwd | string replace $portdir '')
+		set ports (string replace "$portdir/" '' $PWD)
 	end
 
 	for port in $ports

@@ -16,7 +16,17 @@ end
 # TODO: Use locprt somehow?
 function prtlocation
 	for port in $argv
+		# continue if port variable is empty
+		if test -z "$port"
+			continue
+		end
+
 		set location (string match -r ".*/$port\$" $portstree)
+
+		# continue if location variable is empty
+		if test -z "$location"
+			continue
+		end
 
 		# Order ports
 		if test (count $location) -ge 2
@@ -39,9 +49,7 @@ function prtlocation
 		end
 
 		# Finally print the location :)
-		if test -n "$location"
-			echo $location
-		end
+		echo $location
 	end
 end
 
