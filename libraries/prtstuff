@@ -18,16 +18,18 @@ function prtinstall
 	set current 0
 	set total (count $argv)
 
-	# Use $PWD/Pkgfile if no ports have been given
+	# Use $PWD if no ports have been given
 	if test $total -ge 1
 		set ports $argv
 	else
 		set total 1
-		set ports (string replace "$portdir/" '' $PWD)
+		set ports $PWD
 	end
 
 	for port in $ports
-		cd $portdir/$port
+		if test $total -ge 1
+			cd $portdir/$port
+		end
 
 		set current (math $current + 1)
 
@@ -91,8 +93,8 @@ function prtinstall
 		end
 
 		# Install/update port
+		echo "$dark-> "$foreground"Installing package"
 		if test $method = install
-			echo "$dark-> "$foreground"Installing package"
 			if test $verbose = true
 				pkgmk -i >/dev/null
 			else
@@ -103,11 +105,10 @@ function prtinstall
 				exit 1
 			end
 		else
-			echo "$dark-> "$foreground"Updating package"
 			if test $verbose = true
-				pkgmk -u >/dev/null
+				pkgmk -u -f >/dev/null
 			else
-				pkgmk -u >/dev/null ^/dev/null
+				pkgmk -u -f >/dev/null ^/dev/null
 			end
 			if test $status -ge 1
 				echo "Failed to update $bright$port$foreground." >/dev/stderr
