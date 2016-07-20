@@ -3,9 +3,6 @@
 # patchprt - Patches ports
 # onodera, https://github.com/onodera-punpun
 
-# TODO: find: '/proc/8893': No such file or directory
-# TODO: patch: **** Can't reopen file /usr/ports/contrib/opus/1 : No such file or directory
-
 ## EXECUTE
 
 # Load library
@@ -29,12 +26,18 @@ prtonlyroot 'patch ports'
 # Set patches
 set patches (find /etc/prtstuff/patch/ -type f -name '*.patch')
 
+# Initialize count values
+set total (count $repos)
+set current 0
+
 for patch in $patches
 	set repo (echo $patch | rev | cut -d '/' -f 3 | rev)
 	set port (echo $patch | rev | cut -d '/' -f 2 | rev)
 	set file (echo $patch | rev | cut -d '/' -f 1 | rev | cut -d '.' -f 1)
 
-	echo "patching $bright$repo/$port/$file$foreground."
+	set current (math $current + 1)
+	echo "Patching file $current/$total, $bright$repo/$port/$file$foreground."
+
 	patch -N "$portdir/$repo/$port/$file" -i $patch >/dev/null
 	if test $status -ge 1
 		echo "Patching $bright$repo/$port/$file$foreground failed." >/dev/stderr

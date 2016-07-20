@@ -8,9 +8,6 @@
 # Load library
 source /usr/include/prtstuff
 
-# Initialize values
-set current 0
-
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
@@ -31,11 +28,14 @@ else
 	set repos (find /etc/prtstuff/pull -type f | sort)
 end
 
+# Initialize count values
+set total (count $repos)
+set current 0
+
 for file in $repos
 	source $file
 
 	set current (math $current + 1)
-	set total (count $repos)
 	echo "Updating collection $current/$total, $bright$name$foreground."
 
 	cd $portdir/$name >/dev/null

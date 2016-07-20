@@ -39,5 +39,6 @@ if string match -q -r (prtpkgfile | string match -r '^name=.*' | cut -d '=' -f 2
 else
 	set method install
 end
+
 prtonlyroot "$method ports"
 prtinstall

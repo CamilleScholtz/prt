@@ -133,3 +133,4 @@ set portstree (lsprt)
 set installed (lsprt -i | cut -d ' ' -f 1)
 
 prtrecursive
+

@@ -14,7 +14,7 @@
 # verbose (true/false)
 # method (install/update)
 function prtinstall
-	# Initialize values
+	# Initialize count values
 	set current 0
 	set total (count $argv)
 
@@ -22,13 +22,14 @@ function prtinstall
 	if test $total -ge 1
 		set ports $argv
 	else
-		set total 1
 		set ports $PWD
 	end
 
 	for port in $ports
 		if test $total -ge 1
 			cd $portdir/$port
+		else
+			set total 1
 		end
 
 		set current (math $current + 1)
@@ -167,7 +168,7 @@ end
 # Load config
 source /etc/prtstuff/config
 
-# Load colors
+# Initialize colors
 set foreground (set_color $foreground)
 set bright (set_color $bright)
 set dark (set_color $dark)
