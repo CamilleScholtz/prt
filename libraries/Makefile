@@ -16,7 +16,7 @@ LIBRARIES = \
 install:
 	@echo "Installing libraries."
 	@for library in $(LIBRARIES); do \
-		$(INSTALL_FILE) $$library $(DESTDIR)$(PREFIX)/share/prt/$$library; \
+		$(INSTALL_PROG) $$library $(DESTDIR)$(PREFIX)/share/prt/$$library; \
 	done
 
 uninstall:
