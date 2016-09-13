@@ -84,9 +84,9 @@ function prtinstall
 		# Building port
 		echo "$dark-> "$foreground"Creating package"
 		if test $verbose = true
-			pkgmk >/dev/null
+			pkgmk -f >/dev/null
 		else
-			pkgmk >/dev/null ^/dev/null
+			pkgmk -f >/dev/null ^/dev/null
 		end
 		if test $status -ge 1
 			echo "Failed to build $bright$port$foreground." >/dev/stderr
@@ -108,9 +108,9 @@ function prtinstall
 		else
 			# TODO: The -f causes ports to rebuild...
 			if test $verbose = true
-				pkgmk -u -f >/dev/null
+				pkgmk -u >/dev/null
 			else
-				pkgmk -u -f >/dev/null ^/dev/null
+				pkgmk -u >/dev/null ^/dev/null
 			end
 			if test $status -ge 1
 				echo "Failed to update $bright$port$foreground." >/dev/stderr

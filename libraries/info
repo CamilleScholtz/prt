@@ -50,11 +50,11 @@ else
 	echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
 	set dependencies (prtpkgfile | string match -r '^# Dependencies:.*' | cut -d ':' -f 2- | string trim | string replace -a ',' '')
 	if test (count $dependencies) -ge 1
-		echo "Dependencies: $dependencies")
+		echo "Dependencies: $dependencies"
 	end
 	set optional (prtpkgfile | string match -r '^# (Dependencies|Nice to have):.*' | cut -d ':' -f 2- | string trim | string replace -a ',' '')
 	if test (count $optional) -ge 1
-		echo "Optional: $optional")
+		echo "Optional: $optional"
 	end
 	echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
 	echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
