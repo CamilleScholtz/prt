@@ -9,7 +9,7 @@ all:
 install:
 	@echo "Installing executables."
 	@for executable in $(EXECUTABLES); do \
-		$(INSTALL_PROG) $$binary $(DESTDIR)$(PREFIX)/bin/$$executable; \
+		$(INSTALL_PROG) $$executable $(DESTDIR)$(PREFIX)/bin/$$executable; \
 	done
 	cd configs; $(MAKE) install
 	cd completions; $(MAKE) install
