@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# lsdep - List dependencies recursively
+# depends - List dependencies recursively
 # onodera, https://github.com/onodera-punpun
 
 ## FUNCTIONS
@@ -13,7 +13,7 @@ end
 # This function prints port locations
 #
 # I don't use locprt because it's to slow to lsprt every iteration
-# TODO: Use locprt somehow?
+# TODO: Use prt location somehow?
 function prtlocation
 	for port in $argv
 		# continue if port variable is empty
@@ -97,8 +97,8 @@ end
 
 ## EXECUTE
 
-# Load library
-source /usr/include/prtstuff
+# Load util
+source /usr/share/prt/util
 
 # Initialize default option values
 set all false
@@ -108,8 +108,8 @@ set tree false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: lsdep [options]\n'
-			echo 'options:'
+			echo -e 'Usage: prt depends [arguments]\n'
+			echo 'arguments:'
 			echo '  -a,   --all             also list installed dependencies'
 			echo '  -n,   --no-alias        disable aliasing'
 			echo '  -t,   --tree            list using tree view'
@@ -123,14 +123,14 @@ getopts $argv | while read -l opt val
 			set tree true
 			set iteration 0
 		case '*'
-			echo 'Invalid option, use -h for help.' >/dev/stderr
+			echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
 			exit 1
 	end
 end
 
 # Get all and installed ports
-set portstree (lsprt)
-set installed (lsprt -i | cut -d ' ' -f 1)
+set portstree (prt list)
+set installed (prt list -i | cut -d ' ' -f 1)
 
 prtrecursive
 

@@ -1,18 +1,18 @@
 #!/bin/fish
 #
-# pullprt - Pull in ports using git
+# pull - Pull in ports
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
 
-# Load library
-source /usr/include/prtstuff
+# Load util
+source /usr/share/prt/util
 
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: pullprt [options] [repos]\n'
-			echo 'options:'
+			echo -e 'Usage: prt pull [arguments] [repos]\n'
+			echo 'arguments:'
 			echo '  -h,   --help            print help and exit'
 			exit 0
 		case '*'
@@ -23,9 +23,9 @@ end
 prtonlyroot 'pull in ports'
 
 if test (count $repos) -ge 1
-	set repos (find /etc/prtstuff/pull -type f | string match -r '.*/'(string replace -a ' ' '$|.*/' "$repos")'$')
+	set repos (find /etc/prt/pull -type f | string match -r '.*/'(string replace -a ' ' '$|.*/' "$repos")'$')
 else
-	set repos (find /etc/prtstuff/pull -type f | sort)
+	set repos (find /etc/prt/pull -type f | sort)
 end
 
 # Initialize count values
@@ -42,11 +42,14 @@ for file in $repos
 	if test $status -eq 0
 		git checkout -q $branch
 		git fetch -q --depth 1
+		# TODO: Add move to sed
+		# TODO: Use string
 		git diff --pretty=format: --name-status $branch origin/$branch | sed "s/M\t/$dark-> "$foreground"Editing /g; s/A\t/$dark-> "$foreground"Adding /g; s/D\t/$dark-> "$foreground"Deleting /g" | sort
 		git clean -q -f
 		git reset -q --hard origin/$branch
 	else
 		git clone -q --depth 1 -b $branch $url $portdir/$name
+		# TODO: Use string
 		ls $portdir/$name | sed "s/^/$dark-> {$foreground}Adding /g"
 	end
 end

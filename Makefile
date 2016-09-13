@@ -1,25 +1,15 @@
 include config.mk
 
-BINARIES = \
-	locprt \
-	lsdep \
-	lsdiff \
-	lsprt \
-	mkdep \
-	mkdiff \
-	mkprt \
-	patchprt \
-	printprt \
-	provprt \
-	pullprt
+EXECUTABLES = \
+	prt
 
 all:
-	@echo Run \'make install\' to install prtstuff.
+	@echo Run \'make install\' to install prt.
 
 install:
-	@echo "Installing binaries."
-	@for binary in $(BINARIES); do \
-		$(INSTALL_PROG) $$binary $(DESTDIR)$(PREFIX)/bin/$$binary; \
+	@echo "Installing executables."
+	@for executable in $(EXECUTABLES); do \
+		$(INSTALL_PROG) $$binary $(DESTDIR)$(PREFIX)/bin/$$executable; \
 	done
 	cd configs; $(MAKE) install
 	cd completions; $(MAKE) install
@@ -27,9 +17,9 @@ install:
 	cd libraries; $(MAKE) install
 
 uninstall:
-	@echo "Uninstalling binaries."
-	@for binary in $(BINARIES); do \
-		$(RM) $(DESTDIR)$(PREFIX)/bin/$$binary; \
+	@echo "Uninstalling executables."
+	@for executable in $(EXECUTABLES); do \
+		$(RM) $(DESTDIR)$(PREFIX)/bin/$$executable; \
 	done
 	cd configs; $(MAKE) uninstall
 	cd completions; $(MAKE) uninstall

@@ -1,12 +1,12 @@
 #!/bin/fish
 #
-# mkdiff - Update ports that get listed by lsdiff
+# build - Build and install ports
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
 
-# Load library
-source /usr/include/prtstuff
+# Load util
+source /usr/share/prt/util
 
 # Initialize default option values
 set verbose false
@@ -14,8 +14,8 @@ set verbose false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: mkdiff [options]\n'
-			echo 'options:'
+			echo -e 'Usage: prt build [arguments]\n'
+			echo 'arguments:'
 			echo '  -s,   --script          toggle execution of pre- and post-install'
 			echo '  -v,   --verbose         enable verbose output'
 			echo '  -h,   --help            print help and exit'
@@ -29,11 +29,21 @@ getopts $argv | while read -l opt val
 		case v verbose
 			set verbose true
 		case '*'
-			echo 'Invalid option, use -h for help.' >/dev/stderr
+			echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
 			exit 1
 	end
 end
 
-set method update
 prtonlyroot "$method ports"
-prtinstall (lsdiff)
+
+set method install
+prtinstall (prt depends | tac)
+
+if string match -q -r (prtpkgfile | string match -r '^name=.*' | cut -d '=' -f 2) (prt list -i)
+	set method update
+else
+	set method install
+end
+
+prtinstall
+

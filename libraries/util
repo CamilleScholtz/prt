@@ -1,6 +1,6 @@
 #!/bin/fish
 #
-# prtlib - Some common functions
+# util - Some common misc functions
 # onodera, https://github.com/onodera-punpun
 
 ## FUNCTIONS
@@ -106,6 +106,7 @@ function prtinstall
 				exit 1
 			end
 		else
+			# TODO: The -f causes ports to rebuild...
 			if test $verbose = true
 				pkgmk -u -f >/dev/null
 			else
@@ -166,7 +167,7 @@ end
 ## EXECUTE
 
 # Load config
-source /etc/prtstuff/config
+source /etc/prt/config
 
 # Initialize colors
 set foreground (set_color $foreground)

@@ -1,12 +1,12 @@
 #!/bin/fish
 #
-# locprt - Prints port location
+# location - Prints port location
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
 
-# Load library
-source /usr/include/prtstuff
+# Load util
+source /usr/share/prt/util
 
 # Initialize default option values
 set duplicate false
@@ -16,8 +16,8 @@ if test (count $argv) -ge 1
 	getopts $argv | while read -l opt val
 		switch $opt
 			case h help
-				echo -e 'Usage: locprt [options] [ports]\n'
-				echo 'options:'
+				echo -e 'Usage: prt location [arguments] [ports]\n'
+				echo 'arguments:'
 				echo '  -d,   --duplicate       list duplicate ports as well'
 				echo '  -n,   --no-alias        disable aliasing'
 				echo '  -h,   --help            print help and exit'
@@ -36,7 +36,7 @@ else
 end
 
 # Get all ports
-set portstree (lsprt)
+set portstree (prt list)
 
 for port in $ports
 	set location (string match -r ".*/$port\$" $portstree)

@@ -1,16 +1,26 @@
 include ../config.mk
 
 LIBRARIES = \
-	prtstuff
+	build \
+	depends \
+	diff \
+	info \
+	list \
+	location \
+	patch \
+	provide \
+	pull \
+	sysup \
+	util \
 
 install:
 	@echo "Installing libraries."
 	@for library in $(LIBRARIES); do \
-		$(INSTALL_FILE) $$library $(DESTDIR)$(PREFIX)/include/$$library; \
+		$(INSTALL_FILE) $$library $(DESTDIR)$(PREFIX)/share/prt/$$library; \
 	done
 
 uninstall:
 	@echo "Uninstalling libraries."
 	@for library in $(LIBRARIES); do \
-		$(RM) $(DESTDIR)$(PREFIX)/include/$$library; \
+		$(RM) $(DESTDIR)$(PREFIX)/share/prt/$$library; \
 	done

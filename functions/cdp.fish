@@ -1,7 +1,7 @@
 function cdp
-	source /etc/prtstuff/config
+	source /etc/prt/config
 
-	set location (locprt $argv ^/dev/null)
+	set location (prt location $argv ^/dev/null)
 
 	if test -n "$location"
 		cd $portdir/$location

@@ -1,0 +1,39 @@
+#!/bin/fish
+#
+# prt - CRUX port management utils
+# onodera, https://github.com/onodera-punpun
+
+## EXECUTE
+
+if test (count $argv) -ge 1
+	switch $argv[1]
+		case help
+			echo -e 'Usage: prt command [arguments]\n'
+			echo 'commands:'
+			echo '  depends                 list dependencies recursivly'
+			echo '  diff                    list outdated packages'
+			echo '  build                   build and install ports'
+			echo '  info                    print port information'
+			echo '  list                    list repos and ports'
+			echo '  location                prints port location'
+			echo '  patch                   patch ports'
+			echo '  provide                 Search ports for files'
+			echo '  remove                  remove installed ports'
+			echo '  pull                    pull in ports'
+			echo '  sysup                   update outdated packages'
+			echo '  help                    print help and exit'
+			exit 0
+		case depends diff build info list location patch provide remove pull sysup
+			if test (count $argv) -ge 2
+				eval /usr/share/prt/$argv[1] $argv[2..-1]
+			else
+				eval /usr/share/prt/$argv[1]
+			end
+		case '*'
+			echo 'Invalid command, use help for a list of commands.' >/dev/stderr
+			exit 1
+	end
+else
+	echo 'Missing command, use help for a list of commands.' >/dev/stderr
+	exit 1
+end

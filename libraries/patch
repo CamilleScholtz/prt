@@ -1,22 +1,22 @@
 #!/bin/fish
 #
-# patchprt - Patches ports
+# patch - Patch ports
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
 
-# Load library
-source /usr/include/prtstuff
+# Load util
+source /usr/share/prt/util
 
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: patchprt [ports]\n'
-			echo 'options:'
+			echo -e 'Usage: prt patch [ports]\n'
+			echo 'arguments:'
 			echo '  -h,   --help            print help and exit'
 			exit 0
 		case '*'
-			echo 'Invalid option, use -h for help.' >/dev/stderr
+			echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
 			exit 1
 	end
 end
@@ -24,7 +24,7 @@ end
 prtonlyroot 'patch ports'
 
 # Set patches
-set patches (find /etc/prtstuff/patch/ -type f -name '*.patch')
+set patches (find /etc/prt/patch/ -type f -name '*.patch')
 
 # Initialize count values
 set total (count $repos)

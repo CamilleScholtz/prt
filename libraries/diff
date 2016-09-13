@@ -1,12 +1,12 @@
 #!/bin/fish
 #
-# lsdiff - List installed ports with a different version available in the ports tree
+# diff - List outdated packages
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
 
-# Load library
-source /usr/include/prtstuff
+# Load util
+source /usr/share/prt/util
 
 # Initialize default option values
 set oldnew false
@@ -14,8 +14,8 @@ set oldnew false
 getopts $argv | while read -l opt val
 	switch $opt
 		case h help
-			echo -e 'Usage: lsdiff [options]\n'
-			echo 'options:'
+			echo -e 'Usage: prt diff [arguments]\n'
+			echo 'arguments:'
 			echo '  -v,   --version         list installed and available version'
 			echo '  -h,   --help            print help and exit'
 			exit 0
@@ -25,7 +25,7 @@ getopts $argv | while read -l opt val
 end
 
 # Get installed ports
-set installed (lsprt -i)
+set installed (prt list -i)
 
 # Get versions and locations
 set names (string replace -r ' .*' '' $installed)

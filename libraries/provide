@@ -1,19 +1,19 @@
 #!/bin/fish
 #
-# provprt - Search ports for files they provide
+# provide - Search ports for files
 # onodera, https://github.com/onodera-punpun
 
 ## EXECUTE
 
-# Load library
-source /usr/include/prtstuff
+# Load util
+source /usr/share/prt/util
 
 if test (count $argv) -ge 1
 	getopts $argv | while read -l opt val
 		switch $opt
 			case h help
-				echo -e 'Usage: provprt [options] [queries]\n'
-				echo 'options:'
+				echo -e 'Usage: prt provide [arguments] [queries]\n'
+				echo 'arguments:'
 				echo '  -h,   --help            print help and exit'
 				exit 0
 			case '*'
