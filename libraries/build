@@ -41,8 +41,11 @@ else
 end
 prtonlyroot "$methodi ports"
 
-set method install
-prtinstall (prt depends | tac)
+set depends (prt depends | tac)
+if test (count $depends) -ge 1
+	set method install
+	prtinstall (prt depends | tac)
+end
 
 set method $methodi
 prtinstall
