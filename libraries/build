@@ -34,16 +34,16 @@ getopts $argv | while read -l opt val
 	end
 end
 
-prtonlyroot "$method ports"
+if string match -q -r (prtpkgfile | string match -r '^name=.*' | cut -d '=' -f 2) (prt list -i)
+	set methodi update
+else
+	set methodi install
+end
+prtonlyroot "$methodi ports"
 
 set method install
 prtinstall (prt depends | tac)
 
-if string match -q -r (prtpkgfile | string match -r '^name=.*' | cut -d '=' -f 2) (prt list -i)
-	set method update
-else
-	set method install
-end
-
+set method $methodi
 prtinstall
 

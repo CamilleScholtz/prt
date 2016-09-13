@@ -13,6 +13,7 @@ set duplicate false
 set aliasing true
 
 if test (count $argv) -ge 1
+	# TODO: Only -n at the end works, geptops makes the next op a val..
 	getopts $argv | while read -l opt val
 		switch $opt
 			case h help
