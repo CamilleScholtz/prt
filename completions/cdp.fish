@@ -1,1 +1,1 @@
-complete -c cdp -x -a "(lsprt | cut -d '/' -f 2)"
+complete -c cdp -x -a "(prt location | cut -d '/' -f 2)"
