@@ -49,7 +49,7 @@ function prtinstall
 		if test $script = true
 			if test -f $PWD/pre-install
 				echo "$dark-> "$foreground"Executing pre-install"
-				$PWD/pre-install
+				eval $PWD/pre-install
 				if test $status -ge 1
 					echo "Failed to execute $bright$port$foreground pre-install." >/dev/stderr
 					exit 1
@@ -122,7 +122,7 @@ function prtinstall
 		if test $script = true
 			if test -f $PWD/post-install
 				echo "$dark-> "$foreground"Executing post-install"
-				$PWD/post-install
+				eval $PWD/post-install
 				if test $status -ge 1
 					echo "Failed to execute $bright$port$foreground post-install." >/dev/stderr
 					exit 1
