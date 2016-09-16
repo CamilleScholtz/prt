@@ -30,9 +30,9 @@ if test (count $argv) -ge 1
 			case m maintainer
 				echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
 			case e dependencies
-				echo 'Dependencies: '(prtpkgfile | string match -r '^# Dependencies:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+				echo 'Dependencies: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case o optional
-				echo 'Optional: '(prtpkgfile | string match -r '^# (Dependencies|Nice to have):.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+				echo 'Optional: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case r release
 				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 			case v version
@@ -45,12 +45,12 @@ if test (count $argv) -ge 1
 		end
 	end
 else
-	set pkgfile (prtpkgfile)
-	echo 'Description: '(echo $pkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
-	echo 'URL: '(echo $pkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
-	echo 'Maintainer: '(echo $pkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
-	echo 'Dependencies: '(echo $pkgfile | string match -r '^# Dependencies:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	echo 'Optional: '(echo $pkgfile | string match -r '^# (Dependencies|Nice to have):.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	echo 'Version: '(echo $pkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
-	echo 'Release: '(echo $pkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
+	# TODO: I could optimize by not using prtpkgfile each time?
+	echo 'Description: '(prtpkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
+	echo 'URL: '(prtpkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
+	echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
+	echo 'Dependencies: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	echo 'Optional: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
+	echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 end
