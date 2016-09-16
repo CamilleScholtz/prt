@@ -30,9 +30,10 @@ if test (count $argv) -ge 1
 			case m maintainer
 				echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
 			case e dependencies
-				echo 'Dependencies: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+				echo 'Depends on: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case o optional
-				echo 'Optional: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+				# TODO: Remove the OR once 6c37 is fixed
+				echo 'Nice to have: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case r release
 				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 			case v version
@@ -49,8 +50,9 @@ else
 	echo 'Description: '(prtpkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
 	echo 'URL: '(prtpkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
 	echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
-	echo 'Dependencies: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	echo 'Optional: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	echo 'Depends on: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	# TODO: Remove the OR once 6c37 is fixed
+	echo 'Nice to have: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 	echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
 	echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 end
