@@ -3,6 +3,8 @@
 # build - Build and install ports
 # onodera, https://github.com/onodera-punpun
 
+# TODO: Fix 3/3 for 3/4 (deps + pwd)
+
 ## EXECUTE
 
 # Load util
