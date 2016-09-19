@@ -73,9 +73,13 @@ function prtrecursive
 		# Print tree
 		if test $tree = true
 			if test $iteration -ge 1
-				echo -n $dark
-				printf '-> %.0s' (seq $iteration)
-				echo -n $foreground
+				if prtpipe
+					printf '-> %.0s' (seq $iteration)
+				else
+					echo -n $dark
+					printf '-> %.0s' (seq $iteration)
+					echo -n $foreground
+				end
 			end
 
 			set -g iteration (math $iteration + 1)

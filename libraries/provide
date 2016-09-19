@@ -31,7 +31,11 @@ if test (count $argv) -ge 1
 						echo $val
 					end
 
-					echo (echo $line | cut -d \t -f 3 | sed "s/^/$dark-> $foreground\//g")
+					if prtpipe
+						echo (echo $line | cut -d \t -f 3 | sed "s/^/-> \//g")
+					else
+						echo (echo $line | cut -d \t -f 3 | sed "s/^/$dark-> $foreground\//g")
+					end
 				end
 		end
 	end

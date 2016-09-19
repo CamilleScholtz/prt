@@ -3,6 +3,8 @@
 # info - Prints port information
 # onodera, https://github.com/onodera-punpun
 
+# TODO: If optional for example is empty, it prints nothing instead of "Nice to have: "
+
 ## EXECUTE
 
 # Load util
@@ -17,7 +19,7 @@ if test (count $argv) -ge 1
 				echo '  -d,   --description     print description'
 				echo '  -u,   --url             print url'
 				echo '  -m,   --maintainer      print maintainer'
-				echo '  -e,   --dependencies    print dependencies'
+				echo '  -e,   --depends         print dependencies'
 				echo '  -o,   --optional        print optional dependencies'
 				echo '  -v,   --version         print version'
 				echo '  -r,   --release         print release'
@@ -29,7 +31,7 @@ if test (count $argv) -ge 1
 				echo 'URL: '(prtpkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
 			case m maintainer
 				echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
-			case e dependencies
+			case e depends
 				echo 'Depends on: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case o optional
 				echo 'Nice to have: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)

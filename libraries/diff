@@ -38,7 +38,11 @@ for count in (seq (count $locations))
 
 	if test $version != $available
 		if test $oldnew = true
-			echo "$locations[$count] $version$dark -> $foreground$available"
+			if prtpipe
+				echo "$locations[$count] $version -> $available"
+			else
+				echo "$locations[$count] $version$dark -> $foreground$available"
+			end
 		else
 			echo $locations[$count]
 		end

@@ -81,10 +81,15 @@ for port in $ports
 
 				if test -n "$locationrepo"
 					if test $current -ge 1
-						echo -n $dark
-						printf '-> %.0s' (seq $current)
-						echo -n $foreground
-						echo $locationrepo
+						if prtpipe
+							printf '-> %.0s' (seq $current)
+							echo $locationrepo
+						else
+							echo -n $dark
+							printf '-> %.0s' (seq $current)
+							echo -n $foreground
+							echo $locationrepo
+						end
 					end
 
 					set current (math $current + 1)
