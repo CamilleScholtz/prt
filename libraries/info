@@ -32,27 +32,24 @@ if test (count $argv) -ge 1
 			case e dependencies
 				echo 'Depends on: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case o optional
-				# TODO: Remove the OR once 6c37 is fixed
 				echo 'Nice to have: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-			case r release
-				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
 			case v version
-				echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
+				echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2- | string trim)
 			case r release
-				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
+				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2- | string rim)
 			case '*'
 				echo 'Invalid arguments, use -h for a list of arguments.' >/dev/stderr
 				exit 1
 		end
 	end
 else
-	# TODO: I could optimize by not using prtpkgfile each time?
-	echo 'Description: '(prtpkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
-	echo 'URL: '(prtpkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
-	echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
-	echo 'Depends on: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	# TODO: Remove the OR once 6c37 is fixed
-	echo 'Nice to have: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2-)
-	echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2-)
+	set pkgfile (prtpkgfile)
+
+	echo 'Description: '(string match -r '^# Description:.*' $pkgfile | cut -d ':' -f 2- | string trim)
+	echo 'URL: '(string match -r '^# URL:.*' $pkgfile | cut -d ':' -f 2- | string trim)
+	echo 'Maintainer: '(string match -r '^# Maintainer:.*' $pkgfile | cut -d ':' -f 2- | string trim)
+	echo 'Depends on: '(string match -r '^# Depends on:.*' $pkgfile | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	echo 'Nice to have: '(string match -r '^# (Optional|Nice to have):.*' $pkgfile | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	echo 'Version: '(string match -r '^version=.*' $pkgfile | cut -d '=' -f 2- | string trim)
+	echo 'Release: '(string match -r '^release=.*' $pkgfile | cut -d '=' -f 2- | string trim)
 end

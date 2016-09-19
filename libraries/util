@@ -147,7 +147,7 @@ end
 # This function optionally takes a Pkgfile location, for example "core/openssl"
 function prtpkgfile
 	if test -z $argv
-		if test -f $pkgfile
+		if test -f $PWD/Pkgfile
 			cat $PWD/Pkgfile
 		else
 			echo 'Pkgfile not found.' >/dev/stderr
