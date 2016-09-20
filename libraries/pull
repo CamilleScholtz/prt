@@ -38,7 +38,7 @@ for file in $repos
 	set current (math $current + 1)
 	echo "Updating collection $current/$total, $bright$name$foreground."
 
-	cd $portdir/$name >/dev/null
+	cd $prtdir/$name >/dev/null
 	if test $status -eq 0
 		git checkout -q $branch
 		git fetch -q --depth 1
@@ -48,8 +48,8 @@ for file in $repos
 		git clean -q -f
 		git reset -q --hard origin/$branch
 	else
-		git clone -q --depth 1 -b $branch $url $portdir/$name
+		git clone -q --depth 1 -b $branch $url $prtdir/$name
 		# TODO: Use string
-		ls $portdir/$name | sed "s/^/$dark-> {$foreground}Adding /g"
+		ls $prtdir/$name | sed "s/^/$dark-> {$foreground}Adding /g"
 	end
 end

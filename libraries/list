@@ -22,7 +22,7 @@ if test (count $argv) -ge 1
 				grep -A 2 '^$' /var/lib/pkg/db | 'tr' \n ' ' | string replace -r -a '\-\-' '\n' | string trim | head -n -1
 				exit 0
 			case r repos
-				find $portdir -mindepth 1 -maxdepth 1 -type d | string replace "$portdir/" '' | sort
+				find $prtdir -mindepth 1 -maxdepth 1 -type d | string replace "$prtdir/" '' | sort
 				exit 0
 			case '*'
 				echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
@@ -30,5 +30,5 @@ if test (count $argv) -ge 1
 		end
 	end
 else
-	find $portdir -mindepth 2 -maxdepth 2 -type d | string replace "$portdir/" '' | sort
+	find $prtdir -mindepth 2 -maxdepth 2 -type d | string replace "$prtdir/" '' | sort
 end

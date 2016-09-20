@@ -6,7 +6,7 @@ set srcdir /usr/src/pkgmk/sources
 set wrkdir /usr/src/pkgmk/work
 
 # Location of the ports tree
-set portdir /usr/ports
+set prtdir /usr/ports
 
 # Repo order, the port found first is used
 set order core 6c37-git 6c37 opt xorg contrib

@@ -27,7 +27,7 @@ function prtinstall
 
 	for port in $ports
 		if test $total -ge 1
-			cd $portdir/$port
+			cd $prtdir/$port
 		else
 			set total 1
 		end
@@ -157,8 +157,8 @@ function prtpkgfile
 			exit 1
 		end
 	else
-		if test -f $portdir/$argv/Pkgfile
-			cat $portdir/$argv/Pkgfile
+		if test -f $prtdir/$argv/Pkgfile
+			cat $prtdir/$argv/Pkgfile
 		else
 			echo "Pkgfile $bright$argv$foreground not found." >/dev/stderr
 			exit 1

@@ -38,7 +38,7 @@ for patch in $patches
 	set current (math $current + 1)
 	echo "Patching file $current/$total, $bright$repo/$port/$file$foreground."
 
-	patch -N "$portdir/$repo/$port/$file" -i $patch >/dev/null
+	patch -N "$prtdir/$repo/$port/$file" -i $patch >/dev/null
 	if test $status -ge 1
 		echo "Patching $bright$repo/$port/$file$foreground failed." >/dev/stderr
 		exit 1
