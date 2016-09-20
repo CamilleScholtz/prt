@@ -1,48 +1,35 @@
-# prtstuff
+# prt
 
-Consitent CRUX port utilities written in fish, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, and some `prt-utils`. These scripts still make use of `pkgmk` and `pkgadd`,
+Consitent CRUX port utility written in fish, aiming to replace, or at least, be used in combination with `prt-get`, `ports`, and some `prt-utils`. These scripts still make use of `pkgmk` and `pkgadd`,
 simply because it's too hard/complex to parse `Pkgfile`s (bash) with fish.
 
-You might ask why I'm rewriting all these utils that work perfectly fine? One reason if for fun, a few other things that make the prtstuff utils interesting are:
+You might ask why I'm rewriting all these utils that work perfectly fine? One reason if for fun, a few other things that make `prt` interesting are:
 
 * An inconsitency that really bugs me is how `pkgmk` only works by being in a directory with a `Pkgfile`, but `prt-get` is
   the other way around and only works by providing a port name.
-  I definitely like they way `pkgmk` does it, so almost all prtstuff utils work this way.
+  I definitely like they way `pkgmk` does it, so `prt` works this way, but unlike `pkgmk` also does dependencies and stuff.
   In combination with `cdp` it makes managing ports a breeze.
 
 * I'm kind of a perfectionst, I want all my terminal programs to have the exact same style of output.
   all the `--help` outputs of the prtstuff utils use the same kind of spacing, identation is
-  always done with a black arrow (`->`), see the `lsdep`, `pullprt` and `provprt` output.
+  always done with a black arrow (`->`), see the `prt depends`, `prt pull` and `prt provide` output.
   All utils use the same colors, same kind of flags, etcetera.
 
-* prtstuff uses one config file that sets ordering, aliasing, colors, and more for all prtstuff utils.
+  The command line is kinda inspired by the `go` one.
 
-* prtstuff tries to follow the UNIX philosophy of doing one thing and doing it well. `pullprt` ONLY pulls in new ports,
-  `lsprt` ONLY lists repos or ports, `lsdep` ONLY lists dependencies.
+* prtstuff uses one config file that sets ordering, aliasing, colors, and more for all `prt` utils.
 
-* None of the prtstuff utils depend on `prt-get`.
+* None of the prtstuff utils depend on `prt`, kinda neat huh, it's slower though, but whatever.
 
-* The prtstuff utils have nice fish integration, for example a function named `cdp` that uses `locprt` to cd to ports, for example
-  `cdp mpv` cds to `/usr/port/6c37-git/mpv`. Completions for `cdp`, `locprt`, and more.
-
-
-prtstuff tries to keep the naming of the utils kind of sane, and follows the following rules:
-
-pre-fixes:
-* `ls*` for utils that lists things.
-* `mk*` for utils that build packages.
-
-post-fixes:
-* `*prt` for utils that (can) interact with all ports found in the ports tree.
-* `*dep` for utils that interact with dependencies.
-* `*diff` for utils that interact with ports that have a different installed version from the version in the ports tree.
+* `prt` has nice fish integration, for example a function named `cdp` that uses `prt location` to cd to ports, for example
+  `cdp mpv` cds to `/usr/port/6c37-git/mpv`. Most commands also have some form of completion.
 
 
 ----
 
 ## cdp
 
-cd to port location, using `locprt`.
+cd to port location, using `prt location`.
 
 ### Examples
 
@@ -57,6 +44,67 @@ $ pwd
 $ cdp openssl
 $ pwd
 /usr/ports/6c37/libressl
+```
+
+
+## prt depends
+
+List dependencies recursively.
+
+### Help
+
+```
+Usage: prt depends [arguments]
+
+arguments:
+  -a,   --all             also list installed dependencies
+  -n,   --no-alias        disable aliasing
+  -t,   --tree            list using tree view
+  -h,   --help            print help and exit
+```
+
+### Examples
+
+List all not-yet-installed dependencies:
+```
+$ prt depends
+opt/mplayer
+opt/qt4
+opt/libmng
+```
+
+List all not-yet-installed dependencies in tree view:
+```
+$ prt depends -t
+opt/mplayer
+opt/qt4
+-> opt/libmng
+```
+
+List all dependencies without aliasing them in tree view:
+```
+$ prt depends -tna
+opt/mplayer
+-> opt/expat
+-> opt/freetype
+-> -> core/zlib
+-> -> opt/libpng
+...
+```
+
+
+## prt diff
+
+List outdated packages.
+
+### Help
+
+```
+Usage: prt diff [arguments]
+
+arguments:
+  -v,   --version         list installed and available version
+  -h,   --help            print help and exit
 ```
 
 
@@ -109,68 +157,6 @@ core/openssl
 ```
 
 
-## lsdep
-
-List dependencies recursively.
-
-
-### Help
-
-```
-Usage: lsdep [options]
-
-options:
-  -a,   --all             also list installed dependencies
-  -n,   --no-alias        disable aliasing
-  -t,   --tree            list using tree view
-  -h,   --help            print help and exit
-```
-
-
-### Examples
-
-List all not-yet-installed dependencies:
-```
-$ lsdep
-opt/mplayer
-opt/qt4
-opt/libmng
-```
-
-List all not-yet-installed dependencies in tree view:
-```
-$ lsdep -t
-opt/mplayer
-opt/qt4
--> opt/libmng
-```
-
-List all dependencies without aliasing them in tree view:
-```
-$ lsdep -tna
-opt/mplayer
--> opt/expat
--> opt/freetype
--> -> core/zlib
--> -> opt/libpng
-...
-```
-
-
-## lsdiff
-
-List installed ports with a different version available in the portstree.
-
-
-### Help
-
-```
-Usage: lsdiff [options]
-
-options:
-  -v,   --version         list installed and available version
-  -h,   --help            print help and exit
-```
 
 
 ## lsprt
@@ -214,30 +200,6 @@ aspell-en 2016.06.26-0-1
 atk 2.20.0-1
 ...
 ```
-
-
-## mkdep
-
-Update ports that get listed by `lsdep`.
-
-
-### Usage
-
-Set `set script` to either `true` or `false` to change the default behavoir
-of `mkdep` in `/etc/prtstuff/config`, you can toggle the value using the `-s` flag.
-
-
-### Help
-
-```
-Usage: mkdep [options]
-
-options:
-  -s,   --script          toggle execution of pre- and post-install
-  -v,   --verbose         enable verbose output
-  -h,   --help            print help and exit
-```
-
 
 ## mkdiff
 

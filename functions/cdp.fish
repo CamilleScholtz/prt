@@ -4,8 +4,8 @@ function cdp
 	set location (prt location $argv ^/dev/null)
 
 	if test -n "$location"
-		cd $portdir/$location
+		cd $prtdir/$location
 	else
-		cd $portdir
+		cd $prtdir
 	end
 end
