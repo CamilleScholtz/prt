@@ -38,7 +38,7 @@ if test (count $argv) -ge 1
 			case v version
 				echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2- | string trim)
 			case r release
-				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2- | string rim)
+				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2- | string trim)
 			case '*'
 				echo 'Invalid arguments, use -h for a list of arguments.' >/dev/stderr
 				exit 1

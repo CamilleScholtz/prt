@@ -34,6 +34,9 @@ function prtinstall
 
 		set current (math $current + 1)
 
+		# Get port version/release, this is needed for pkgadd
+		set version (prt info -v -r | cut -d ' ' -f 2)
+
 		if test $method = install
 			echo "Installing port $current/$total, $bright$port$foreground."
 		else
@@ -60,9 +63,9 @@ function prtinstall
 		# Download port
 		echo "$dark-> "$foreground"Downloading sources"
 		if test $verbose = true
-			pkgmk -do >/dev/null
+			sudo -H -u pkgmk fakeroot pkgmk -do >/dev/null
 		else
-			pkgmk -do >/dev/null ^/dev/null
+			sudo -H -u pkgmk fakeroot pkgmk -do >/dev/null ^/dev/null
 		end
 		if test $status -ge 1
 			echo "Failed to download $bright$port$foreground." >/dev/stderr
@@ -72,9 +75,9 @@ function prtinstall
 		# Extract port
 		echo "$dark-> "$foreground"Extracting sources"
 		if test $verbose = true
-			pkgmk -eo >/dev/null
+			sudo -H -u pkgmk fakeroot pkgmk -eo >/dev/null
 		else
-			pkgmk -eo >/dev/null ^/dev/null
+			sudo -H -u pkgmk fakeroot pkgmk -eo >/dev/null ^/dev/null
 		end
 		if test $status -ge 1
 			echo "Failed to extract $bright$port$foreground." >/dev/stderr
@@ -84,9 +87,9 @@ function prtinstall
 		# Building port
 		echo "$dark-> "$foreground"Creating package"
 		if test $verbose = true
-			pkgmk -f >/dev/null
+			sudo -H -u pkgmk fakeroot pkgmk -f >/dev/null
 		else
-			pkgmk -f >/dev/null ^/dev/null
+			sudo -H -u pkgmk fakeroot pkgmk -f >/dev/null ^/dev/null
 		end
 		if test $status -ge 1
 			echo "Failed to build $bright$port$foreground." >/dev/stderr
@@ -97,20 +100,19 @@ function prtinstall
 		echo "$dark-> "$foreground"Installing package"
 		if test $method = install
 			if test $verbose = true
-				pkgmk -i >/dev/null
+				sudo pkgadd $pkgdir/$port#$version[1]-$version[2].tar.* >/dev/null
 			else
-				pkgmk -i >/dev/null ^/dev/null
+				sudo pkgadd $pkgdir/$port#$version[1]-$version[2].tar.* >/dev/null ^/dev/null
 			end
 			if test $status -ge 1
 				echo "Failed to install $bright$port$foreground." >/dev/stderr
 				exit 1
 			end
 		else
-			# TODO: The -f causes ports to rebuild...
 			if test $verbose = true
-				pkgmk -u >/dev/null
+				sudo pkgadd -u $pkgdir/$port#$version[1]-$version[2].tar.* >/dev/null
 			else
-				pkgmk -u >/dev/null ^/dev/null
+				sudo pkgadd -u $pkgdir/$port#$version[1]-$version[2].tar.* >/dev/null ^/dev/null
 			end
 			if test $status -ge 1
 				echo "Failed to update $bright$port$foreground." >/dev/stderr

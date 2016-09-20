@@ -1,3 +1,10 @@
+#!/bin/fish
+
+# Location of the pkgmk packages, sources and work directories
+set pkgdir /usr/src/pkgmk/packages
+set srcdir /usr/src/pkgmk/sources
+set wrkdir /usr/src/pkgmk/work
+
 # Location of the ports tree
 set portdir /usr/ports
 
