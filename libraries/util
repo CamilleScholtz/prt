@@ -145,15 +145,6 @@ function prtonlyroot
 	end
 end
 
-# This function check if the output is being piped
-function prtpipe
-	if isatty stdout
-		return 1
-	else
-		return 0
-	end
-end
-
 # This function outputs the Pkgfile
 #
 # This function optionally takes a Pkgfile location, for example "core/openssl"
