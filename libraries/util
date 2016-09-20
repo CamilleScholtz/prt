@@ -148,9 +148,9 @@ end
 # This function check if the output is being piped
 function prtpipe
 	if isatty stdout
-		return 0
-	else
 		return 1
+	else
+		return 0
 	end
 end
 

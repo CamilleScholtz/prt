@@ -34,7 +34,7 @@ set locations (prt location $names)
 
 for count in (seq (count $locations))
 	set version $versions[$count]
-	set available (prtpkgfile $locations[$count] | string match -r '^version=.*|^release=.*' | string replace -r '^version=|^release=' '' | string join '-')
+	set available (prtpkgfile $locations[$count] | string match -r '^version=.*|^release=.*' | cut -d '=' -f 2 | cut -d ' ' -f 1 | string join '-')
 
 	if test $version != $available
 		if test $oldnew = true

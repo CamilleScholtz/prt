@@ -36,9 +36,9 @@ if test (count $argv) -ge 1
 			case o optional
 				echo 'Nice to have: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case v version
-				echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2- | string trim)
+				echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
 			case r release
-				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2- | string trim)
+				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
 			case '*'
 				echo 'Invalid arguments, use -h for a list of arguments.' >/dev/stderr
 				exit 1
@@ -52,6 +52,6 @@ else
 	echo 'Maintainer: '(string match -r '^# Maintainer:.*' $pkgfile | cut -d ':' -f 2- | string trim)
 	echo 'Depends on: '(string match -r '^# Depends on:.*' $pkgfile | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 	echo 'Nice to have: '(string match -r '^# (Optional|Nice to have):.*' $pkgfile | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	echo 'Version: '(string match -r '^version=.*' $pkgfile | cut -d '=' -f 2- | string trim)
-	echo 'Release: '(string match -r '^release=.*' $pkgfile | cut -d '=' -f 2- | string trim)
+	echo 'Version: '(string match -r '^version=.*' $pkgfile | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
+	echo 'Release: '(string match -r '^release=.*' $pkgfile | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
 end
