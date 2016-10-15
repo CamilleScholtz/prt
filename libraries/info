@@ -3,8 +3,6 @@
 # info - Prints port information
 # onodera, https://github.com/onodera-punpun
 
-# TODO: If optional for example is empty, it prints nothing instead of "Nice to have: "
-
 ## EXECUTE
 
 # Load util
@@ -26,19 +24,26 @@ if test (count $argv) -ge 1
 				echo '  -h,   --help            print help and exit'
 				exit 0
 			case d description
-				echo 'Description: '(prtpkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
+				echo -n 'Description: '
+				echo (prtpkgfile | string match -r '^# Description:.*' | cut -d ':' -f 2- | string trim)
 			case u url
-				echo 'URL: '(prtpkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
+				echo -n 'URL: '
+				echo (prtpkgfile | string match -r '^# URL:.*' | cut -d ':' -f 2- | string trim)
 			case m maintainer
-				echo 'Maintainer: '(prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
+				echo -n 'Maintainer: '
+				echo (prtpkgfile | string match -r '^# Maintainer:.*' | cut -d ':' -f 2- | string trim)
 			case e depends
-				echo 'Depends on: '(prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+				echo -n 'Depends on: '
+				echo (prtpkgfile | string match -r '^# Depends on:.*' | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case o optional
-				echo 'Nice to have: '(prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+				echo -n 'Nice to have: '
+				echo (prtpkgfile | string match -r '^# (Optional|Nice to have):.*' | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
 			case v version
-				echo 'Version: '(prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
+				echo -n 'Version: '
+				echo (prtpkgfile | string match -r '^version=.*' | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
 			case r release
-				echo 'Release: '(prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
+				echo -n 'Release: '
+				echo (prtpkgfile | string match -r '^release=.*' | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
 			case '*'
 				echo 'Invalid arguments, use -h for a list of arguments.' >/dev/stderr
 				exit 1
@@ -47,11 +52,18 @@ if test (count $argv) -ge 1
 else
 	set pkgfile (prtpkgfile)
 
-	echo 'Description: '(string match -r '^# Description:.*' $pkgfile | cut -d ':' -f 2- | string trim)
-	echo 'URL: '(string match -r '^# URL:.*' $pkgfile | cut -d ':' -f 2- | string trim)
-	echo 'Maintainer: '(string match -r '^# Maintainer:.*' $pkgfile | cut -d ':' -f 2- | string trim)
-	echo 'Depends on: '(string match -r '^# Depends on:.*' $pkgfile | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	echo 'Nice to have: '(string match -r '^# (Optional|Nice to have):.*' $pkgfile | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
-	echo 'Version: '(string match -r '^version=.*' $pkgfile | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
-	echo 'Release: '(string match -r '^release=.*' $pkgfile | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
+	echo -n 'Description: '
+	echo (string match -r '^# Description:.*' $pkgfile | cut -d ':' -f 2- | string trim)
+	echo -n 'URL: '
+	echo (string match -r '^# URL:.*' $pkgfile | cut -d ':' -f 2- | string trim)
+	echo -n 'Maintainer: '
+	echo (string match -r '^# Maintainer:.*' $pkgfile | cut -d ':' -f 2- | string trim)
+	echo -n 'Depends on: '
+	echo (string match -r '^# Depends on:.*' $pkgfile | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	echo -n 'Nice to have: '
+	echo (string match -r '^# (Optional|Nice to have):.*' $pkgfile | head -n 1 | cut -d ':' -f 2- | string replace -a ',' '' | string trim)
+	echo -n 'Version: '
+	echo (string match -r '^version=.*' $pkgfile | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
+	echo -n 'Release: '
+	echo (string match -r '^release=.*' $pkgfile | cut -d '=' -f 2 | cut -d ' ' -f 1 | string trim)
 end

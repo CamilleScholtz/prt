@@ -7,95 +7,93 @@
 
 # This function prints the Pkgfile dependencies
 function prtdependencies
-	string match -r '# Depends on:.*' $argv | string replace '# Depends on:' '' | string trim | string split ' ' | string trim -c ','
+    string match -r '# Depends on:.*' $argv | string replace '# Depends on:' '' | string trim | string split ' ' | string trim -c ','
 end
 
 # This function prints port locations
-#
-# I don't use locprt because it's to slow to lsprt every iteration
-# TODO: Use prt location somehow?
+# TODO: Use prt location somehow, I currently don't use it because it's to slow too prt location every iteration
 function prtlocation
-	for port in $argv
-		# continue if port variable is empty
-		if test -z "$port"
-			continue
-		end
+    for port in $argv
+        # continue if port variable is empty
+        if test -z "$port"
+            continue
+        end
 
-		set location (string match -r ".*/$port\$" $portstree)
+        set location (string match -r ".*/$port\$" $portstree)
 
-		# continue if location variable is empty
-		if test -z "$location"
-			continue
-		end
+        # continue if location variable is empty
+        if test -z "$location"
+            continue
+        end
 
-		# Order ports
-		if test (count $location) -ge 2
-			for repo in $order
-				set locationrepo (string match -r "^$repo/.*" $location)
+        # Order ports
+        if test (count $location) -ge 2
+            for repo in $order
+                set locationrepo (string match -r "^$repo/.*" $location)
 
-				if test -n "$locationrepo"
-					set location $locationrepo
-					break
-				end
-			end
+                if test -n "$locationrepo"
+                    set location $locationrepo
+                    break
+                end
+            end
 
-		end
+        end
 
-		# Alias ports
-		if test $aliasing = true
-			if string match -q -r "^$location=" $alias
-				set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
-			end
-		end
+        # Alias ports
+        if test $aliasing = true
+            if string match -q -r "^$location=" $alias
+                set location (string match -r "^$location=.*" $alias | cut -d '=' -f 2)
+            end
+        end
 
-		# Finally print the location :)
-		echo $location
-	end
+        # Finally print the location :)
+        echo $location
+    end
 end
 
 # This function prints dependencies recursivly
 function prtrecursive
-	for port in (prtlocation (prtdependencies (prtpkgfile $location)))
-		# Continue if already checked
-		if string match -q -r "^$port\$" $checked
-			continue
-		else
-			set -g checked $port $checked
-		end
+    for port in (prtlocation (prtdependencies (prtpkgfile $location)))
+        # Continue if already checked
+        if string match -q -r "^$port\$" $checked
+            continue
+        else
+            set -g checked $port $checked
+        end
 
-		# Continue if already installed
-		if test $all = false
-			if string match -q -r "^"(echo $port | cut -d '/' -f 2)"\$" $installed
-				continue
-			end
-		end
+        # Continue if already installed
+        if test $all = false
+            if string match -q -r "^"(echo $port | cut -d '/' -f 2)"\$" $installed
+                continue
+            end
+        end
 
-		# Print tree
-		if test $tree = true
-			if test $iteration -ge 1
-				if isatty stdout
-					echo -n $dark
-					printf '-> %.0s' (seq $iteration)
-					echo -n $foreground
-				else
-					printf '-> %.0s' (seq $iteration)
-				end
-			end
+        # Print tree
+        if test $tree = true
+            if test $iteration -ge 1
+                if isatty stdout
+                    echo -n $dark
+                    printf '-> %.0s' (seq $iteration)
+                    echo -n $foreground
+                else
+                    printf '-> %.0s' (seq $iteration)
+                end
+            end
 
-			set -g iteration (math $iteration + 1)
-		end
+            set -g iteration (math $iteration + 1)
+        end
 
-		# Finally print the port :)
-		echo $port
+        # Finally print the port :)
+        echo $port
 
-		# Change location and loop again
-		set -g location $port
-		prtrecursive
+        # Change location and loop again
+        set -g location $port
+        prtrecursive
 
-		if test $tree = true
-			set -g iteration (math $iteration - 1)
-		end
-	end
+        if test $tree = true
+            set -g iteration (math $iteration - 1)
+        end
+    end
 end
 
 
@@ -110,26 +108,26 @@ set aliasing true
 set tree false
 
 getopts $argv | while read -l opt val
-	switch $opt
-		case h help
-			echo -e 'Usage: prt depends [arguments]\n'
-			echo 'arguments:'
-			echo '  -a,   --all             also list installed dependencies'
-			echo '  -n,   --no-alias        disable aliasing'
-			echo '  -t,   --tree            list using tree view'
-			echo '  -h,   --help            print help and exit'
-			exit 0
-		case a all
-			set all true
-		case n no-alias
-			set aliasing false
-		case t tree
-			set tree true
-			set iteration 0
-		case '*'
-			echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
-			exit 1
-	end
+    switch $opt
+        case h help
+            echo -e 'Usage: prt depends [arguments]\n'
+            echo 'arguments:'
+            echo '  -a,   --all             also list installed dependencies'
+            echo '  -n,   --no-alias        disable aliasing'
+            echo '  -t,   --tree            list using tree view'
+            echo '  -h,   --help            print help and exit'
+            exit 0
+        case a all
+            set all true
+        case n no-alias
+            set aliasing false
+        case t tree
+            set tree true
+            set iteration 0
+        case '*'
+            echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
+            exit 1
+    end
 end
 
 # Get all and installed ports
@@ -137,4 +135,3 @@ set portstree (prt list)
 set installed (prt list -i | cut -d ' ' -f 1)
 
 prtrecursive
-
