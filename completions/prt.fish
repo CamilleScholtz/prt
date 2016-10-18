@@ -23,9 +23,10 @@ complete -c prt -n '__fish_seen_subcommand_from info' -o v -l version -d 'print 
 complete -c prt -n '__fish_seen_subcommand_from info' -o r -l release -d 'print release'
 complete -c prt -n '__fish_seen_subcommand_from info' -o h -l help -d 'print help and exit'
 
-complete -c prt -n '__fish_use_subcommand' -a list -d 'list repos and ports'
+complete -c prt -n '__fish_use_subcommand' -a list -d 'list ports'
 complete -c prt -n '__fish_seen_subcommand_from list' -o i -l installed -d 'list installed ports'
-complete -c prt -n '__fish_seen_subcommand_from list' -o r -l repos -d 'list repos'
+complete -c prt -n '__fish_seen_subcommand_from list' -o r -l repo -d 'list repo info as well'
+complete -c prt -n '__fish_seen_subcommand_from list' -o b -l version -d 'list port version info as well'
 complete -c prt -n '__fish_seen_subcommand_from list' -o h -l help -d 'print help and exit'
 
 complete -c prt -n '__fish_use_subcommand' -a location -d 'prints port locations'
@@ -43,7 +44,6 @@ complete -c prt -n '__fish_seen_subcommand_from provide' -o h -l help -d 'print 
 complete -c prt -n '__fish_use_subcommand' -a remove -d 'remove installed ports'
 
 complete -c prt -n '__fish_use_subcommand' -a pull -d 'pull in ports'
-complete -c prt -n '__fish_seen_subcommand_from location' -x -a "(prt list -r)"
 complete -c prt -n '__fish_seen_subcommand_from pull' -o h -l help -d 'print help and exit'
 
 complete -c prt -n '__fish_use_subcommand' -a sysup -d 'update outdated packages'

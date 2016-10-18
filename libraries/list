@@ -1,34 +1,56 @@
 #!/bin/fish
 #
-# list - List repos and ports
+# list - List ports
 # onodera, https://github.com/onodera-punpun
+
+# TODO: Add version flag
 
 ## EXECUTE
 
 # Load util
 source /usr/share/prt/util
 
-if test (count $argv) -ge 1
-	getopts $argv | while read -l opt val
-		switch $opt
-			case h help
-				echo -e 'Usage: prt list [arguments]\n'
-				echo 'arguments:'
-				echo '  -i,   --installed       list installed ports'
-				echo '  -r,   --repos           list repos'
-				echo '  -h,   --help            print help and exit'
-				exit 0
-			case i installed
-				grep -A 2 '^$' /var/lib/pkg/db | 'tr' \n ' ' | string replace -r -a '\-\-' '\n' | string trim | head -n -1
-				exit 0
-			case r repos
-				find $prtdir -mindepth 1 -maxdepth 1 -type d | string replace "$prtdir/" '' | sort
-				exit 0
-			case '*'
-				echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
-				exit 1
-		end
+# Initialize default option values
+set installed false
+set repo false
+set version false
+
+getopts $argv | while read -l opt val
+	switch $opt
+		case h help
+			echo -e 'Usage: prt list [arguments]\n'
+			echo 'arguments:'
+			echo '  -i,   --installed       list installed ports'
+			echo '  -r,   --repo            list repo info as well'
+			echo '  -v,   --version         list port version info as well'
+			echo '  -h,   --help            print help and exit'
+			exit 0
+		case i installed
+			set installed true
+		case r repo
+			set repo true
+		case v version
+			set version true
+		case '*'
+			echo 'Invalid argument, use -h for a list of arguments.' >/dev/stderr
+			exit 1
+	end
+end
+
+if test $installed = true
+	if test $version = true
+		grep -A 2 '^$' /var/lib/pkg/db | tr '\n' ' ' | string replace -r -a '\-\-' '\n' | string trim | head -n -1
+	else
+		grep -A 1 '^$' /var/lib/pkg/db | tr '\n' ' ' | string replace -r -a '\-\-' '\n' | string trim | head -n -1
 	end
 else
-	find $prtdir -mindepth 2 -maxdepth 2 -type d | string replace "$prtdir/" '' | sort
+	if test $repo = true -a $version = true
+		grep '^version=\|^release=' (find /usr/ports -type f -name 'Pkgfile' -print) | string replace "$prtdir/" '' | string replace -r '.*:release=' '-' | string replace '/Pkgfile:version=' ' ' | sed 'N;s/\n-/-/g'
+	else if test $repo = true
+		find $prtdir -mindepth 2 -maxdepth 2 -type d | string replace -r "$prtdir/" '' | sort
+	else if test $version = true
+		grep '^version=\|^release=' (find /usr/ports -type f -name 'Pkgfile' -print) | string replace -r "$prtdir/" '' | string replace -r '.*:release=' '-' | string replace '/Pkgfile:version=' ' ' | sed 'N;s/\n-/-/g' | cut -d '/' -f 2- | sort
+	else
+		find $prtdir -mindepth 2 -maxdepth 2 -type d | string replace -r "$prtdir/.*/" '' | sort | uniq
+	end
 end

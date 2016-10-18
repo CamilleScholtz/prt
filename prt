@@ -14,7 +14,7 @@ if test (count $argv) -ge 1
 			echo '  diff                    list outdated packages'
 			echo '  build                   build and install ports'
 			echo '  info                    print port information'
-			echo '  list                    list repos and ports'
+			echo '  list                    list ports'
 			echo '  location                prints port locations'
 			echo '  patch                   patch ports'
 			echo '  provide                 search ports for files'

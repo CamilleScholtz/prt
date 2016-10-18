@@ -131,7 +131,7 @@ getopts $argv | while read -l opt val
 end
 
 # Get all and installed ports
-set portstree (prt list)
-set installed (prt list -i | cut -d ' ' -f 1)
+set portstree (prt list -r)
+set installed (prt list -i)
 
 prtrecursive
