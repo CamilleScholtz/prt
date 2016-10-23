@@ -36,4 +36,4 @@ end
 
 set method update
 prtonlyroot "$method ports"
-prtinstall (prt diff)
+prtinstall (prt list -d)
