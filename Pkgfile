@@ -1,0 +1,21 @@
+# Description:	Mplayer frontend
+# URL:		http://smplayer.sf.net/
+# Maintainer:	Alan Mizrahi, alan at mizrahi dot com dot ve
+# Depends on:	mplayer qt4
+# Optional:	kdelibs
+
+name=smplayer
+version=16.11.0
+release=1
+source=(http://prdownloads.sf.net/$name/$name-$version.tar.bz2)
+
+build() {
+	cd $name-$version
+	sed -i -e 's|kde-config|kde4-config|g' Makefile
+
+	# Check if kdelibs is installed, since its not detected automatically
+	[ -x /usr/bin/kde4-config ] && kde=KDE_SUPPORT=1
+
+	make DESTDIR=$PKG PREFIX=/usr QMAKE_OPTS=DEFINES+=NO_DEBUG_ON_CONSOLE $kde install
+	rm -rf $PKG/usr/share/doc
+}
