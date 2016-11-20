@@ -47,10 +47,10 @@ func ListInstPorts() []string {
 }
 
 // This function returns the port location
-func PortLoc(port string) []string {
+func PortLoc(ports []string, port string) []string {
 	regex := regexp.MustCompile("(?m)^.*/" + port + "$")
 
-	return regex.FindAllString(strings.Join(ListAllPorts(), "\n"), -1)
+	return regex.FindAllString(strings.Join(ports, "\n"), -1)
 }
 
 // This function reads out Pkgfile comments

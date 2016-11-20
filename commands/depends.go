@@ -10,6 +10,7 @@ import (
 )
 
 var Checked []string
+var Ports []string
 
 // This function prints dependencies recursivly
 func recursive(path string) {
@@ -20,27 +21,25 @@ func recursive(path string) {
 		os.Exit(1)
 	}
 
-	// Read out pkgfile dependencies
-	var loc string
-	var fix []string
+	// Read out Pkgfile dependencies
 	deps := utils.ReadDepends(pkgfile, "Depends on")
-	if len(deps) < 1 {
-		return
-	}
 
-	for _, port := range deps {
+	var locList []string
+	var loc string
+
+	for _, dep := range deps {
 		// Continue if already checked
-		if utils.StringInSlice(port, Checked) {
+		if utils.StringInSlice(dep, Checked) {
 			continue
 		} else {
-			Checked = append(Checked, port)
+			Checked = append(Checked, dep)
 		}
 
-		fix = utils.PortLoc(port)
-		if len(fix) < 1 {
+		locList = utils.PortLoc(Ports, dep)
+		if len(locList) < 1 {
 			return
 		} else {
-			loc = fix[0]
+			loc = locList[0]
 		}
 		fmt.Println(loc)
 
@@ -65,6 +64,7 @@ func Depends(args []string) {
 		os.Exit(1)
 	}
 
+	Ports = utils.ListAllPorts()
 	recursive("./")
 
 	if len(opts) > 0 {
