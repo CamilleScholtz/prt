@@ -38,8 +38,8 @@ func Info(args []string) {
 		os.Exit(1)
 	}
 
-	// Initialize options
-	var description, url, maintainer, depends, optional, version, release bool
+	// Initialize opt variables
+	var d, u, m, e, o, v, r bool
 
 	if len(opts) > 0 {
 		for _, opt := range opts {
@@ -58,51 +58,45 @@ func Info(args []string) {
 				fmt.Println("  -h,   --help            print help and exit")
 				os.Exit(0)
 			case "-d", "--description":
-				description = true
+				d = true
 			case "-u", "--url":
-				url = true
+				u = true
 			case "-m", "--maintainer":
-				maintainer = true
+				m = true
 			case "-e", "--depends":
-				depends = true
+				d = true
 			case "-o", "--optional":
-				optional = true
+				o = true
 			case "-v", "--version":
-				version = true
+				v = true
 			case "-r", "--release":
-				release = true
+				r = true
 			}
 		}
 	} else {
-		description = true
-		url = true
-		maintainer = true
-		depends = true
-		optional = true
-		version = true
-		release = true
+		d, u, m, e, o, v, r = true, true, true, true, true, true, true
 	}
 
 	// Print stuff
-	if description {
+	if d {
 		fmt.Println("Description: " + utils.ReadComment(pkgfile, "Description"))
 	}
-	if url {
+	if u {
 		fmt.Println("URL: " + utils.ReadComment(pkgfile, "URL"))
 	}
-	if maintainer {
+	if m {
 		fmt.Println("Maintainer: " + utils.ReadComment(pkgfile, "Maintainer"))
 	}
-	if depends {
+	if e {
 		fmt.Println("Depends on: " + strings.Join(utils.ReadDepends(pkgfile, "Depends on"), " "))
 	}
-	if optional {
+	if o {
 		fmt.Println("Nice to have: " + strings.Join(utils.ReadDepends(pkgfile, "Nice to have|Optional"), " "))
 	}
-	if version {
+	if v {
 		fmt.Println("Version: " + utils.ReadVar(pkgfile, "version"))
 	}
-	if release {
+	if r {
 		fmt.Println("Release: " + utils.ReadVar(pkgfile, "release"))
 	}
 }
