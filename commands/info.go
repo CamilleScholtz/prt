@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/onodera-punpun/prt/utils"
@@ -88,10 +87,10 @@ func Info(args []string) {
 		fmt.Println("Maintainer: " + utils.ReadComment(pkgfile, "Maintainer"))
 	}
 	if e {
-		fmt.Println("Depends on: " + strings.Join(utils.ReadDepends(pkgfile, "Depends on"), " "))
+		fmt.Println("Depends on: " + utils.ReadComment(pkgfile, "Depends on"))
 	}
 	if o {
-		fmt.Println("Nice to have: " + strings.Join(utils.ReadDepends(pkgfile, "Nice to have|Optional"), " "))
+		fmt.Println("Nice to have: " + utils.ReadComment(pkgfile, "Nice to have|Optional"))
 	}
 	if v {
 		fmt.Println("Version: " + utils.ReadVar(pkgfile, "version"))

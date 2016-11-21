@@ -32,15 +32,15 @@ func recursive(path string, a, t bool) {
 
 	for _, dep := range deps {
 		// Continue if already checked
-		if utils.StringInSlice(dep, Checked) {
+		if utils.StringInList(dep, Checked) {
 			continue
 		} else {
 			Checked = append(Checked, dep)
 		}
 
 		// Continue if already installed
-		if a {
-			if utils.StringInSlice(dep, InstPorts) {
+		if !a {
+			if utils.StringInList(dep, InstPorts) {
 				continue
 			}
 		}
@@ -116,7 +116,7 @@ func Depends(args []string) {
 	print(d)
 
 	AllPorts = utils.ListAllPorts()
-	if a {
+	if !a {
 		InstPorts = utils.ListInstPorts()
 	}
 

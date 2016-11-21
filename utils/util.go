@@ -88,8 +88,8 @@ func ReadVar(file []byte, name string) string {
 	return string(match[1])
 }
 
-// This function checks if a string is in a slice
-func StringInSlice(a string, list []string) bool {
+// This function checks if a string is in a list
+func StringInList(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
 			return true
