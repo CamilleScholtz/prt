@@ -1,4 +1,4 @@
-package command
+package main
 
 import (
 	"fmt"
@@ -8,16 +8,15 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/util"
 )
 
 // Initialize global variables
+var A, T bool
 var AllPorts, Checked, InstPorts []string
 var Iteration int
 
 // This function prints dependencies recursivly
-func recursive(path string, a, t bool) {
+func recursive(path string) {
 	// Read out Pkgfile
 	pkgfile, err := ioutil.ReadFile(path + "/Pkgfile")
 	if err != nil {
@@ -26,28 +25,28 @@ func recursive(path string, a, t bool) {
 	}
 
 	// Read out Pkgfile dependencies
-	deps := util.ReadDepends(pkgfile, "Depends on")
+	deps := ReadDepends(pkgfile, "Depends on")
 
 	var locList []string
 	var loc string
 
 	for _, dep := range deps {
 		// Continue if already checked
-		if util.StringInList(dep, Checked) {
+		if StringInList(dep, Checked) {
 			continue
 		} else {
 			Checked = append(Checked, dep)
 		}
 
 		// Continue if already installed
-		if !a {
-			if util.StringInList(dep, InstPorts) {
+		if !A {
+			if StringInList(dep, InstPorts) {
 				continue
 			}
 		}
 
 		// Get port location
-		locList = util.GetPortLoc(AllPorts, dep)
+		locList = GetPortLoc(dep)
 		if len(locList) < 1 {
 			return
 		} else {
@@ -55,7 +54,7 @@ func recursive(path string, a, t bool) {
 		}
 
 		// Print tree arrowsPrt
-		if t {
+		if T {
 			if Iteration > 0 {
 				color.Set(color.FgBlack, color.Bold)
 				fmt.Printf(strings.Repeat("-  ", Iteration))
@@ -68,9 +67,9 @@ func recursive(path string, a, t bool) {
 		fmt.Println(loc)
 
 		// Loop
-		recursive(config.Struct.PrtDir+"/"+loc, a, t)
+		recursive(Config.PortDir + "/" + loc)
 
-		if t {
+		if T {
 			Iteration -= 1
 		}
 	}
@@ -92,10 +91,6 @@ func Depends(args []string) {
 		os.Exit(1)
 	}
 
-	// Initialize opt variables
-	//var a, d, t bool
-	var a, t bool
-
 	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
@@ -108,18 +103,18 @@ func Depends(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
-			a = true
+			A = true
 		case "-d", "--disable-alias":
 			//d = true
 		case "-t", "--tree":
-			t = true
+			T = true
 		}
 	}
 
-	AllPorts = util.ListAllPorts()
-	if !a {
-		InstPorts = util.ListInstPorts()
+	AllPorts = ListAllPorts()
+	if !A {
+		InstPorts = ListInstPorts()
 	}
 
-	recursive("./", a, t)
+	recursive("./")
 }

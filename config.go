@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"fmt"
@@ -9,23 +9,24 @@ import (
 )
 
 // Initialize global variables
-var Struct Config
+var Config configStruct
 
 // Initialize config options
-type Config struct {
-	PrtDir string
+type configStruct struct {
+	PortDir   string
+	RepoOrder []string
 }
 
 func InitConfig() {
 	// Read out config
-	config, err := ioutil.ReadFile("./config.toml")
+	configFile, err := ioutil.ReadFile("./config/config.toml")
 	if err != nil {
 		fmt.Println("Could not read config.")
 		os.Exit(1)
 	}
 
 	// Decode config
-	if _, err := toml.Decode(string(config), &Struct); err != nil {
+	if _, err := toml.Decode(string(configFile), &Config); err != nil {
 		fmt.Println("Could not decode config.")
 		os.Exit(1)
 	}

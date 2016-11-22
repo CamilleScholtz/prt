@@ -1,4 +1,4 @@
-package util
+package main
 
 import (
 	"fmt"
@@ -7,27 +7,21 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/onodera-punpun/prt/config"
 )
 
 // This functions lists all ports
 func ListAllPorts() []string {
 	// TODO: Is there something more efficient than Glob?
-	dirs, err := filepath.Glob(config.Struct.PrtDir + "/*/*")
+	dirs, err := filepath.Glob(Config.PortDir + "/*/*/Pkgfile")
 	if err != nil {
 		fmt.Println("Could not read ports.")
 		os.Exit(1)
 	}
 
-	// Count seperators in PrtDir
-	sep := strings.Count(config.Struct.PrtDir, "/")
-
 	var ports []string
 	for _, port := range dirs {
-		// TODO: Test if these sep+ values actually are correct
-		// TODO: Is there an easier way of basically getting the last 2 directories?
-		ports = append(ports, strings.SplitAfterN(port, "/", sep+2)[sep+1])
+		path := strings.Split(filepath.Dir(port), "/")
+		ports = append(ports, strings.Join(path[len(path)-2:], "/"))
 	}
 
 	return ports
@@ -55,8 +49,33 @@ func ListInstPorts() []string {
 }
 
 // This function returns the port location
-func GetPortLoc(ports []string, port string) []string {
-	regex := regexp.MustCompile("(?m)^.*/" + port + "$")
+func GetPortLoc(port string) []string {
+	regex := regexp.MustCompile(".*/" + port + "$")
 
-	return regex.FindAllString(strings.Join(ports, "\n"), -1)
+	var ports []string
+	for _, port := range AllPorts {
+		if regex.MatchString(port) {
+			ports = append(ports, regex.FindString(port))
+		}
+	}
+
+	// If there are multiple matches, sort using RepoOrder
+	var repoPort []string
+	if len(ports) > 1 {
+		// Empty old port array
+		oldPorts := ports
+		ports = []string{}
+
+		for _, port := range oldPorts {
+			repoPort = strings.Split(port, "/")
+
+			for _, repo := range Config.RepoOrder {
+				if repo == repoPort[0] {
+					ports = append(ports, strings.Join(repoPort, "/"))
+				}
+			}
+		}
+	}
+
+	return ports
 }

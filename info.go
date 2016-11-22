@@ -1,4 +1,4 @@
-package command
+package main
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/chiyouhen/getopt"
-	"github.com/onodera-punpun/prt/util"
 )
 
 func Info(args []string) {
@@ -78,24 +77,24 @@ func Info(args []string) {
 
 	// Print stuff
 	if d {
-		fmt.Println("Description: " + util.ReadComment(pkgfile, "Description"))
+		fmt.Println("Description: " + ReadComment(pkgfile, "Description"))
 	}
 	if u {
-		fmt.Println("URL: " + util.ReadComment(pkgfile, "URL"))
+		fmt.Println("URL: " + ReadComment(pkgfile, "URL"))
 	}
 	if m {
-		fmt.Println("Maintainer: " + util.ReadComment(pkgfile, "Maintainer"))
+		fmt.Println("Maintainer: " + ReadComment(pkgfile, "Maintainer"))
 	}
 	if e {
-		fmt.Println("Depends on: " + util.ReadComment(pkgfile, "Depends on"))
+		fmt.Println("Depends on: " + ReadComment(pkgfile, "Depends on"))
 	}
 	if o {
-		fmt.Println("Nice to have: " + util.ReadComment(pkgfile, "Nice to have|Optional"))
+		fmt.Println("Nice to have: " + ReadComment(pkgfile, "Nice to have|Optional"))
 	}
 	if v {
-		fmt.Println("Version: " + util.ReadVar(pkgfile, "version"))
+		fmt.Println("Version: " + ReadVar(pkgfile, "version"))
 	}
 	if r {
-		fmt.Println("Release: " + util.ReadVar(pkgfile, "release"))
+		fmt.Println("Release: " + ReadVar(pkgfile, "release"))
 	}
 }

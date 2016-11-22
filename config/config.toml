@@ -1,0 +1,9 @@
+PortDir   = "/usr/ports"
+RepoOrder = [ "punpun",
+              "6c37-dropin",
+              "core",
+              "6c37-git",
+              "6c37",
+              "opt",
+              "xorg",
+              "contrib" ]

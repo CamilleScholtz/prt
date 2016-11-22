@@ -3,13 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-
-	"github.com/onodera-punpun/prt/command"
-	"github.com/onodera-punpun/prt/config"
 )
 
 func main() {
-	config.InitConfig()
+	InitConfig()
 
 	if len(os.Args[1:]) == 0 {
 		fmt.Println("Missing command, use help for a list of commands.")
@@ -35,13 +32,13 @@ func main() {
 		fmt.Println("  help                    print help and exit")
 		os.Exit(0)
 	case "depends":
-		command.Depends(os.Args[1:])
+		Depends(os.Args[1:])
 		os.Exit(0)
 		//	case "build":
 		//		commands.Build(os.Args[1:])
 		//		os.Exit(0)
 	case "info":
-		command.Info(os.Args[1:])
+		Info(os.Args[1:])
 		os.Exit(0)
 		//	case "list":
 		//		command.List(os.Args[1:])
