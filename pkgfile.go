@@ -1,5 +1,7 @@
 package main
 
+// TODO: Think about using readline instead of regexp for most of this shit
+
 import (
 	"regexp"
 	"strings"

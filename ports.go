@@ -1,20 +1,51 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 )
+
+// This function returns the port location
+func GetPortLoc(name string) []string {
+	var ports []string
+	for _, port := range AllPorts {
+		if strings.Split(port, "/")[1] == name {
+			ports = append(ports, port)
+		}
+	}
+
+	// If there are multiple matches, sort using the config Order value
+	if len(ports) > 1 {
+		for i, port := range ports {
+			for _, repo := range Config.Order {
+				if repo == filepath.Dir(port) {
+					ports[i] = port
+				}
+			}
+		}
+	}
+
+	// Alias ports using the config Alias value if needed
+	for i, port := range ports {
+		for _, alias := range Config.Alias {
+			if alias[0] == port {
+				ports[i] = alias[1]
+			}
+		}
+	}
+
+	return ports
+}
 
 // This functions lists all ports
 func ListAllPorts() []string {
 	// TODO: Is there something more efficient than Glob?
 	dirs, err := filepath.Glob(Config.PortDir + "/*/*/Pkgfile")
 	if err != nil {
-		fmt.Println("Could not read ports.")
+		fmt.Fprintln(os.Stderr, "Could not read ports!")
 		os.Exit(1)
 	}
 
@@ -28,53 +59,26 @@ func ListAllPorts() []string {
 }
 
 // This functions lists installed ports
-// TODO: This could use some optimization
 func ListInstPorts() []string {
-	regex := regexp.MustCompile("(?m)^$\n(.*)")
-
-	// Read out db
-	db, err := ioutil.ReadFile("/var/lib/pkg/db")
-	if err != nil {
-		fmt.Println("Could not read pkg db.")
-		os.Exit(1)
-	}
-
-	// Convert byte[][][] to string[]
 	var ports []string
-	for _, port := range regex.FindAllSubmatch(db, -1) {
-		ports = append(ports, string(port[:][1]))
-	}
+	if db, err := os.Open("/var/lib/pkg/db"); err == nil {
+		// Make sure it gets closed
+		defer db.Close()
 
-	return ports
-}
+		// Create a new scanner and read the db line by line
+		scanner := bufio.NewScanner(db)
 
-// This function returns the port location
-func GetPortLoc(port string) []string {
-	regex := regexp.MustCompile(".*/" + port + "$")
-
-	var ports []string
-	for _, port := range AllPorts {
-		if regex.MatchString(port) {
-			ports = append(ports, regex.FindString(port))
-		}
-	}
-
-	// If there are multiple matches, sort using RepoOrder
-	var repoPort []string
-	if len(ports) > 1 {
-		// Empty old port array
-		oldPorts := ports
-		ports = []string{}
-
-		for _, port := range oldPorts {
-			repoPort = strings.Split(port, "/")
-
-			for _, repo := range Config.RepoOrder {
-				if repo == repoPort[0] {
-					ports = append(ports, strings.Join(repoPort, "/"))
-				}
+		var empty bool
+		for scanner.Scan() {
+			if empty {
+				ports = append(ports, scanner.Text())
+				empty = false
+			} else if scanner.Text() == "" {
+				empty = true
 			}
 		}
+	} else {
+		fmt.Fprintln(os.Stderr, "Could not read pkg db!")
 	}
 
 	return ports

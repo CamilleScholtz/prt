@@ -10,8 +10,10 @@ import (
 	"github.com/fatih/color"
 )
 
-// Initialize global variables
+// Initialize opt variables
 var A, T bool
+
+// Initialize global variables
 var AllPorts, Checked, InstPorts []string
 var Iteration int
 
@@ -20,7 +22,7 @@ func recursive(path string) {
 	// Read out Pkgfile
 	pkgfile, err := ioutil.ReadFile(path + "/Pkgfile")
 	if err != nil {
-		fmt.Println("Could not read Pkgfile.")
+		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
 		os.Exit(1)
 	}
 
@@ -57,7 +59,7 @@ func recursive(path string) {
 		if T {
 			if Iteration > 0 {
 				color.Set(color.FgBlack, color.Bold)
-				fmt.Printf(strings.Repeat("-  ", Iteration))
+				fmt.Printf(strings.Repeat(Config.IndentChar, Iteration))
 				color.Unset()
 			}
 			Iteration += 1
@@ -87,7 +89,7 @@ func Depends(args []string) {
 	// Read out opts
 	opts, _, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
-		fmt.Println("Invaild argument, use -h for a list of arguments.")
+		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 

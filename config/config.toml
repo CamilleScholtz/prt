@@ -1,9 +1,26 @@
-PortDir   = "/usr/ports"
-RepoOrder = [ "punpun",
-              "6c37-dropin",
-              "core",
-              "6c37-git",
-              "6c37",
-              "opt",
-              "xorg",
-              "contrib" ]
+# Location of the ports tree
+PortDir = "/usr/ports"
+
+# Repo order, the port found first is used
+Order = [
+	"punpun",
+	"6c37-dropin",
+	"core",
+	"6c37-git",
+	"6c37",
+	"opt",
+	"xorg",
+	"contrib"
+]
+
+# Alias ports
+Alias = [
+	[ "core/openssl", "6c37-dropin/libressl" ],
+	[ "core/pkg-config", "6c37-dropin/pkgconf" ],
+	[ "opt/cairo", "6c37-dropin/cairo-iu" ],
+	[ "opt/fontconfig", "6c37-dropin/fontconfig-iu" ],
+	[ "opt/freetype", "6c37-dropin/freetype-iu" ]
+]
+
+# Characters used for indentation
+IndentChar = "-  "

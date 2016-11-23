@@ -9,7 +9,7 @@ func main() {
 	InitConfig()
 
 	if len(os.Args[1:]) == 0 {
-		fmt.Println("Missing command, use help for a list of commands.")
+		fmt.Fprintln(os.Stderr, "Missing command, use help for a list of commands!")
 		os.Exit(1)
 	}
 
@@ -62,7 +62,7 @@ func main() {
 		//		command.Sysup(os.Args[1:])
 		//		os.Exit(0)
 	default:
-		fmt.Println("Invalid command, use help for a list of commands.")
+		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")
 		os.Exit(1)
 	}
 }

@@ -8,6 +8,9 @@ import (
 	"github.com/chiyouhen/getopt"
 )
 
+// Initialize opt variables
+var D, U, M, E, O, V, R bool
+
 func Info(args []string) {
 	// Define opts
 	shortopts := "hdumeovr"
@@ -25,19 +28,16 @@ func Info(args []string) {
 	// Read out opts
 	opts, _, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
-		fmt.Println("Invaild argument, use -h for a list of arguments.")
+		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
 	// Read out Pkgfile
 	pkgfile, err := ioutil.ReadFile("./Pkgfile")
 	if err != nil {
-		fmt.Println("Could not read Pkgfile.")
+		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
 		os.Exit(1)
 	}
-
-	// Initialize opt variables
-	var d, u, m, e, o, v, r bool
 
 	if len(opts) > 0 {
 		for _, opt := range opts {
@@ -56,45 +56,45 @@ func Info(args []string) {
 				fmt.Println("  -h,   --help            print help and exit")
 				os.Exit(0)
 			case "-d", "--description":
-				d = true
+				D = true
 			case "-u", "--url":
-				u = true
+				U = true
 			case "-m", "--maintainer":
-				m = true
+				M = true
 			case "-e", "--depends":
-				d = true
+				D = true
 			case "-o", "--optional":
-				o = true
+				O = true
 			case "-v", "--version":
-				v = true
+				V = true
 			case "-r", "--release":
-				r = true
+				R = true
 			}
 		}
 	} else {
-		d, u, m, e, o, v, r = true, true, true, true, true, true, true
+		D, U, M, E, O, V, R = true, true, true, true, true, true, true
 	}
 
 	// Print stuff
-	if d {
+	if D {
 		fmt.Println("Description: " + ReadComment(pkgfile, "Description"))
 	}
-	if u {
+	if U {
 		fmt.Println("URL: " + ReadComment(pkgfile, "URL"))
 	}
-	if m {
+	if M {
 		fmt.Println("Maintainer: " + ReadComment(pkgfile, "Maintainer"))
 	}
-	if e {
+	if E {
 		fmt.Println("Depends on: " + ReadComment(pkgfile, "Depends on"))
 	}
-	if o {
+	if O {
 		fmt.Println("Nice to have: " + ReadComment(pkgfile, "Nice to have|Optional"))
 	}
-	if v {
+	if V {
 		fmt.Println("Version: " + ReadVar(pkgfile, "version"))
 	}
-	if r {
+	if R {
 		fmt.Println("Release: " + ReadVar(pkgfile, "release"))
 	}
 }
