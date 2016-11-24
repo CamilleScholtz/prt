@@ -1,8 +1,8 @@
 # Location of the ports tree
-PortDir = "/usr/ports"
+portdir = "/usr/ports"
 
 # Repo order, the port found first is used
-Order = [
+order = [
 	"punpun",
 	"6c37-dropin",
 	"core",
@@ -14,7 +14,7 @@ Order = [
 ]
 
 # Alias ports
-Alias = [
+alias = [
 	[ "core/openssl", "6c37-dropin/libressl" ],
 	[ "core/pkg-config", "6c37-dropin/pkgconf" ],
 	[ "opt/cairo", "6c37-dropin/cairo-iu" ],
@@ -23,4 +23,46 @@ Alias = [
 ]
 
 # Characters used for indentation
-IndentChar = "-  "
+indentchar = "-  "
+
+
+[pull]
+	[pull.6c37]
+	name = "6c37"
+	url = "git://github.com/6c37/crux-ports"
+	branch = "3.2"
+
+	[pull.6c37-dropin]
+	name = "6c37-dropin"
+	url = "git://github.com/6c37/crux-ports-dropin"
+	branch = "3.2"
+
+	[pull.6c37-git]
+	name = "6c37-git"
+	url = "git://github.com/6c37/crux-ports-git"
+	branch = "3.2"
+
+	[pull.contrib]
+	name = "contrib"
+	url = "git://github.com/6c37/crux-ports-dropin"
+	branch = "3.2"
+
+	[pull.core]
+	name = "core"
+	url = "git://github.com/6c37/crux-ports-dropin"
+	branch = "3.2"
+
+	[pull.opt]
+	name = "opt"
+	url = "git://github.com/6c37/crux-ports-dropin"
+	branch = "3.2"
+
+	[pull.punpun]
+	name = "punpun"
+	url = "git://github.com/6c37/crux-ports-dropin"
+	branch = "3.2"
+
+	[pull.xoxorgxorgrg]
+	name = "xorg"
+	url = "git://github.com/6c37/crux-ports-dropin"
+	branch = "3.2"

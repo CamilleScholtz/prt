@@ -17,6 +17,13 @@ type configStruct struct {
 	Order      []string
 	Alias      [][]string
 	IndentChar string
+	Pull       map[string]pull
+}
+
+type pull struct {
+	Name   string
+	Url    string
+	Branch string
 }
 
 func InitConfig() {

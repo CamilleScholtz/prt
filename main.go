@@ -3,17 +3,28 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/chiyouhen/getopt"
 )
 
 func main() {
 	InitConfig()
 
-	if len(os.Args[1:]) == 0 {
+	// Define opts
+	shortopts := ""
+	longopts := []string{
+
+	}
+
+	// Read out opts
+	_, vals, _ := getopt.Getopt(os.Args, shortopts, longopts)
+
+	if len(vals) == 1 {
 		fmt.Fprintln(os.Stderr, "Missing command, use help for a list of commands!")
 		os.Exit(1)
 	}
 
-	switch os.Args[1] {
+	switch vals[1] {
 	case "help":
 		fmt.Println("Usage: prt command [arguments]")
 		fmt.Println("")

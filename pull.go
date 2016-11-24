@@ -5,7 +5,9 @@ import (
 	"os"
 
 	"github.com/chiyouhen/getopt"
+	"github.com/fatih/color"
 )
+
 
 func Pull(args []string) {
 	// Define opts
@@ -30,5 +32,12 @@ func Pull(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		}
+	}
+
+	for i, repo := range Config.Pull {
+		color.Set(color.FgYellow, color.Bold)
+		fmt.Println(i)
+		fmt.Println("Pulling in repo " + i + "/" + string(len(Config.Pull)) + ", " + repo.Name + ".")
+		color.Unset()
 	}
 }

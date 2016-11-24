@@ -32,13 +32,6 @@ func Info(args []string) {
 		os.Exit(1)
 	}
 
-	// Read out Pkgfile
-	pkgfile, err := ioutil.ReadFile("./Pkgfile")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
-		os.Exit(1)
-	}
-
 	if len(opts) > 0 {
 		for _, opt := range opts {
 			switch opt[0] {
@@ -73,6 +66,13 @@ func Info(args []string) {
 		}
 	} else {
 		d, u, m, e, o, v, r = true, true, true, true, true, true, true
+	}
+
+	// Read out Pkgfile
+	pkgfile, err := ioutil.ReadFile("./Pkgfile")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
+		os.Exit(1)
 	}
 
 	// Print stuff

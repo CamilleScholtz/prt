@@ -22,7 +22,7 @@ func Loc(args []string) {
 	}
 
 	// Read out opts
-	opts, _, err := getopt.Getopt(args, shortopts, longopts)
+	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -45,8 +45,7 @@ func Loc(args []string) {
 		}
 	}
 
-	// TODO: Make this happen even when flags are given
-	if len(os.Args[2:]) < 1 {
+	if len(vals) == 1 {
 		fmt.Fprintln(os.Stderr, "Please specify a port!")
 		os.Exit(1)
 	}
@@ -55,7 +54,7 @@ func Loc(args []string) {
 
 	var checked []string
 	var locs []string
-	for _, port := range os.Args[2:] {
+	for _, port := range args {
 		// Continue if already checked
 		if StringInList(port, checked) {
 			continue
