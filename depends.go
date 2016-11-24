@@ -4,21 +4,19 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
 )
 
-// Initialize opt variables
-var A, T bool
-
 // Initialize global variables
 var AllPorts, Checked, InstPorts []string
 var Iteration int
 
 // This function prints dependencies recursivly
-func recursive(path string) {
+func recursive(path string, all, alias, tree bool) {
 	// Read out Pkgfile
 	pkgfile, err := ioutil.ReadFile(path + "/Pkgfile")
 	if err != nil {
@@ -29,7 +27,7 @@ func recursive(path string) {
 	// Read out Pkgfile dependencies
 	deps := ReadDepends(pkgfile, "Depends on")
 
-	var locList []string
+	var locs []string
 	var loc string
 
 	for _, dep := range deps {
@@ -40,23 +38,28 @@ func recursive(path string) {
 			Checked = append(Checked, dep)
 		}
 
+		// Get port location
+		locs = GetPortLoc(dep)
+		if len(locs) < 1 {
+			return
+		} else {
+			loc = locs[0]
+		}
+
+		// Alias if needed
+		if !alias {
+			loc = GetPortAlias(loc)
+		}
+
 		// Continue if already installed
-		if !A {
-			if StringInList(dep, InstPorts) {
+		if !all {
+			if StringInList(filepath.Base(loc), InstPorts) {
 				continue
 			}
 		}
 
-		// Get port location
-		locList = GetPortLoc(dep)
-		if len(locList) < 1 {
-			return
-		} else {
-			loc = locList[0]
-		}
-
-		// Print tree arrowsPrt
-		if T {
+		// Print tree indentation
+		if tree {
 			if Iteration > 0 {
 				color.Set(color.FgBlack, color.Bold)
 				fmt.Printf(strings.Repeat(Config.IndentChar, Iteration))
@@ -69,20 +72,23 @@ func recursive(path string) {
 		fmt.Println(loc)
 
 		// Loop
-		recursive(Config.PortDir + "/" + loc)
+		recursive(Config.PortDir+"/"+loc, all, alias, tree)
 
-		if T {
+		if tree {
 			Iteration -= 1
 		}
 	}
 }
 
 func Depends(args []string) {
+	// Initialize opt vars
+	var a, n, t bool
+
 	// Define opts
-	shortopts := "hadt"
+	shortopts := "hant"
 	longopts := []string{
 		"--help",
-		"--disable-alias",
+		"--no-alias",
 		"--tree",
 	}
 
@@ -100,23 +106,23 @@ func Depends(args []string) {
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -a,   --all             also list installed dependencies")
-			fmt.Println("  -d,   --disable-alias   disable aliasing")
+			fmt.Println("  -n,   --no-alias        disable aliasing")
 			fmt.Println("  -t,   --tree            list using tree view")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
-			A = true
-		case "-d", "--disable-alias":
-			//d = true
+			a = true
+		case "-n", "--no-alias":
+			n = true
 		case "-t", "--tree":
-			T = true
+			t = true
 		}
 	}
 
 	AllPorts = ListAllPorts()
-	if !A {
+	if !a {
 		InstPorts = ListInstPorts()
 	}
 
-	recursive("./")
+	recursive("./", a, n, t)
 }

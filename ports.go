@@ -8,6 +8,16 @@ import (
 	"strings"
 )
 
+func GetPortAlias(port string) string {
+	for _, alias := range Config.Alias {
+		if alias[0] == port {
+			port = alias[1]
+		}
+	}
+
+	return port
+}
+
 // This function returns the port location
 func GetPortLoc(name string) []string {
 	var ports []string
@@ -24,15 +34,6 @@ func GetPortLoc(name string) []string {
 				if repo == filepath.Dir(port) {
 					ports[i] = port
 				}
-			}
-		}
-	}
-
-	// Alias ports using the config Alias value if needed
-	for i, port := range ports {
-		for _, alias := range Config.Alias {
-			if alias[0] == port {
-				ports[i] = alias[1]
 			}
 		}
 	}

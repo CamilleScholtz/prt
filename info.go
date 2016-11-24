@@ -8,10 +8,10 @@ import (
 	"github.com/chiyouhen/getopt"
 )
 
-// Initialize opt variables
-var D, U, M, E, O, V, R bool
-
 func Info(args []string) {
+	// Initialize opt vars
+	var d, u, m, e, o, v, r bool
+
 	// Define opts
 	shortopts := "hdumeovr"
 	longopts := []string{
@@ -56,45 +56,45 @@ func Info(args []string) {
 				fmt.Println("  -h,   --help            print help and exit")
 				os.Exit(0)
 			case "-d", "--description":
-				D = true
+				d = true
 			case "-u", "--url":
-				U = true
+				u = true
 			case "-m", "--maintainer":
-				M = true
+				m = true
 			case "-e", "--depends":
-				D = true
+				d = true
 			case "-o", "--optional":
-				O = true
+				o = true
 			case "-v", "--version":
-				V = true
+				v = true
 			case "-r", "--release":
-				R = true
+				r = true
 			}
 		}
 	} else {
-		D, U, M, E, O, V, R = true, true, true, true, true, true, true
+		d, u, m, e, o, v, r = true, true, true, true, true, true, true
 	}
 
 	// Print stuff
-	if D {
+	if d {
 		fmt.Println("Description: " + ReadComment(pkgfile, "Description"))
 	}
-	if U {
+	if u {
 		fmt.Println("URL: " + ReadComment(pkgfile, "URL"))
 	}
-	if M {
+	if m {
 		fmt.Println("Maintainer: " + ReadComment(pkgfile, "Maintainer"))
 	}
-	if E {
+	if e {
 		fmt.Println("Depends on: " + ReadComment(pkgfile, "Depends on"))
 	}
-	if O {
+	if o {
 		fmt.Println("Nice to have: " + ReadComment(pkgfile, "Nice to have|Optional"))
 	}
-	if V {
+	if v {
 		fmt.Println("Version: " + ReadVar(pkgfile, "version"))
 	}
-	if R {
+	if r {
 		fmt.Println("Release: " + ReadVar(pkgfile, "release"))
 	}
 }

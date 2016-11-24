@@ -23,7 +23,7 @@ func main() {
 		fmt.Println("  build                   build and install ports")
 		fmt.Println("  info                    print port information")
 		fmt.Println("  list                    list ports")
-		fmt.Println("  location                prints port locations")
+		fmt.Println("  loc                     prints port locations")
 		fmt.Println("  patch                   patch ports")
 		fmt.Println("  provide                 search ports for files")
 		fmt.Println("  remove                  remove installed ports")
@@ -43,9 +43,9 @@ func main() {
 		//	case "list":
 		//		command.List(os.Args[1:])
 		//		os.Exit(0)
-		//	case "location":
-		//		command.Location(os.Args[1:])
-		//		os.Exit(0)
+	case "loc":
+		Loc(os.Args[1:])
+		os.Exit(0)
 		//	case "patch":
 		//		command.Patch(os.Args[1:])
 		//		os.Exit(0)
@@ -55,9 +55,9 @@ func main() {
 		//	case "remove":
 		//		command.Remove(os.Args[1:])
 		//		os.Exit(0)
-		//	case "pull":
-		//		command.Pull(os.Args[1:])
-		//		os.Exit(0)
+	case "pull":
+		Pull(os.Args[1:])
+		os.Exit(0)
 		//	case "sysup":
 		//		command.Sysup(os.Args[1:])
 		//		os.Exit(0)
