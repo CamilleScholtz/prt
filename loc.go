@@ -9,9 +9,15 @@ import (
 	"github.com/fatih/color"
 )
 
+// Initialize variables
+var all, alias, tree bool
+var allPorts, checkPorts, instPorts []string
+var i int
+
 func Loc(args []string) {
-	// Initialize opt vars
-	var d, n bool
+	// Initialize variables
+	var dup, alias bool
+	var allPorts, checkPorts, instPorts []string
 
 	// Define opts
 	shortopts := "hdn"
@@ -39,9 +45,9 @@ func Loc(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-d", "--duplicate":
-			d = true
+			dup = true
 		case "-n", "--no-alias":
-			n = true
+			alias = true
 		}
 	}
 
@@ -50,43 +56,41 @@ func Loc(args []string) {
 		os.Exit(1)
 	}
 
-	AllPorts = ListAllPorts()
+	allPorts = AllPorts()
 
-	var checked []string
 	var locs []string
 	for _, port := range args {
 		// Continue if already checked
-		if StringInList(port, checked) {
+		if StringInList(port, checkPorts) {
 			continue
-		} else {
-			checked = append(checked, port)
 		}
+		checkPorts = append(checkPorts, port)
 
-		iteration := 0
+		i := 0
 
 		// Get port location
-		locs = GetPortLoc(port)
+		locs = PortLoc(port)
 		if len(locs) < 1 {
 			continue
 		}
-		if !d {
+		if !dup {
 			locs = []string{locs[0]}
 		}
 
 		for _, loc := range locs {
 			// Alias if needed
-			if !n {
-				loc = GetPortAlias(loc)
+			if !alias {
+				loc = PortAlias(loc)
 			}
 
 			// Print duplicate indentation
-			if d {
-				if iteration > 0 {
+			if dup {
+				if i > 0 {
 					color.Set(color.FgBlack, color.Bold)
-					fmt.Printf(strings.Repeat(Config.IndentChar, iteration))
+					fmt.Printf(strings.Repeat(Config.IndentChar, i))
 					color.Unset()
 				}
-				iteration += 1
+				i += 1
 			}
 
 			// Finally print the port :)

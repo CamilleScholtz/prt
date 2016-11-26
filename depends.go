@@ -11,12 +11,13 @@ import (
 	"github.com/fatih/color"
 )
 
-// Initialize global variables
-var AllPorts, Checked, InstPorts []string
-var Iteration int
+// Initialize variables
+var all, alias, tree bool
+var allPorts, checkPorts, instPorts []string
+var i int
 
 // This function prints dependencies recursivly
-func recursive(path string, all, alias, tree bool) {
+func recursive(path string) {
 	// Read out Pkgfile
 	pkgfile, err := ioutil.ReadFile(path + "/Pkgfile")
 	if err != nil {
@@ -32,58 +33,53 @@ func recursive(path string, all, alias, tree bool) {
 
 	for _, dep := range deps {
 		// Continue if already checked
-		if StringInList(dep, Checked) {
+		if StringInList(dep, checkPorts) {
 			continue
-		} else {
-			Checked = append(Checked, dep)
 		}
+		checkPorts = append(checkPorts, dep)
 
 		// Get port location
-		locs = GetPortLoc(dep)
+		locs = PortLoc(dep)
 		if len(locs) < 1 {
 			return
-		} else {
-			loc = locs[0]
 		}
+		loc = locs[0]
 
 		// Alias if needed
 		if !alias {
-			loc = GetPortAlias(loc)
+			loc = PortAlias(loc)
 		}
 
 		// Continue if already installed
 		if !all {
-			if StringInList(filepath.Base(loc), InstPorts) {
+			if StringInList(filepath.Base(loc), instPorts) {
 				continue
 			}
 		}
 
 		// Print tree indentation
 		if tree {
-			if Iteration > 0 {
+			if i > 0 {
 				color.Set(color.FgBlack, color.Bold)
-				fmt.Printf(strings.Repeat(Config.IndentChar, Iteration))
+				fmt.Printf(strings.Repeat(Config.IndentChar, i))
 				color.Unset()
 			}
-			Iteration += 1
+			i += 1
 		}
 
 		// Finally print the port :)
 		fmt.Println(loc)
 
 		// Loop
-		recursive(Config.PortDir+"/"+loc, all, alias, tree)
+		recursive(Config.PortDir + "/" + loc)
 
 		if tree {
-			Iteration -= 1
+			i -= 1
 		}
 	}
 }
 
 func Depends(args []string) {
-	// Initialize opt vars
-	var a, n, t bool
-
 	// Define opts
 	shortopts := "hant"
 	longopts := []string{
@@ -111,18 +107,18 @@ func Depends(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
-			a = true
+			all = true
 		case "-n", "--no-alias":
-			n = true
+			alias = true
 		case "-t", "--tree":
-			t = true
+			tree = true
 		}
 	}
 
-	AllPorts = ListAllPorts()
-	if !a {
-		InstPorts = ListInstPorts()
+	allPorts = AllPorts()
+	if !all {
+		instPorts = InstPorts()
 	}
 
-	recursive("./", a, n, t)
+	recursive("./")
 }

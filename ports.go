@@ -8,41 +8,7 @@ import (
 	"strings"
 )
 
-func GetPortAlias(port string) string {
-	for _, alias := range Config.Alias {
-		if alias[0] == port {
-			port = alias[1]
-		}
-	}
-
-	return port
-}
-
-// This function returns the port location
-func GetPortLoc(name string) []string {
-	var ports []string
-	for _, port := range AllPorts {
-		if strings.Split(port, "/")[1] == name {
-			ports = append(ports, port)
-		}
-	}
-
-	// If there are multiple matches, sort using the config Order value
-	if len(ports) > 1 {
-		for i, port := range ports {
-			for _, repo := range Config.Order {
-				if repo == filepath.Dir(port) {
-					ports[i] = port
-				}
-			}
-		}
-	}
-
-	return ports
-}
-
-// This functions lists all ports
-func ListAllPorts() []string {
+func AllPorts() []string {
 	// TODO: Is there something more efficient than Glob?
 	dirs, err := filepath.Glob(Config.PortDir + "/*/*/Pkgfile")
 	if err != nil {
@@ -59,8 +25,7 @@ func ListAllPorts() []string {
 	return ports
 }
 
-// This functions lists installed ports
-func ListInstPorts() []string {
+func InstPorts() []string {
 	var ports []string
 	if db, err := os.Open("/var/lib/pkg/db"); err == nil {
 		// Make sure it gets closed
@@ -80,6 +45,38 @@ func ListInstPorts() []string {
 		}
 	} else {
 		fmt.Fprintln(os.Stderr, "Could not read pkg db!")
+	}
+
+	return ports
+}
+
+func PortAlias(port string) string {
+	for _, alias := range Config.Alias {
+		if alias[0] == port {
+			port = alias[1]
+		}
+	}
+
+	return port
+}
+
+func PortLoc(name string) []string {
+	var ports []string
+	for _, port := range All {
+		if strings.Split(port, "/")[1] == name {
+			ports = append(ports, port)
+		}
+	}
+
+	// If there are multiple matches, sort using the config Order value
+	if len(ports) > 1 {
+		for i, port := range ports {
+			for _, repo := range Config.Order {
+				if repo == filepath.Dir(port) {
+					ports[i] = port
+				}
+			}
+		}
 	}
 
 	return ports

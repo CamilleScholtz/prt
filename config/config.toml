@@ -25,44 +25,36 @@ alias = [
 # Characters used for indentation
 indentchar = "-  "
 
-
+# Repos to pull
 [pull]
 	[pull.6c37]
-	name = "6c37"
 	url = "git://github.com/6c37/crux-ports"
 	branch = "3.2"
 
 	[pull.6c37-dropin]
-	name = "6c37-dropin"
 	url = "git://github.com/6c37/crux-ports-dropin"
 	branch = "3.2"
 
 	[pull.6c37-git]
-	name = "6c37-git"
 	url = "git://github.com/6c37/crux-ports-git"
 	branch = "3.2"
 
 	[pull.contrib]
-	name = "contrib"
 	url = "git://github.com/6c37/crux-ports-dropin"
 	branch = "3.2"
 
 	[pull.core]
-	name = "core"
 	url = "git://github.com/6c37/crux-ports-dropin"
 	branch = "3.2"
 
 	[pull.opt]
-	name = "opt"
 	url = "git://github.com/6c37/crux-ports-dropin"
 	branch = "3.2"
 
 	[pull.punpun]
-	name = "punpun"
 	url = "git://github.com/6c37/crux-ports-dropin"
 	branch = "3.2"
 
-	[pull.xoxorgxorgrg]
-	name = "xorg"
+	[pull.xorg]
 	url = "git://github.com/6c37/crux-ports-dropin"
 	branch = "3.2"

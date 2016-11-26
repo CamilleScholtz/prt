@@ -8,13 +8,9 @@ import (
 )
 
 func main() {
-	InitConfig()
-
 	// Define opts
 	shortopts := ""
-	longopts := []string{
-
-	}
+	longopts := []string{}
 
 	// Read out opts
 	_, vals, _ := getopt.Getopt(os.Args, shortopts, longopts)

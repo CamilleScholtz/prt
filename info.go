@@ -69,7 +69,7 @@ func Info(args []string) {
 	}
 
 	// Read out Pkgfile
-	pkgfile, err := ioutil.ReadFile("./Pkgfile")
+	f, err := ioutil.ReadFile("./Pkgfile")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
 		os.Exit(1)
@@ -77,24 +77,24 @@ func Info(args []string) {
 
 	// Print stuff
 	if d {
-		fmt.Println("Description: " + ReadComment(pkgfile, "Description"))
+		fmt.Println("Description: " + ReadComment(f, "Description"))
 	}
 	if u {
-		fmt.Println("URL: " + ReadComment(pkgfile, "URL"))
+		fmt.Println("URL: " + ReadComment(f, "URL"))
 	}
 	if m {
-		fmt.Println("Maintainer: " + ReadComment(pkgfile, "Maintainer"))
+		fmt.Println("Maintainer: " + ReadComment(f, "Maintainer"))
 	}
 	if e {
-		fmt.Println("Depends on: " + ReadComment(pkgfile, "Depends on"))
+		fmt.Println("Depends on: " + ReadComment(f, "Depends on"))
 	}
 	if o {
-		fmt.Println("Nice to have: " + ReadComment(pkgfile, "Nice to have|Optional"))
+		fmt.Println("Nice to have: " + ReadComment(f, "Nice to have|Optional"))
 	}
 	if v {
-		fmt.Println("Version: " + ReadVar(pkgfile, "version"))
+		fmt.Println("Version: " + ReadVar(f, "version"))
 	}
 	if r {
-		fmt.Println("Release: " + ReadVar(pkgfile, "release"))
+		fmt.Println("Release: " + ReadVar(f, "release"))
 	}
 }
