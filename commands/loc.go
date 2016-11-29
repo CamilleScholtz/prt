@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -7,17 +7,15 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
+	"github.com/onodera-punpun/prt/ports"
+	"github.com/onodera-punpun/prt/utils"
 )
-
-// Initialize variables
-var all, alias, tree bool
-var allPorts, checkPorts, instPorts []string
-var i int
 
 func Loc(args []string) {
 	// Initialize variables
 	var dup, alias bool
-	var allPorts, checkPorts, instPorts []string
+	var allPorts, checkPorts []string
 
 	// Define opts
 	shortopts := "hdn"
@@ -56,12 +54,12 @@ func Loc(args []string) {
 		os.Exit(1)
 	}
 
-	allPorts = AllPorts()
+	allPorts = ports.All()
 
 	var locs []string
 	for _, port := range args {
 		// Continue if already checked
-		if StringInList(port, checkPorts) {
+		if utils.StringInList(port, checkPorts) {
 			continue
 		}
 		checkPorts = append(checkPorts, port)
@@ -69,7 +67,7 @@ func Loc(args []string) {
 		i := 0
 
 		// Get port location
-		locs = PortLoc(port)
+		locs = ports.Loc(allPorts, port)
 		if len(locs) < 1 {
 			continue
 		}
@@ -80,14 +78,14 @@ func Loc(args []string) {
 		for _, loc := range locs {
 			// Alias if needed
 			if !alias {
-				loc = PortAlias(loc)
+				loc = ports.Alias(loc)
 			}
 
 			// Print duplicate indentation
 			if dup {
 				if i > 0 {
 					color.Set(color.FgBlack, color.Bold)
-					fmt.Printf(strings.Repeat(Config.IndentChar, i))
+					fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
 					color.Unset()
 				}
 				i += 1

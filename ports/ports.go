@@ -1,4 +1,4 @@
-package main
+package ports
 
 import (
 	"bufio"
@@ -6,11 +6,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/onodera-punpun/prt/config"
 )
 
-func AllPorts() []string {
+func All() []string {
 	// TODO: Is there something more efficient than Glob?
-	dirs, err := filepath.Glob(Config.PortDir + "/*/*/Pkgfile")
+	dirs, err := filepath.Glob(config.Struct.PortDir + "/*/*/Pkgfile")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not read ports!")
 		os.Exit(1)
@@ -25,7 +27,7 @@ func AllPorts() []string {
 	return ports
 }
 
-func InstPorts() []string {
+func Inst() []string {
 	var ports []string
 	if db, err := os.Open("/var/lib/pkg/db"); err == nil {
 		// Make sure it gets closed
@@ -50,8 +52,8 @@ func InstPorts() []string {
 	return ports
 }
 
-func PortAlias(port string) string {
-	for _, alias := range Config.Alias {
+func Alias(port string) string {
+	for _, alias := range config.Struct.Alias {
 		if alias[0] == port {
 			port = alias[1]
 		}
@@ -60,24 +62,24 @@ func PortAlias(port string) string {
 	return port
 }
 
-func PortLoc(name string) []string {
-	var ports []string
-	for _, port := range All {
+func Loc(ports []string, name string) []string {
+	var locs []string
+	for _, port := range ports {
 		if strings.Split(port, "/")[1] == name {
-			ports = append(ports, port)
+			locs = append(locs, port)
 		}
 	}
 
 	// If there are multiple matches, sort using the config Order value
-	if len(ports) > 1 {
-		for i, port := range ports {
-			for _, repo := range Config.Order {
-				if repo == filepath.Dir(port) {
-					ports[i] = port
+	if len(locs) > 1 {
+		for i, loc := range locs {
+			for _, repo := range config.Struct.Order {
+				if repo == filepath.Dir(loc) {
+					locs[i] = loc
 				}
 			}
 		}
 	}
 
-	return ports
+	return locs
 }

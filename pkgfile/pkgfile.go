@@ -1,11 +1,11 @@
-package main
+package pkgfile
 
 import (
 	"regexp"
 	"strings"
 )
 
-func ReadComment(file []byte, name string) string {
+func Comment(file []byte, name string) string {
 	regex := regexp.MustCompile("(?m)^# " + name + ":[\t\f ]*(.*)")
 	match := regex.FindSubmatch(file)
 	if len(match) < 1 {
@@ -15,7 +15,7 @@ func ReadComment(file []byte, name string) string {
 	return string(match[1])
 }
 
-func ReadDepends(file []byte, name string) []string {
+func Depends(file []byte, name string) []string {
 	regex := regexp.MustCompile("(?m)^# Depends on:[\t\f ]*(.*)")
 	match := regex.FindSubmatch(file)
 	if len(match) < 1 {
@@ -28,7 +28,7 @@ func ReadDepends(file []byte, name string) []string {
 	return strings.Split(fix, " ")
 }
 
-func ReadVar(file []byte, name string) string {
+func Var(file []byte, name string) string {
 	regex := regexp.MustCompile("(?m)^" + name + "=([a-z0-9-_+.]*)")
 	match := regex.FindSubmatch(file)
 

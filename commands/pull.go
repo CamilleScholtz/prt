@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
+	"github.com/onodera-punpun/prt/utils"
 )
 
 func Pull(args []string) {
@@ -40,13 +42,13 @@ func Pull(args []string) {
 	if len(val) != 1 {
 		total = len(val) - 1
 	} else {
-		total = len(Config.Pull)
+		total = len(config.Struct.Pull)
 	}
 
-	for name, repo := range Config.Pull {
+	for name, repo := range config.Struct.Pull {
 		// Skip repos if needed
 		if len(val) != 1 {
-			if !StringInList(name, val) {
+			if !utils.StringInList(name, val) {
 				continue
 			}
 		}

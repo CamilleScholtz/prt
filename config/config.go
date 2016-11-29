@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 // Initialize global variables
-var Config config
+var Struct config
 
 // Initialize config options
 type config struct {
@@ -27,14 +27,14 @@ type pull struct {
 
 func init() {
 	// Read out config
-	f, err := ioutil.ReadFile("./config/config.toml")
+	f, err := ioutil.ReadFile("./runtime/config.toml")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not read config!")
 		os.Exit(1)
 	}
 
 	// Decode config
-	if _, err := toml.Decode(string(f), &Config); err != nil {
+	if _, err := toml.Decode(string(f), &Struct); err != nil {
 		fmt.Fprintln(os.Stderr, "Could not decode config!")
 		os.Exit(1)
 	}

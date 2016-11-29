@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -9,37 +9,41 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
+	"github.com/onodera-punpun/prt/pkgfile"
+	"github.com/onodera-punpun/prt/ports"
+	"github.com/onodera-punpun/prt/utils"
 )
 
 // Initialize variables
+// TODO: Fix this shit
 var all, alias, tree bool
 var allPorts, checkPorts, instPorts []string
 var i int
 
-// This function prints dependencies recursivly
 func recursive(path string) {
 	// Read out Pkgfile
-	pkgfile, err := ioutil.ReadFile(path + "/Pkgfile")
+	f, err := ioutil.ReadFile(path + "/Pkgfile")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
 		os.Exit(1)
 	}
 
 	// Read out Pkgfile dependencies
-	deps := ReadDepends(pkgfile, "Depends on")
+	deps := pkgfile.Depends(f, "Depends on")
 
 	var locs []string
 	var loc string
 
 	for _, dep := range deps {
 		// Continue if already checked
-		if StringInList(dep, checkPorts) {
+		if utils.StringInList(dep, checkPorts) {
 			continue
 		}
 		checkPorts = append(checkPorts, dep)
 
 		// Get port location
-		locs = PortLoc(dep)
+		locs = ports.Loc(allPorts, dep)
 		if len(locs) < 1 {
 			return
 		}
@@ -47,12 +51,12 @@ func recursive(path string) {
 
 		// Alias if needed
 		if !alias {
-			loc = PortAlias(loc)
+			loc = ports.Alias(loc)
 		}
 
 		// Continue if already installed
 		if !all {
-			if StringInList(filepath.Base(loc), instPorts) {
+			if utils.StringInList(filepath.Base(loc), instPorts) {
 				continue
 			}
 		}
@@ -61,7 +65,7 @@ func recursive(path string) {
 		if tree {
 			if i > 0 {
 				color.Set(color.FgBlack, color.Bold)
-				fmt.Printf(strings.Repeat(Config.IndentChar, i))
+				fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
 				color.Unset()
 			}
 			i += 1
@@ -71,7 +75,7 @@ func recursive(path string) {
 		fmt.Println(loc)
 
 		// Loop
-		recursive(Config.PortDir + "/" + loc)
+		recursive(config.Struct.PortDir + "/" + loc)
 
 		if tree {
 			i -= 1
@@ -115,9 +119,9 @@ func Depends(args []string) {
 		}
 	}
 
-	allPorts = AllPorts()
+	allPorts = ports.All()
 	if !all {
-		instPorts = InstPorts()
+		instPorts = ports.Inst()
 	}
 
 	recursive("./")

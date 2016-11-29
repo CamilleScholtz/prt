@@ -1,4 +1,4 @@
-package main
+package utils
 
 func StringInList(a string, list []string) bool {
 	for _, b := range list {

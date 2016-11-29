@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/chiyouhen/getopt"
+	"github.com/onodera-punpun/prt/commands"
 )
 
 func main() {
@@ -39,19 +40,19 @@ func main() {
 		fmt.Println("  help                    print help and exit")
 		os.Exit(0)
 	case "depends":
-		Depends(os.Args[1:])
+		commands.Depends(os.Args[1:])
 		os.Exit(0)
 		//	case "build":
 		//		commands.Build(os.Args[1:])
 		//		os.Exit(0)
 	case "info":
-		Info(os.Args[1:])
+		commands.Info(os.Args[1:])
 		os.Exit(0)
 		//	case "list":
 		//		command.List(os.Args[1:])
 		//		os.Exit(0)
 	case "loc":
-		Loc(os.Args[1:])
+		commands.Loc(os.Args[1:])
 		os.Exit(0)
 		//	case "patch":
 		//		command.Patch(os.Args[1:])
@@ -63,7 +64,7 @@ func main() {
 		//		command.Remove(os.Args[1:])
 		//		os.Exit(0)
 	case "pull":
-		Pull(os.Args[1:])
+		commands.Pull(os.Args[1:])
 		os.Exit(0)
 		//	case "sysup":
 		//		command.Sysup(os.Args[1:])
