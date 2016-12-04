@@ -49,26 +49,29 @@ func Loc(args []string) {
 		}
 	}
 
-	if len(vals) == 1 {
+	if len(vals) == 0 {
 		fmt.Fprintln(os.Stderr, "Please specify a port!")
 		os.Exit(1)
 	}
 
-	allPorts = ports.All()
+	allPorts, err = ports.All()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
-	var locs []string
-	for _, port := range args {
+	for _, port := range vals {
 		// Continue if already checked
 		if utils.StringInList(port, checkPorts) {
 			continue
 		}
 		checkPorts = append(checkPorts, port)
 
-		i := 0
+		var i int
 
-		// Get port location
-		locs = ports.Loc(allPorts, port)
-		if len(locs) < 1 {
+		locs, err := ports.Loc(allPorts, port)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
 		if !dup {
@@ -88,7 +91,7 @@ func Loc(args []string) {
 					fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
 					color.Unset()
 				}
-				i += 1
+				i++
 			}
 
 			// Finally print the port :)

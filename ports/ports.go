@@ -8,49 +8,8 @@ import (
 	"strings"
 
 	"github.com/onodera-punpun/prt/config"
+	"github.com/onodera-punpun/prt/utils"
 )
-
-func All() []string {
-	// TODO: Is there something more efficient than Glob?
-	dirs, err := filepath.Glob(config.Struct.PortDir + "/*/*/Pkgfile")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read ports!")
-		os.Exit(1)
-	}
-
-	var ports []string
-	for _, port := range dirs {
-		path := strings.Split(filepath.Dir(port), "/")
-		ports = append(ports, strings.Join(path[len(path)-2:], "/"))
-	}
-
-	return ports
-}
-
-func Inst() []string {
-	var ports []string
-	if db, err := os.Open("/var/lib/pkg/db"); err == nil {
-		// Make sure it gets closed
-		defer db.Close()
-
-		// Create a new scanner and read the db line by line
-		scanner := bufio.NewScanner(db)
-
-		var empty bool
-		for scanner.Scan() {
-			if empty {
-				ports = append(ports, scanner.Text())
-				empty = false
-			} else if scanner.Text() == "" {
-				empty = true
-			}
-		}
-	} else {
-		fmt.Fprintln(os.Stderr, "Could not read pkg db!")
-	}
-
-	return ports
-}
 
 func Alias(port string) string {
 	for _, alias := range config.Struct.Alias {
@@ -62,7 +21,46 @@ func Alias(port string) string {
 	return port
 }
 
-func Loc(ports []string, name string) []string {
+func All() ([]string, error) {
+	// TODO: Is there something more efficient than Glob?
+	dirs, err := filepath.Glob(config.Struct.PortDir + "/*/*/Pkgfile")
+	if err != nil {
+		return []string{}, fmt.Errorf("Could not read '" + config.Struct.PortDir + "/*/*/Pkgfile'!")
+	}
+
+	var ports []string
+	for _, port := range dirs {
+		path := strings.Split(filepath.Dir(port), "/")
+		ports = append(ports, strings.Join(path[len(path)-2:], "/"))
+	}
+
+	return ports, nil
+}
+
+func Inst() ([]string, error) {
+	db, err := os.Open("/var/lib/pkg/db")
+	if err != nil {
+		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")
+	}
+
+	defer db.Close()
+	scanner := bufio.NewScanner(db)
+
+	var match bool
+	var ports []string
+	for scanner.Scan() {
+		if match {
+			ports = append(ports, scanner.Text())
+			match = false
+		} else if scanner.Text() == "" {
+			match = true
+		}
+	}
+
+	return ports, nil
+}
+
+func Loc(ports []string, name string) ([]string, error) {
 	var locs []string
 	for _, port := range ports {
 		if strings.Split(port, "/")[1] == name {
@@ -70,16 +68,53 @@ func Loc(ports []string, name string) []string {
 		}
 	}
 
+	if len(locs) == 0 {
+		return []string{}, fmt.Errorf("Could not find location for '" + name + "'!")
+	}
+
 	// If there are multiple matches, sort using the config Order value
 	if len(locs) > 1 {
-		for i, loc := range locs {
-			for _, repo := range config.Struct.Order {
-				if repo == filepath.Dir(loc) {
-					locs[i] = loc
-				}
+		var i int
+		for _, repo := range config.Struct.Order {
+			newLoc := repo + "/" + filepath.Base(locs[i])
+			if utils.StringInList(newLoc, ports) {
+				locs[i] = newLoc
+				i++
+			}
+
+			// Break if everything has been ordered
+			if i == len(locs) {
+				break
 			}
 		}
 	}
 
-	return locs
+	return locs, nil
+}
+
+func InstVer(name string) (string, error) {
+	db, err := os.Open("/var/lib/pkg/db")
+	if err != nil {
+		return "", fmt.Errorf("Could not read '/var/lib/pkg/db'!")
+	}
+
+	defer db.Close()
+	scanner := bufio.NewScanner(db)
+
+	var match bool
+	var ver string
+	for scanner.Scan() {
+		if match {
+			ver = scanner.Text()
+			break
+		} else if scanner.Text() == name {
+			match = true
+		}
+	}
+
+	if len(ver) == 0 {
+		return "", fmt.Errorf("Could not find installed version of '" + name + "'!")
+	}
+
+	return ver, nil
 }

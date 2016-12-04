@@ -25,15 +25,15 @@ func recursive(path string) {
 	// Read out Pkgfile
 	f, err := ioutil.ReadFile(path + "/Pkgfile")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
-		os.Exit(1)
+		fmt.Fprintln(os.Stderr, "Could not read '"+path+"/Pkgfile'!")
+		return
 	}
 
 	// Read out Pkgfile dependencies
-	deps := pkgfile.Depends(f, "Depends on")
-
-	var locs []string
-	var loc string
+	deps, err := pkgfile.Depends(f, "Depends on")
+	if err != nil {
+		return
+	}
 
 	for _, dep := range deps {
 		// Continue if already checked
@@ -43,11 +43,11 @@ func recursive(path string) {
 		checkPorts = append(checkPorts, dep)
 
 		// Get port location
-		locs = ports.Loc(allPorts, dep)
-		if len(locs) < 1 {
-			return
+		locs, err := ports.Loc(allPorts, dep)
+		if err != nil {
+			continue
 		}
-		loc = locs[0]
+		loc := locs[0]
 
 		// Alias if needed
 		if !alias {
@@ -68,7 +68,7 @@ func recursive(path string) {
 				fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
 				color.Unset()
 			}
-			i += 1
+			i++
 		}
 
 		// Finally print the port :)
@@ -78,7 +78,7 @@ func recursive(path string) {
 		recursive(config.Struct.PortDir + "/" + loc)
 
 		if tree {
-			i -= 1
+			i--
 		}
 	}
 }
@@ -119,9 +119,17 @@ func Depends(args []string) {
 		}
 	}
 
-	allPorts = ports.All()
+	allPorts, err = ports.All()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 	if !all {
-		instPorts = ports.Inst()
+		instPorts, err = ports.Inst()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 
 	recursive("./")

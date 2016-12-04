@@ -53,7 +53,7 @@ indentchar = "-  "
 
 	[pull.punpun]
 	url = "git://github.com/6c37/crux-ports-dropin"
-	branch = "3.2"
+	branch = "master"
 
 	[pull.xorg]
 	url = "git://github.com/6c37/crux-ports-dropin"

@@ -78,24 +78,59 @@ func Info(args []string) {
 
 	// Print stuff
 	if d {
-		fmt.Println("Description: " + pkgfile.Comment(f, "Description"))
+		text, err := pkgfile.Comment(f, "Description")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Description: " + text)
 	}
 	if u {
-		fmt.Println("URL: " + pkgfile.Comment(f, "URL"))
+		text, err := pkgfile.Comment(f, "URL")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("URL: " + text)
 	}
 	if m {
-		fmt.Println("Maintainer: " + pkgfile.Comment(f, "Maintainer"))
+		text, err := pkgfile.Comment(f, "Maintainer")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Maintainer: " + text)
 	}
 	if e {
-		fmt.Println("Depends on: " + pkgfile.Comment(f, "Depends on"))
+		text, err := pkgfile.Comment(f, "Depends on")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Depends on: " + text)
 	}
 	if o {
-		fmt.Println("Nice to have: " + pkgfile.Comment(f, "Nice to have|Optional"))
+		text, err := pkgfile.Comment(f, "Nice to have|Optional")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Nice to have: " + text)
 	}
 	if v {
-		fmt.Println("Version: " + pkgfile.Var(f, "version"))
+		text, err := pkgfile.Comment(f, "version")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Version: " + text)
 	}
 	if r {
-		fmt.Println("Release: " + pkgfile.Var(f, "release"))
+		text, err := pkgfile.Comment(f, "release")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		fmt.Println("Release: " + text)
 	}
 }

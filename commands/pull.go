@@ -36,13 +36,13 @@ func Pull(args []string) {
 		}
 	}
 
-	var iteration, total int
+	var i, t int
 
 	// Count total repos that need to be pulled
 	if len(val) != 1 {
-		total = len(val) - 1
+		t = len(val) - 1
 	} else {
-		total = len(config.Struct.Pull)
+		t = len(config.Struct.Pull)
 	}
 
 	for name, repo := range config.Struct.Pull {
@@ -53,10 +53,10 @@ func Pull(args []string) {
 			}
 		}
 
-		iteration += 1
+		i++
 
 		// Print some info
-		fmt.Printf("Pulling in repo %d/%d, ", iteration, total)
+		fmt.Printf("Pulling in repo %d/%d, ", i, t)
 		color.Set(color.FgYellow, color.Bold)
 		fmt.Printf(name)
 		color.Unset()
@@ -87,6 +87,7 @@ func Pull(args []string) {
 			}
 
 			// TODO: Prettify this
+			// TODO: Make this actually output something
 			args = []string{"diff", "--pretty=format:", "--name-status", repo.Branch}
 			info := exec.Command(cmd, args...)
 			info.Stdout = os.Stdout

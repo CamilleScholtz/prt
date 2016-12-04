@@ -4,24 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/chiyouhen/getopt"
 	"github.com/onodera-punpun/prt/commands"
 )
 
 func main() {
-	// Define opts
-	shortopts := ""
-	longopts := []string{}
-
-	// Read out opts
-	_, vals, _ := getopt.Getopt(os.Args, shortopts, longopts)
-
-	if len(vals) == 1 {
-		fmt.Fprintln(os.Stderr, "Missing command, use help for a list of commands!")
-		os.Exit(1)
-	}
-
-	switch vals[1] {
+	switch os.Args[1] {
 	case "help":
 		fmt.Println("Usage: prt command [arguments]")
 		fmt.Println("")
@@ -40,19 +27,22 @@ func main() {
 		fmt.Println("  help                    print help and exit")
 		os.Exit(0)
 	case "depends":
-		commands.Depends(os.Args[1:])
+		commands.Depends(os.Args[2:])
+		os.Exit(0)
+	case "diff":
+		commands.Diff(os.Args[2:])
 		os.Exit(0)
 		//	case "build":
 		//		commands.Build(os.Args[1:])
 		//		os.Exit(0)
 	case "info":
-		commands.Info(os.Args[1:])
+		commands.Info(os.Args[2:])
 		os.Exit(0)
 		//	case "list":
 		//		command.List(os.Args[1:])
 		//		os.Exit(0)
 	case "loc":
-		commands.Loc(os.Args[1:])
+		commands.Loc(os.Args[2:])
 		os.Exit(0)
 		//	case "patch":
 		//		command.Patch(os.Args[1:])
@@ -64,7 +54,7 @@ func main() {
 		//		command.Remove(os.Args[1:])
 		//		os.Exit(0)
 	case "pull":
-		commands.Pull(os.Args[1:])
+		commands.Pull(os.Args[2:])
 		os.Exit(0)
 		//	case "sysup":
 		//		command.Sysup(os.Args[1:])
