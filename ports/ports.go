@@ -44,15 +44,15 @@ func Inst() ([]string, error) {
 	}
 
 	defer db.Close()
-	scanner := bufio.NewScanner(db)
+	s := bufio.NewScanner(db)
 
 	var match bool
 	var ports []string
-	for scanner.Scan() {
+	for s.Scan() {
 		if match {
-			ports = append(ports, scanner.Text())
+			ports = append(ports, s.Text())
 			match = false
-		} else if scanner.Text() == "" {
+		} else if s.Text() == "" {
 			match = true
 		}
 	}
@@ -99,15 +99,15 @@ func InstVer(name string) (string, error) {
 	}
 
 	defer db.Close()
-	scanner := bufio.NewScanner(db)
+	s := bufio.NewScanner(db)
 
 	var match bool
 	var ver string
-	for scanner.Scan() {
+	for s.Scan() {
 		if match {
-			ver = scanner.Text()
+			ver = s.Text()
 			break
-		} else if scanner.Text() == name {
+		} else if s.Text() == name {
 			match = true
 		}
 	}

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/chiyouhen/getopt"
+	"github.com/fatih/color"
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
@@ -13,11 +14,10 @@ import (
 
 func Diff(args []string) {
 	// Define opts
-	shortopts := "hant"
+	shortopts := "hn"
 	longopts := []string{
 		"--help",
 		"--no-alias",
-		"--tree",
 	}
 
 	// Read out opts
@@ -33,17 +33,11 @@ func Diff(args []string) {
 			fmt.Println("Usage: prt diff [arguments]")
 			fmt.Println("")
 			fmt.Println("arguments:")
-			fmt.Println("  -a,   --all             also list installed dependencies")
 			fmt.Println("  -n,   --no-alias        disable aliasing")
-			fmt.Println("  -t,   --tree            list using tree view")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
-		case "-a", "--all":
-			all = true
 		case "-n", "--no-alias":
 			alias = true
-		case "-t", "--tree":
-			tree = true
 		}
 	}
 
@@ -96,7 +90,11 @@ func Diff(args []string) {
 		availVer := ver + "-" + rel
 
 		if instVer != availVer {
-			fmt.Println(port + " " + instVer + " -> " + availVer)
+			fmt.Print(port + "\t\t" + instVer)
+			color.Set(color.FgBlack, color.Bold)
+			fmt.Print("\t-\t")
+			color.Unset()
+			fmt.Println(availVer)
 		}
 	}
 }

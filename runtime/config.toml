@@ -40,21 +40,21 @@ indentchar = "-  "
 	branch = "3.2"
 
 	[pull.contrib]
-	url = "git://github.com/6c37/crux-ports-dropin"
+	url = "git://crux.nu/ports/contrib"
 	branch = "3.2"
 
 	[pull.core]
-	url = "git://github.com/6c37/crux-ports-dropin"
+	url = "git://crux.nu/ports/core"
 	branch = "3.2"
 
 	[pull.opt]
-	url = "git://github.com/6c37/crux-ports-dropin"
+	url = "git://crux.nu/ports/opt"
 	branch = "3.2"
 
 	[pull.punpun]
-	url = "git://github.com/6c37/crux-ports-dropin"
+	url = "git://github.com/onodera-punpun/crux-ports"
 	branch = "master"
 
 	[pull.xorg]
-	url = "git://github.com/6c37/crux-ports-dropin"
+	url = "git://crux.nu/ports/xorg"
 	branch = "3.2"
