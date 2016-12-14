@@ -1,7 +1,5 @@
 package utils
 
-import "bytes"
-
 // StringInList checks if a string is in a list
 func StringInList(a string, list []string) bool {
 	for _, b := range list {
@@ -19,15 +17,5 @@ func TrimString(s string, n int) string {
 		return s
 	}
 
-	var b bytes.Buffer
-	for i := 0; i <= len(s); i++ {
-		if i < n {
-			b.WriteString(string(s[i]))
-		} else {
-			b.WriteString("…")
-			break
-		}
-	}
-
-	return b.String()
+	return s[0:n-1] + "…"
 }

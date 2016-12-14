@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
@@ -93,20 +94,20 @@ func Diff(args []string) {
 		availVer := ver + "-" + rel
 
 		if instVer != availVer {
-			port = utils.TrimString(port, 16)
+			port = utils.TrimString(port, 24)
 			fmt.Print(port)
-			fmt.Printf(strings.Repeat(" ", 19-len(port)))
+			fmt.Printf(strings.Repeat(" ", 25-utf8.RuneCountInString(port)))
 
-			instVer = utils.TrimString(instVer, 8)
+			instVer = utils.TrimString(instVer, 12)
 			fmt.Print(instVer)
-			fmt.Printf(strings.Repeat(" ", 11-len(instVer)))
+			fmt.Printf(strings.Repeat(" ", 13-utf8.RuneCountInString(instVer)))
 
 			color.Set(color.FgBlack, color.Bold)
 			fmt.Print("->")
 			color.Unset()
-			fmt.Printf("   ")
+			fmt.Print(" ")
 
-			availVer = utils.TrimString(availVer, 8)
+			availVer = utils.TrimString(availVer, 13)
 			fmt.Println(availVer)
 		}
 	}
