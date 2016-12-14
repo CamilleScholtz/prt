@@ -83,6 +83,7 @@ func recursive(path string) {
 	}
 }
 
+// Depends lists dependencies recursivly
 func Depends(args []string) {
 	// Define opts
 	shortopts := "hant"

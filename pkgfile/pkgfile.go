@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// Comment reads a comment from a (Pkg)file
 func Comment(file []byte, value string) (string, error) {
 	regex := regexp.MustCompile("(?m)^# " + value + ":[\t\f ]*(.*)")
 	match := regex.FindSubmatch(file)
@@ -17,6 +18,7 @@ func Comment(file []byte, value string) (string, error) {
 	return string(match[1]), nil
 }
 
+// Depends reads the depends comment from a (Pkg)file
 func Depends(file []byte, value string) ([]string, error) {
 	regex := regexp.MustCompile("(?m)^# " + value + ":[\t\f ]*(.*)")
 	match := regex.FindSubmatch(file)
@@ -31,6 +33,7 @@ func Depends(file []byte, value string) ([]string, error) {
 	return strings.Split(fix, " "), nil
 }
 
+// Var reads a variable from a (Pkg)file
 func Var(file []byte, value string) (string, error) {
 	regex := regexp.MustCompile("(?m)^" + value + "=([a-z0-9-_+.]*)")
 	match := regex.FindSubmatch(file)

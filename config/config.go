@@ -8,7 +8,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// Initialize global variables
+// Struct contains the config values
 var Struct config
 
 // Initialize config options
@@ -21,7 +21,7 @@ type config struct {
 }
 
 type pull struct {
-	Url    string
+	URL    string
 	Branch string
 }
 

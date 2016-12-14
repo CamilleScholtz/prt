@@ -9,6 +9,7 @@ import (
 	"github.com/onodera-punpun/prt/pkgfile"
 )
 
+// Info prints ports information
 func Info(args []string) {
 	// Initialize opt vars
 	var d, u, m, e, o, v, r bool

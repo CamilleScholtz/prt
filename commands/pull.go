@@ -11,6 +11,7 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
+// Pull pulls in ports
 func Pull(args []string) {
 	// Define opts
 	shortopts := "h"
@@ -66,7 +67,7 @@ func Pull(args []string) {
 		cmd := "git"
 		loc := "./test" + "/" + name
 		if _, err := os.Stat("./test" + "/" + name); err != nil {
-			args = []string{"clone", "--depth", "1", "-b", repo.Branch, repo.Url, loc}
+			args = []string{"clone", "--depth", "1", "-b", repo.Branch, repo.URL, loc}
 			if err := exec.Command(cmd, args...).Run(); err != nil {
 				fmt.Fprintln(os.Stderr, "Could not git clone repo!")
 				os.Exit(1)

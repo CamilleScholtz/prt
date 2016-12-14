@@ -12,6 +12,7 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
+// Loc prints port locations
 func Loc(args []string) {
 	// Initialize variables
 	var dup, alias bool

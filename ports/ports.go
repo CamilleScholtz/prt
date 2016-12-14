@@ -11,6 +11,7 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
+// Alias aliases ports using the config values
 func Alias(port string) string {
 	for _, alias := range config.Struct.Alias {
 		if alias[0] == port {
@@ -21,6 +22,7 @@ func Alias(port string) string {
 	return port
 }
 
+// All lists all ports found in the PortDir
 func All() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
 	dirs, err := filepath.Glob(config.Struct.PortDir + "/*/*/Pkgfile")
@@ -37,6 +39,7 @@ func All() ([]string, error) {
 	return ports, nil
 }
 
+// Inst lists all installed ports
 func Inst() ([]string, error) {
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
@@ -60,6 +63,7 @@ func Inst() ([]string, error) {
 	return ports, nil
 }
 
+// Loc tries to get the location of a port
 func Loc(ports []string, name string) ([]string, error) {
 	var locs []string
 	for _, port := range ports {
@@ -92,6 +96,7 @@ func Loc(ports []string, name string) ([]string, error) {
 	return locs, nil
 }
 
+// InstVer tries to get the installed version of a port
 func InstVer(name string) (string, error) {
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {

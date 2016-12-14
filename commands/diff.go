@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
+	"github.com/onodera-punpun/prt/utils"
 )
 
+// Diff lists outdated packages
 func Diff(args []string) {
 	// Define opts
 	shortopts := "hn"
@@ -90,10 +93,20 @@ func Diff(args []string) {
 		availVer := ver + "-" + rel
 
 		if instVer != availVer {
-			fmt.Print(port + "\t\t" + instVer)
+			port = utils.TrimString(port, 16)
+			fmt.Print(port)
+			fmt.Printf(strings.Repeat(" ", 19-len(port)))
+
+			instVer = utils.TrimString(instVer, 8)
+			fmt.Print(instVer)
+			fmt.Printf(strings.Repeat(" ", 11-len(instVer)))
+
 			color.Set(color.FgBlack, color.Bold)
-			fmt.Print("\t-\t")
+			fmt.Print("->")
 			color.Unset()
+			fmt.Printf("   ")
+
+			availVer = utils.TrimString(availVer, 8)
 			fmt.Println(availVer)
 		}
 	}
