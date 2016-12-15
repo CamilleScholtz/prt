@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -27,15 +26,8 @@ type pull struct {
 }
 
 func init() {
-	// Read out config
-	f, err := ioutil.ReadFile("./runtime/config.toml")
+	_, err := toml.DecodeFile("./runtime/config.toml", &Struct)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read config!")
-		os.Exit(1)
-	}
-
-	// Decode config
-	if _, err := toml.Decode(string(f), &Struct); err != nil {
 		fmt.Fprintln(os.Stderr, "Could not decode config!")
 		os.Exit(1)
 	}
