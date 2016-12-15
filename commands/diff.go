@@ -32,7 +32,6 @@ func Diff(args []string) {
 		os.Exit(1)
 	}
 
-	var alias, version bool
 	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
@@ -44,9 +43,9 @@ func Diff(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-n", "--no-alias":
-			alias = true
+			optsList = append(optsList, "n")
 		case "-v", "--no-version":
-			version = true
+			optsList = append(optsList, "v")
 		}
 	}
 
@@ -70,7 +69,7 @@ func Diff(args []string) {
 		loc := locs[0]
 
 		// Alias if needed
-		if !alias {
+		if !utils.StringInList("a", optsList) {
 			loc = ports.Alias(loc)
 		}
 
@@ -98,27 +97,25 @@ func Diff(args []string) {
 		}
 		availVer := ver + "-" + rel
 
-		// TODO
-		if version {
-			fmt.Println(ver)
-		}
-
 		if instVer != availVer {
 			port = utils.TrimString(port, 24)
 			fmt.Print(port)
 			fmt.Printf(strings.Repeat(" ", 25-utf8.RuneCountInString(port)))
 
-			instVer = utils.TrimString(instVer, 12)
-			fmt.Print(instVer)
-			fmt.Printf(strings.Repeat(" ", 13-utf8.RuneCountInString(instVer)))
+			if !utils.StringInList("v", optsList) {
+				instVer = utils.TrimString(instVer, 12)
+				fmt.Print(instVer)
+				fmt.Printf(strings.Repeat(" ", 13-utf8.RuneCountInString(instVer)))
 
-			color.Set(color.FgBlack, color.Bold)
-			fmt.Print("->")
-			color.Unset()
-			fmt.Print(" ")
+				color.Set(color.FgBlack, color.Bold)
+				fmt.Print("->")
+				color.Unset()
+				fmt.Print(" ")
 
-			availVer = utils.TrimString(availVer, 12)
-			fmt.Println(availVer)
+				availVer = utils.TrimString(availVer, 12)
+				fmt.Print(availVer)
+			}
+			fmt.Println()
 		}
 	}
 }

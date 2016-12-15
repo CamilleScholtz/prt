@@ -14,10 +14,6 @@ import (
 
 // Loc prints port locations
 func Loc(args []string) {
-	// Initialize variables
-	var dup, alias bool
-	var allPorts, checkPorts []string
-
 	// Define opts
 	shortopts := "hdn"
 	longopts := []string{
@@ -44,9 +40,9 @@ func Loc(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-d", "--duplicate":
-			dup = true
+			optsList = append(optsList, "d")
 		case "-n", "--no-alias":
-			alias = true
+			optsList = append(optsList, "n")
 		}
 	}
 
@@ -75,18 +71,18 @@ func Loc(args []string) {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		if !dup {
+		if !utils.StringInList("d", optsList) {
 			locs = []string{locs[0]}
 		}
 
 		for _, loc := range locs {
 			// Alias if needed
-			if !alias {
+			if !utils.StringInList("a", optsList) {
 				loc = ports.Alias(loc)
 			}
 
 			// Print duplicate indentation
-			if dup {
+			if utils.StringInList("d", optsList) {
 				if i > 0 {
 					color.Set(color.FgBlack, color.Bold)
 					fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))

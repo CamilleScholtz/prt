@@ -8,6 +8,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) == 1 {
+		fmt.Fprintln(os.Stderr, "Missing command, use help for a list of commands!")
+		os.Exit(1)
+	}
+
 	switch os.Args[1] {
 	case "help":
 		fmt.Println("Usage: prt command [arguments]")

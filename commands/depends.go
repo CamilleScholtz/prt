@@ -15,10 +15,6 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Initialize variables
-var i int
-var checkPorts []string
-
 func recursive(path string) {
 	// Read out Pkgfile
 	f, err := ioutil.ReadFile(path + "/Pkgfile")
@@ -48,19 +44,19 @@ func recursive(path string) {
 		loc := locs[0]
 
 		// Alias if needed
-		if !oAlias {
+		if !utils.StringInList("n", optsList) {
 			loc = ports.Alias(loc)
 		}
 
 		// Continue if already installed
-		if !all {
+		if !utils.StringInList("a", optsList) {
 			if utils.StringInList(filepath.Base(loc), instPorts) {
 				continue
 			}
 		}
 
 		// Print tree indentation
-		if !tree {
+		if !utils.StringInList("t", optsList) {
 			if i > 0 {
 				color.Set(color.FgBlack, color.Bold)
 				fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
@@ -75,7 +71,7 @@ func recursive(path string) {
 		// Loop
 		recursive(config.Struct.PortDir + "/" + loc)
 
-		if !oTree {
+		if !utils.StringInList("t", optsList) {
 			i--
 		}
 	}
@@ -98,7 +94,6 @@ func Depends(args []string) {
 		os.Exit(1)
 	}
 
-	var all, alias, tree bool
 	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
@@ -111,21 +106,21 @@ func Depends(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
-			all := true
+			optsList = append(optsList, "a")
 		case "-n", "--no-alias":
-			alias := true
+			optsList = append(optsList, "n")
 		case "-t", "--tree":
-			tree := true
+			optsList = append(optsList, "t")
 		}
 	}
 
-	allPorts, err := ports.All()
+	allPorts, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	if !all {
-		instPorts, err := ports.Inst()
+	if utils.StringInList("a", optsList) {
+		instPorts, err = ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

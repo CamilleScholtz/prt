@@ -7,13 +7,11 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/onodera-punpun/prt/pkgfile"
+	"github.com/onodera-punpun/prt/utils"
 )
 
 // Info prints ports information
 func Info(args []string) {
-	// Initialize opt vars
-	var d, u, m, e, o, v, r bool
-
 	// Define opts
 	shortopts := "hdumeovr"
 	longopts := []string{
@@ -51,23 +49,23 @@ func Info(args []string) {
 				fmt.Println("  -h,   --help            print help and exit")
 				os.Exit(0)
 			case "-d", "--description":
-				d = true
+				optsList = append(optsList, "a")
 			case "-u", "--url":
-				u = true
+				optsList = append(optsList, "u")
 			case "-m", "--maintainer":
-				m = true
+				optsList = append(optsList, "m")
 			case "-e", "--depends":
-				d = true
+				optsList = append(optsList, "e")
 			case "-o", "--optional":
-				o = true
+				optsList = append(optsList, "0")
 			case "-v", "--version":
-				v = true
+				optsList = append(optsList, "v")
 			case "-r", "--release":
-				r = true
+				optsList = append(optsList, "r")
 			}
 		}
 	} else {
-		d, u, m, e, o, v, r = true, true, true, true, true, true, true
+		optsList = []string{"a", "u", "m", "e", "o", "v", "r"}
 	}
 
 	// Read out Pkgfile
@@ -78,7 +76,7 @@ func Info(args []string) {
 	}
 
 	// Print stuff
-	if d {
+	if utils.StringInList("d", optsList) {
 		text, err := pkgfile.Comment(f, "Description")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -86,7 +84,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Description: " + text)
 	}
-	if u {
+	if utils.StringInList("u", optsList) {
 		text, err := pkgfile.Comment(f, "URL")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -94,7 +92,7 @@ func Info(args []string) {
 		}
 		fmt.Println("URL: " + text)
 	}
-	if m {
+	if utils.StringInList("m", optsList) {
 		text, err := pkgfile.Comment(f, "Maintainer")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -102,7 +100,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Maintainer: " + text)
 	}
-	if e {
+	if utils.StringInList("e", optsList) {
 		text, err := pkgfile.Comment(f, "Depends on")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -110,7 +108,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Depends on: " + text)
 	}
-	if o {
+	if utils.StringInList("o", optsList) {
 		text, err := pkgfile.Comment(f, "Nice to have|Optional")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -118,7 +116,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Nice to have: " + text)
 	}
-	if v {
+	if utils.StringInList("v", optsList) {
 		text, err := pkgfile.Comment(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -126,7 +124,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Version: " + text)
 	}
-	if r {
+	if utils.StringInList("r", optsList) {
 		text, err := pkgfile.Comment(f, "release")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
