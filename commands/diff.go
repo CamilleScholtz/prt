@@ -18,10 +18,11 @@ import (
 // Diff lists outdated packages
 func Diff(args []string) {
 	// Define opts
-	shortopts := "hn"
+	shortopts := "hnv"
 	longopts := []string{
 		"--help",
 		"--no-alias",
+		"--no-version",
 	}
 
 	// Read out opts
@@ -31,6 +32,7 @@ func Diff(args []string) {
 		os.Exit(1)
 	}
 
+	var alias, version bool
 	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
@@ -38,10 +40,13 @@ func Diff(args []string) {
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -n,   --no-alias        disable aliasing")
+			fmt.Println("  -v,   --no-version      print without version info")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-n", "--no-alias":
 			alias = true
+		case "-v", "--no-version":
+			version = true
 		}
 	}
 
@@ -93,6 +98,11 @@ func Diff(args []string) {
 		}
 		availVer := ver + "-" + rel
 
+		// TODO
+		if version {
+			fmt.Println(ver)
+		}
+
 		if instVer != availVer {
 			port = utils.TrimString(port, 24)
 			fmt.Print(port)
@@ -107,7 +117,7 @@ func Diff(args []string) {
 			color.Unset()
 			fmt.Print(" ")
 
-			availVer = utils.TrimString(availVer, 13)
+			availVer = utils.TrimString(availVer, 12)
 			fmt.Println(availVer)
 		}
 	}

@@ -16,10 +16,8 @@ import (
 )
 
 // Initialize variables
-// TODO: Fix this shit
-var all, alias, tree bool
-var allPorts, checkPorts, instPorts []string
 var i int
+var checkPorts []string
 
 func recursive(path string) {
 	// Read out Pkgfile
@@ -50,7 +48,7 @@ func recursive(path string) {
 		loc := locs[0]
 
 		// Alias if needed
-		if !alias {
+		if !oAlias {
 			loc = ports.Alias(loc)
 		}
 
@@ -62,7 +60,7 @@ func recursive(path string) {
 		}
 
 		// Print tree indentation
-		if tree {
+		if !tree {
 			if i > 0 {
 				color.Set(color.FgBlack, color.Bold)
 				fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
@@ -77,7 +75,7 @@ func recursive(path string) {
 		// Loop
 		recursive(config.Struct.PortDir + "/" + loc)
 
-		if tree {
+		if !oTree {
 			i--
 		}
 	}
@@ -90,7 +88,7 @@ func Depends(args []string) {
 	longopts := []string{
 		"--help",
 		"--no-alias",
-		"--tree",
+		"--no-tree",
 	}
 
 	// Read out opts
@@ -100,6 +98,7 @@ func Depends(args []string) {
 		os.Exit(1)
 	}
 
+	var all, alias, tree bool
 	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
@@ -108,25 +107,25 @@ func Depends(args []string) {
 			fmt.Println("arguments:")
 			fmt.Println("  -a,   --all             also list installed dependencies")
 			fmt.Println("  -n,   --no-alias        disable aliasing")
-			fmt.Println("  -t,   --tree            list using tree view")
+			fmt.Println("  -t,   --no-tree         list without tree view")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
-			all = true
+			all := true
 		case "-n", "--no-alias":
-			alias = true
+			alias := true
 		case "-t", "--tree":
-			tree = true
+			tree := true
 		}
 	}
 
-	allPorts, err = ports.All()
+	allPorts, err := ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	if !all {
-		instPorts, err = ports.Inst()
+		instPorts, err := ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

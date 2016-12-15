@@ -9,6 +9,7 @@ import (
 )
 
 // Struct contains the config values
+// TODO: Is a struct really needed?
 var Struct config
 
 // Initialize config options
