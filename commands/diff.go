@@ -22,7 +22,7 @@ func Diff(args []string) {
 	longopts := []string{
 		"--help",
 		"--no-alias",
-		"--no-version",
+		"--version",
 	}
 
 	// Read out opts
@@ -44,7 +44,7 @@ func Diff(args []string) {
 			os.Exit(0)
 		case "-n", "--no-alias":
 			optsList = append(optsList, "n")
-		case "-v", "--no-version":
+		case "-v", "--version":
 			optsList = append(optsList, "v")
 		}
 	}
@@ -102,7 +102,7 @@ func Diff(args []string) {
 			fmt.Print(port)
 			fmt.Printf(strings.Repeat(" ", 25-utf8.RuneCountInString(port)))
 
-			if !utils.StringInList("v", optsList) {
+			if utils.StringInList("v", optsList) {
 				instVer = utils.TrimString(instVer, 12)
 				fmt.Print(instVer)
 				fmt.Printf(strings.Repeat(" ", 13-utf8.RuneCountInString(instVer)))

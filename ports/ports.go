@@ -63,6 +63,34 @@ func Inst() ([]string, error) {
 	return ports, nil
 }
 
+// InstVer tries to get the installed version of a port
+func InstVer(name string) (string, error) {
+	db, err := os.Open("/var/lib/pkg/db")
+	if err != nil {
+		return "", fmt.Errorf("Could not read '/var/lib/pkg/db'!")
+	}
+
+	defer db.Close()
+	s := bufio.NewScanner(db)
+
+	var match bool
+	var ver string
+	for s.Scan() {
+		if match {
+			ver = s.Text()
+			break
+		} else if s.Text() == name {
+			match = true
+		}
+	}
+
+	if len(ver) == 0 {
+		return "", fmt.Errorf("Could not find installed version of '" + name + "'!")
+	}
+
+	return ver, nil
+}
+
 // Loc tries to get the location of a port
 func Loc(ports []string, name string) ([]string, error) {
 	var locs []string
@@ -94,32 +122,4 @@ func Loc(ports []string, name string) ([]string, error) {
 	}
 
 	return locs, nil
-}
-
-// InstVer tries to get the installed version of a port
-func InstVer(name string) (string, error) {
-	db, err := os.Open("/var/lib/pkg/db")
-	if err != nil {
-		return "", fmt.Errorf("Could not read '/var/lib/pkg/db'!")
-	}
-
-	defer db.Close()
-	s := bufio.NewScanner(db)
-
-	var match bool
-	var ver string
-	for s.Scan() {
-		if match {
-			ver = s.Text()
-			break
-		} else if s.Text() == name {
-			match = true
-		}
-	}
-
-	if len(ver) == 0 {
-		return "", fmt.Errorf("Could not find installed version of '" + name + "'!")
-	}
-
-	return ver, nil
 }
