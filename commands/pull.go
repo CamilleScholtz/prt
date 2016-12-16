@@ -20,7 +20,7 @@ func Pull(args []string) {
 	}
 
 	// Read out opts
-	opts, val, err := getopt.Getopt(args, shortopts, longopts)
+	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -40,16 +40,16 @@ func Pull(args []string) {
 	var i, t int
 
 	// Count total repos that need to be pulled
-	if len(val) != 1 {
-		t = len(val) - 1
+	if len(vals) != 0 {
+		t = len(vals)
 	} else {
 		t = len(config.Struct.Pull)
 	}
 
 	for name, repo := range config.Struct.Pull {
 		// Skip repos if needed
-		if len(val) != 1 {
-			if !utils.StringInList(name, val) {
+		if len(vals) != 0 {
+			if !utils.StringInList(name, vals) {
 				continue
 			}
 		}
@@ -92,6 +92,7 @@ func Pull(args []string) {
 			args = []string{"diff", "--pretty=format:", "--name-status", repo.Branch}
 			info := exec.Command(cmd, args...)
 			info.Stdout = os.Stdout
+			info.Stderr = os.Stderr
 			if err := info.Run(); err != nil {
 				fmt.Fprintln(os.Stderr, "Could not git diff repo!")
 				os.Exit(1)

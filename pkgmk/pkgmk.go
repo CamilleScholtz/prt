@@ -1,12 +1,19 @@
 package pkgmk
 
-import "os/exec"
+import (
+	"fmt"
+	"os"
+	"os/exec"
+)
 
 // Download TODO
 func Download(loc string) error {
-	args = []string{"checkout", repo.Branch}
+	os.Chdir(loc)
+
+	cmd := "pkgmk"
+	args := []string{"-d"}
 	if err := exec.Command(cmd, args...).Run(); err != nil {
-		return "Could not git checkout repo!"
+		return fmt.Errorf("Could not git checkout repo!")
 	}
 
 	return nil
