@@ -45,7 +45,6 @@ func Inst() ([]string, error) {
 	if err != nil {
 		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")
 	}
-
 	defer db.Close()
 	s := bufio.NewScanner(db)
 
@@ -64,12 +63,12 @@ func Inst() ([]string, error) {
 }
 
 // InstVer tries to get the installed version of a port
+// TODO: This is slow as fuck and *the* bottleneck of list and diff
 func InstVer(name string) (string, error) {
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return "", fmt.Errorf("Could not read '/var/lib/pkg/db'!")
 	}
-
 	defer db.Close()
 	s := bufio.NewScanner(db)
 

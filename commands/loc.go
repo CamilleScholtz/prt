@@ -40,9 +40,9 @@ func Loc(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-d", "--duplicate":
-			optsList = append(optsList, "d")
+			o = append(o, "d")
 		case "-n", "--no-alias":
-			optsList = append(optsList, "n")
+			o = append(o, "n")
 		}
 	}
 
@@ -71,18 +71,18 @@ func Loc(args []string) {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		if !utils.StringInList("d", optsList) {
+		if !utils.StringInList("d", o) {
 			locs = []string{locs[0]}
 		}
 
 		for _, loc := range locs {
 			// Alias if needed
-			if !utils.StringInList("a", optsList) {
+			if !utils.StringInList("a", o) {
 				loc = ports.Alias(loc)
 			}
 
 			// Print duplicate indentation
-			if utils.StringInList("d", optsList) {
+			if utils.StringInList("d", o) {
 				if i > 0 {
 					color.Set(color.FgBlack, color.Bold)
 					fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))

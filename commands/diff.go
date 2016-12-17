@@ -43,9 +43,9 @@ func Diff(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-n", "--no-alias":
-			optsList = append(optsList, "n")
+			o = append(o, "n")
 		case "-v", "--version":
-			optsList = append(optsList, "v")
+			o = append(o, "v")
 		}
 	}
 
@@ -69,7 +69,7 @@ func Diff(args []string) {
 		loc := locs[0]
 
 		// Alias if needed
-		if !utils.StringInList("a", optsList) {
+		if !utils.StringInList("a", o) {
 			loc = ports.Alias(loc)
 		}
 
@@ -102,7 +102,7 @@ func Diff(args []string) {
 			fmt.Print(port)
 			fmt.Printf(strings.Repeat(" ", 25-utf8.RuneCountInString(port)))
 
-			if utils.StringInList("v", optsList) {
+			if utils.StringInList("v", o) {
 				instVer = utils.TrimString(instVer, 12)
 				fmt.Print(instVer)
 				fmt.Printf(strings.Repeat(" ", 13-utf8.RuneCountInString(instVer)))

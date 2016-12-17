@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -17,10 +18,11 @@ import (
 // List lists ports
 func List(args []string) {
 	// Define opts
-	shortopts := "hiv"
+	shortopts := "hirv"
 	longopts := []string{
 		"--help",
 		"--installed",
+		"--repo",
 		"--version",
 	}
 
@@ -38,13 +40,16 @@ func List(args []string) {
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -i,   --installed       list installed ports only")
+			fmt.Println("  -r,   --repo            print with repo info")
 			fmt.Println("  -v,   --version         print with version info")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-i", "--installed":
-			optsList = append(optsList, "i")
+			o = append(o, "i")
+		case "-r", "--repo":
+			o = append(o, "r")
 		case "-v", "--version":
-			optsList = append(optsList, "v")
+			o = append(o, "v")
 		}
 	}
 
@@ -55,7 +60,7 @@ func List(args []string) {
 	}
 
 	// Only list installed ports
-	if utils.StringInList("i", optsList) {
+	if utils.StringInList("i", o) {
 		instPorts, err = ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -63,23 +68,32 @@ func List(args []string) {
 		}
 
 		// Get port locations
-		for i, port := range instPorts {
-			locs, err := ports.Loc(allPorts, port)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+		if utils.StringInList("r", o) {
+			for i, port := range instPorts {
+				locs, err := ports.Loc(allPorts, port)
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
+				}
+				instPorts[i] = locs[0]
 			}
-			instPorts[i] = locs[0]
 		}
 
 		sort.Strings(instPorts)
 		allPorts = instPorts
+	} else {
+		// Remove repo info
+		if !utils.StringInList("r", o) {
+			for i, port := range allPorts {
+				allPorts[i] = filepath.Base(port)
+			}
+		}
 	}
 
 	for _, port := range allPorts {
-		if utils.StringInList("v", optsList) {
+		if utils.StringInList("v", o) {
 			var ver string
-			if utils.StringInList("i", optsList) {
+			if utils.StringInList("i", o) {
 				ver, err = ports.InstVer(strings.Split(port, "/")[1])
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)

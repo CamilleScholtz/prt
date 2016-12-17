@@ -49,23 +49,23 @@ func Info(args []string) {
 				fmt.Println("  -h,   --help            print help and exit")
 				os.Exit(0)
 			case "-d", "--description":
-				optsList = append(optsList, "a")
+				o = append(o, "a")
 			case "-u", "--url":
-				optsList = append(optsList, "u")
+				o = append(o, "u")
 			case "-m", "--maintainer":
-				optsList = append(optsList, "m")
+				o = append(o, "m")
 			case "-e", "--depends":
-				optsList = append(optsList, "e")
+				o = append(o, "e")
 			case "-o", "--optional":
-				optsList = append(optsList, "0")
+				o = append(o, "0")
 			case "-v", "--version":
-				optsList = append(optsList, "v")
+				o = append(o, "v")
 			case "-r", "--release":
-				optsList = append(optsList, "r")
+				o = append(o, "r")
 			}
 		}
 	} else {
-		optsList = []string{"a", "u", "m", "e", "o", "v", "r"}
+		o = []string{"a", "u", "m", "e", "o", "v", "r"}
 	}
 
 	// Read out Pkgfile
@@ -76,7 +76,7 @@ func Info(args []string) {
 	}
 
 	// Print stuff
-	if utils.StringInList("d", optsList) {
+	if utils.StringInList("d", o) {
 		text, err := pkgfile.Comment(f, "Description")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -84,7 +84,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Description: " + text)
 	}
-	if utils.StringInList("u", optsList) {
+	if utils.StringInList("u", o) {
 		text, err := pkgfile.Comment(f, "URL")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -92,7 +92,7 @@ func Info(args []string) {
 		}
 		fmt.Println("URL: " + text)
 	}
-	if utils.StringInList("m", optsList) {
+	if utils.StringInList("m", o) {
 		text, err := pkgfile.Comment(f, "Maintainer")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -100,7 +100,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Maintainer: " + text)
 	}
-	if utils.StringInList("e", optsList) {
+	if utils.StringInList("e", o) {
 		text, err := pkgfile.Comment(f, "Depends on")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -108,7 +108,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Depends on: " + text)
 	}
-	if utils.StringInList("o", optsList) {
+	if utils.StringInList("o", o) {
 		text, err := pkgfile.Comment(f, "Nice to have|Optional")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -116,7 +116,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Nice to have: " + text)
 	}
-	if utils.StringInList("v", optsList) {
+	if utils.StringInList("v", o) {
 		text, err := pkgfile.Comment(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -124,7 +124,7 @@ func Info(args []string) {
 		}
 		fmt.Println("Version: " + text)
 	}
-	if utils.StringInList("r", optsList) {
+	if utils.StringInList("r", o) {
 		text, err := pkgfile.Comment(f, "release")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

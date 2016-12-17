@@ -44,19 +44,19 @@ func recursive(path string) {
 		loc := locs[0]
 
 		// Alias if needed
-		if !utils.StringInList("n", optsList) {
+		if !utils.StringInList("n", o) {
 			loc = ports.Alias(loc)
 		}
 
 		// Continue if already installed
-		if !utils.StringInList("a", optsList) {
+		if !utils.StringInList("a", o) {
 			if utils.StringInList(filepath.Base(loc), instPorts) {
 				continue
 			}
 		}
 
 		// Print tree indentation
-		if !utils.StringInList("t", optsList) {
+		if utils.StringInList("t", o) {
 			if i > 0 {
 				color.Set(color.FgBlack, color.Bold)
 				fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
@@ -71,7 +71,7 @@ func recursive(path string) {
 		// Loop
 		recursive(config.Struct.PortDir + "/" + loc)
 
-		if !utils.StringInList("t", optsList) {
+		if utils.StringInList("t", o) {
 			i--
 		}
 	}
@@ -84,7 +84,7 @@ func Depends(args []string) {
 	longopts := []string{
 		"--help",
 		"--no-alias",
-		"--no-tree",
+		"--tree",
 	}
 
 	// Read out opts
@@ -102,15 +102,15 @@ func Depends(args []string) {
 			fmt.Println("arguments:")
 			fmt.Println("  -a,   --all             also list installed dependencies")
 			fmt.Println("  -n,   --no-alias        disable aliasing")
-			fmt.Println("  -t,   --no-tree         list without tree view")
+			fmt.Println("  -t,   --tree            list with tree view")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
-			optsList = append(optsList, "a")
+			o = append(o, "a")
 		case "-n", "--no-alias":
-			optsList = append(optsList, "n")
+			o = append(o, "n")
 		case "-t", "--tree":
-			optsList = append(optsList, "t")
+			o = append(o, "t")
 		}
 	}
 
@@ -119,7 +119,7 @@ func Depends(args []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	if utils.StringInList("a", optsList) {
+	if !utils.StringInList("a", o) {
 		instPorts, err = ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
