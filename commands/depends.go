@@ -102,7 +102,7 @@ func Depends(args []string) {
 			fmt.Println("arguments:")
 			fmt.Println("  -a,   --all             also list installed dependencies")
 			fmt.Println("  -n,   --no-alias        disable aliasing")
-			fmt.Println("  -t,   --tree            list with tree view")
+			fmt.Println("  -t,   --tree            list using tree view")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
