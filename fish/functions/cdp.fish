@@ -1,7 +1,5 @@
 function cdp
-	source /etc/prt/config
-
-	set location (prt loc $argv ^/dev/null)
+	set location (prt loc $argv)
 
 	if test -n "$location"
 		cd $prtdir/$location
