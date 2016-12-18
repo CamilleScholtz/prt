@@ -10,12 +10,3 @@ func StringInList(a string, list []string) bool {
 
 	return false
 }
-
-// TrimString trims a string to a certain lenght
-func TrimString(s string, n int) string {
-	if len(s) <= n {
-		return s
-	}
-
-	return s[0:n-1] + "…"
-}

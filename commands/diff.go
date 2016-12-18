@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
-	"unicode/utf8"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
@@ -99,21 +97,15 @@ func Diff(args []string) {
 		instVer := instVers[i]
 
 		if instVer != availVer {
-			port = utils.TrimString(port, 24)
 			fmt.Print(port)
-			fmt.Printf(strings.Repeat(" ", 25-utf8.RuneCountInString(port)))
 
 			if utils.StringInList("v", o) {
-				instVer = utils.TrimString(instVer, 12)
 				fmt.Print(instVer)
-				fmt.Printf(strings.Repeat(" ", 13-utf8.RuneCountInString(instVer)))
 
 				color.Set(color.FgBlack, color.Bold)
-				fmt.Print("->")
+				fmt.Print(" -> ")
 				color.Unset()
-				fmt.Print(" ")
 
-				availVer = utils.TrimString(availVer, 12)
 				fmt.Print(availVer)
 			}
 			fmt.Println()
