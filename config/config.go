@@ -26,7 +26,7 @@ type pull struct {
 }
 
 func init() {
-	_, err := toml.DecodeFile("/home/onodera/code/go/src/github.com/onodera-punpun/prt/runtime/config.toml", &Struct)
+	_, err := toml.DecodeFile("/etc/prt/config.toml", &Struct)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not decode config!")
 		os.Exit(1)

@@ -3,11 +3,7 @@ portdir = "/usr/ports"
 
 # Repo order, the port found first is used
 order = [
-	"punpun",
-	"6c37-dropin",
 	"core",
-	"6c37-git",
-	"6c37",
 	"opt",
 	"xorg",
 	"contrib"
@@ -15,11 +11,11 @@ order = [
 
 # Alias ports
 alias = [
-	[ "core/openssl", "6c37-dropin/libressl" ],
-	[ "core/pkg-config", "6c37-dropin/pkgconf" ],
-	[ "opt/cairo", "6c37-dropin/cairo-iu" ],
-	[ "opt/fontconfig", "6c37-dropin/fontconfig-iu" ],
-	[ "opt/freetype", "6c37-dropin/freetype-iu" ]
+#	[ "core/openssl", "6c37-dropin/libressl" ],
+#	[ "core/pkg-config", "6c37-dropin/pkgconf" ],
+#	[ "opt/cairo", "6c37-dropin/cairo-iu" ],
+#	[ "opt/fontconfig", "6c37-dropin/fontconfig-iu" ],
+#	[ "opt/freetype", "6c37-dropin/freetype-iu" ]
 ]
 
 # Characters used for indentation
@@ -27,18 +23,6 @@ indentchar = "-  "
 
 # Repos to pull
 [pull]
-	[pull.6c37]
-	url = "git://github.com/6c37/crux-ports"
-	branch = "3.2"
-
-	[pull.6c37-dropin]
-	url = "git://github.com/6c37/crux-ports-dropin"
-	branch = "3.2"
-
-	[pull.6c37-git]
-	url = "git://github.com/6c37/crux-ports-git"
-	branch = "3.2"
-
 	[pull.contrib]
 	url = "git://crux.nu/ports/contrib"
 	branch = "3.2"
@@ -50,10 +34,6 @@ indentchar = "-  "
 	[pull.opt]
 	url = "git://crux.nu/ports/opt"
 	branch = "3.2"
-
-	[pull.punpun]
-	url = "git://github.com/onodera-punpun/crux-ports"
-	branch = "master"
 
 	[pull.xorg]
 	url = "git://crux.nu/ports/xorg"
