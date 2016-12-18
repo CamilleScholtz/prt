@@ -85,13 +85,6 @@ func List(args []string) {
 
 		sort.Strings(instPorts)
 		allPorts = instPorts
-	} else {
-		// Remove repo info
-		if !utils.StringInList("r", o) {
-			for i, port := range allPorts {
-				allPorts[i] = filepath.Base(port)
-			}
-		}
 	}
 
 	for i, port := range allPorts {
@@ -103,7 +96,7 @@ func List(args []string) {
 				// Read out Pkgfile
 				f, err := ioutil.ReadFile(config.Struct.PortDir + "/" + port + "/Pkgfile")
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+config.Struct.PortDir+"/"+port+"/Pkgfile!")
+					fmt.Fprintln(os.Stderr, "Could not read '"+config.Struct.PortDir+"/"+port+"/Pkgfile'!")
 					continue
 				}
 
@@ -112,9 +105,15 @@ func List(args []string) {
 					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
+
+				// Remove repo if needed
+				if utils.StringInList("r", o) {
+					port = filepath.Base(port)
+				}
 			}
 
 			port = port + " " + ver
+
 		}
 
 		fmt.Println(port)
