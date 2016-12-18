@@ -62,32 +62,29 @@ func Inst() ([]string, error) {
 	return ports, nil
 }
 
-// InstVer tries to get the installed version of a port
-// TODO: This is slow as fuck and *the* bottleneck of list and diff
-func InstVer(name string) (string, error) {
+// InstVer list all installed versions, this should follow the same order as Inst()
+func InstVer() ([]string, error) {
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
-		return "", fmt.Errorf("Could not read '/var/lib/pkg/db'!")
+		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")
 	}
 	defer db.Close()
 	s := bufio.NewScanner(db)
 
-	var match bool
-	var ver string
+	var match1, match2 bool
+	var vers []string
 	for s.Scan() {
-		if match {
-			ver = s.Text()
-			break
-		} else if s.Text() == name {
-			match = true
+		if match1 {
+			match1, match2 = false, true
+		} else if match2 {
+			vers = append(vers, s.Text())
+			match2 = false
+		} else if s.Text() == "" {
+			match1 = true
 		}
 	}
 
-	if len(ver) == 0 {
-		return "", fmt.Errorf("Could not find installed version of '" + name + "'!")
-	}
-
-	return ver, nil
+	return vers, nil
 }
 
 // Loc tries to get the location of a port

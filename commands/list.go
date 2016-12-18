@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/onodera-punpun/prt/config"
@@ -66,6 +65,11 @@ func List(args []string) {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
+		instVers, err = ports.InstVer()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 
 		// Get port locations
 		if utils.StringInList("r", o) {
@@ -90,15 +94,11 @@ func List(args []string) {
 		}
 	}
 
-	for _, port := range allPorts {
+	for i, port := range allPorts {
 		if utils.StringInList("v", o) {
 			var ver string
 			if utils.StringInList("i", o) {
-				ver, err = ports.InstVer(strings.Split(port, "/")[1])
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-					continue
-				}
+				ver = instVers[i]
 			} else {
 				// Read out Pkgfile
 				f, err := ioutil.ReadFile(config.Struct.PortDir + "/" + port + "/Pkgfile")

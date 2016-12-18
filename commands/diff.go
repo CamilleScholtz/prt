@@ -59,8 +59,13 @@ func Diff(args []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	instVers, err := ports.InstVer()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
-	for _, port := range instPorts {
+	for i, port := range instPorts {
 		// Get port location
 		locs, err := ports.Loc(allPorts, port)
 		if err != nil {
@@ -80,11 +85,6 @@ func Diff(args []string) {
 			continue
 		}
 
-		instVer, err := ports.InstVer(port)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
-		}
 		ver, err := pkgfile.Var(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -96,6 +96,7 @@ func Diff(args []string) {
 			continue
 		}
 		availVer := ver + "-" + rel
+		instVer := instVers[i]
 
 		if instVer != availVer {
 			port = utils.TrimString(port, 24)

@@ -117,7 +117,7 @@ func Info(args []string) {
 		fmt.Println("Nice to have: " + text)
 	}
 	if utils.StringInList("v", o) {
-		text, err := pkgfile.Comment(f, "version")
+		text, err := pkgfile.Var(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -125,7 +125,7 @@ func Info(args []string) {
 		fmt.Println("Version: " + text)
 	}
 	if utils.StringInList("r", o) {
-		text, err := pkgfile.Comment(f, "release")
+		text, err := pkgfile.Var(f, "release")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
