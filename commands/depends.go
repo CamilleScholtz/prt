@@ -53,12 +53,16 @@ func recursive(path string) {
 			if utils.StringInList(filepath.Base(loc), instPorts) {
 				continue
 			}
+			// Core packages should always be installed
+			if filepath.Dir(loc) == "core" {
+				continue
+			}
 		}
 
 		// Print tree indentation
 		if utils.StringInList("t", o) {
 			if i > 0 {
-				color.Set(color.FgBlack, color.Bold)
+				color.Set(config.Struct.DarkColor)
 				fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
 				color.Unset()
 			}

@@ -77,7 +77,7 @@ func List(args []string) {
 				locs, err := ports.Loc(allPorts, port)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
-					os.Exit(1)
+					continue
 				}
 				instPorts[i] = locs[0]
 			}
@@ -113,7 +113,6 @@ func List(args []string) {
 			}
 
 			port = port + " " + ver
-
 		}
 
 		fmt.Println(port)

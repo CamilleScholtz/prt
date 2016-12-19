@@ -48,14 +48,14 @@ func Inst() ([]string, error) {
 	defer db.Close()
 	s := bufio.NewScanner(db)
 
-	var match bool
+	var blank bool
 	var ports []string
 	for s.Scan() {
-		if match {
+		if blank {
 			ports = append(ports, s.Text())
-			match = false
+			blank = false
 		} else if s.Text() == "" {
-			match = true
+			blank = true
 		}
 	}
 
@@ -71,16 +71,16 @@ func InstVer() ([]string, error) {
 	defer db.Close()
 	s := bufio.NewScanner(db)
 
-	var match1, match2 bool
+	var blank, name bool
 	var vers []string
 	for s.Scan() {
-		if match1 {
-			match1, match2 = false, true
-		} else if match2 {
+		if blank {
+			blank, name = false, true
+		} else if name {
 			vers = append(vers, s.Text())
-			match2 = false
+			name = false
 		} else if s.Text() == "" {
-			match1 = true
+			blank = true
 		}
 	}
 

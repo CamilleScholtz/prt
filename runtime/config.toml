@@ -21,6 +21,12 @@ alias = [
 # Characters used for indentation
 indentchar = "-  "
 
+# Color used for indentation, arrows, et cetera
+darkcolor = 8
+
+# Color used to highlight repos to pull, ports install, et cetera
+lightcolor = 11
+
 # Repos to pull
 [pull]
 	[pull.contrib]

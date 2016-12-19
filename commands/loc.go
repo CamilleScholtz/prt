@@ -84,7 +84,7 @@ func Loc(args []string) {
 			// Print duplicate indentation
 			if utils.StringInList("d", o) {
 				if i > 0 {
-					color.Set(color.FgBlack, color.Bold)
+					color.Set(config.Struct.DarkColor)
 					fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
 					color.Unset()
 				}

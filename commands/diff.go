@@ -83,6 +83,7 @@ func Diff(args []string) {
 			continue
 		}
 
+		// Get available version
 		ver, err := pkgfile.Var(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -94,15 +95,18 @@ func Diff(args []string) {
 			continue
 		}
 		availVer := ver + "-" + rel
+
+		// Get installed version
 		instVer := instVers[i]
 
-		if instVer != availVer {
+		// Print if installed and available version don't match
+		if availVer != instVer {
 			fmt.Print(port)
 
 			if utils.StringInList("v", o) {
 				fmt.Print(instVer)
 
-				color.Set(color.FgBlack, color.Bold)
+				color.Set(config.Struct.DarkColor)
 				fmt.Print(" -> ")
 				color.Unset()
 
