@@ -1,1 +1,1 @@
-complete -c cdp -x -a "(prt list | cut -d '/' -f 2)"
+complete -c cdp -x -a "(prt list)"

@@ -36,7 +36,7 @@ func Prov(args []string) {
 			fmt.Println("Usage: prt print [arguments] [queries]")
 			fmt.Println("")
 			fmt.Println("arguments:")
-			fmt.Println("  -i,   --installed       search in installed ports")
+			fmt.Println("  -i,   --installed       search in installed ports only")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-i", "--installed":

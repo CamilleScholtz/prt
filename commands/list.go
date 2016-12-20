@@ -39,8 +39,8 @@ func List(args []string) {
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -i,   --installed       list installed ports only")
-			fmt.Println("  -r,   --repo            print with repo info")
-			fmt.Println("  -v,   --version         print with version info")
+			fmt.Println("  -r,   --repo            list with repo info")
+			fmt.Println("  -v,   --version         list with version info")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-i", "--installed":

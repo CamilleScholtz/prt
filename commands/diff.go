@@ -37,7 +37,7 @@ func Diff(args []string) {
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -n,   --no-alias        disable aliasing")
-			fmt.Println("  -v,   --no-version      print without version info")
+			fmt.Println("  -v,   --version         print with version info")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-n", "--no-alias":
