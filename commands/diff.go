@@ -57,7 +57,7 @@ func Diff(args []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	instVers, err := ports.InstVer()
+	instVers, err := ports.InstVers()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

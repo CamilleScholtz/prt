@@ -28,8 +28,8 @@ type pull struct {
 	Branch string
 }
 
-// intToColor convers a config color (0..15) to a color compatible color (30..97)
-func intToColor(i color.Attribute) (color.Attribute, error) {
+// colorFix converts a config color (0..15) to a color compatible color (30..97)
+func colorFix(i color.Attribute) (color.Attribute, error) {
 	if i > 15 {
 		return 0, fmt.Errorf("Could not convert '" + string(i) + "' to color!")
 	}
@@ -81,12 +81,12 @@ func init() {
 	}
 
 	// Convert colors to something usable
-	Struct.DarkColor, err = intToColor(Struct.DarkColor)
+	Struct.DarkColor, err = colorFix(Struct.DarkColor)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	Struct.LightColor, err = intToColor(Struct.LightColor)
+	Struct.LightColor, err = colorFix(Struct.LightColor)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

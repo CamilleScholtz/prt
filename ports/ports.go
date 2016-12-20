@@ -62,8 +62,8 @@ func Inst() ([]string, error) {
 	return ports, nil
 }
 
-// InstVer list all installed versions, this should follow the same order as Inst()
-func InstVer() ([]string, error) {
+// InstVers list all installed versions, this should follow the same order as Inst()
+func InstVers() ([]string, error) {
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")

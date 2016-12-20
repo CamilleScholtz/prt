@@ -37,13 +37,12 @@ func Pull(args []string) {
 		}
 	}
 
-	var i, t int
-
 	// Count total repos that need to be pulled
-	if len(vals) != 0 {
-		t = len(vals)
-	} else {
+	var t int
+	if len(vals) == 0 {
 		t = len(config.Struct.Pull)
+	} else {
+		t = len(vals)
 	}
 
 	for name, repo := range config.Struct.Pull {
