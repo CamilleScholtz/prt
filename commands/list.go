@@ -105,14 +105,14 @@ func List(args []string) {
 					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
-
-				// Remove repo if needed
-				if utils.StringInList("r", o) {
-					port = filepath.Base(port)
-				}
 			}
 
 			port = port + " " + ver
+		}
+
+		// Remove repo if needed
+		if !utils.StringInList("r", o) {
+			port = filepath.Base(port)
 		}
 
 		fmt.Println(port)
