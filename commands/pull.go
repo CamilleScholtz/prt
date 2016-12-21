@@ -3,11 +3,11 @@ package commands
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
 	"github.com/onodera-punpun/prt/config"
+	"github.com/onodera-punpun/prt/git"
 	"github.com/onodera-punpun/prt/utils"
 )
 
@@ -52,7 +52,6 @@ func Pull(args []string) {
 				continue
 			}
 		}
-
 		i++
 
 		// Print some info
@@ -62,52 +61,46 @@ func Pull(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		// Actually clone/pull port
-		cmd := "git"
-		loc := "./test" + "/" + name
-		if _, err := os.Stat("./test" + "/" + name); err != nil {
-			args = []string{"clone", "--depth", "1", "-b", repo.Branch, repo.URL, loc}
-			if err := exec.Command(cmd, args...).Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "Could not git clone repo!")
-				os.Exit(1)
-			}
-		} else {
-			os.Chdir(loc)
+		loc := config.Struct.PortDir + "/" + name
 
-			args = []string{"checkout", repo.Branch}
-			if err := exec.Command(cmd, args...).Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "Could not git checkout repo!")
-				os.Exit(1)
+		// Check if location exists, clone if it doesn't
+		_, err := os.Stat(loc)
+		if err != nil {
+			err := git.Clone(repo.URL, repo.Branch, loc)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
 			}
+			continue
+		}
 
-			args = []string{"fetch", "--depth", "1"}
-			if err := exec.Command(cmd, args...).Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "Could not git fetch repo!")
-				os.Exit(1)
-			}
+		err = git.Checkout(repo.Branch, loc)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
+		err = git.Fetch(loc)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
 
-			// TODO: Prettify this
-			// TODO: Make this actually output something
-			args = []string{"diff", "--pretty=format:", "--name-status", repo.Branch}
-			info := exec.Command(cmd, args...)
-			info.Stdout = os.Stdout
-			info.Stderr = os.Stderr
-			if err := info.Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "Could not git diff repo!")
-				os.Exit(1)
-			}
+		// Output changes
+		diff, err := git.Diff(repo.Branch, loc)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
+		fmt.Println(diff)
 
-			args = []string{"clean", "-f"}
-			if err := exec.Command(cmd, args...).Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "Could not git clean repo!")
-				os.Exit(1)
-			}
-
-			args = []string{"reset", "--hard", "origin/" + repo.Branch}
-			if err := exec.Command(cmd, args...).Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "Could not git reset repo!")
-				os.Exit(1)
-			}
+		err = git.Clean(loc)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
+		err = git.Reset(repo.Branch, loc)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
 		}
 	}
 }

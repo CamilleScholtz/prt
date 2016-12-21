@@ -14,7 +14,7 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Prov lists TODO
+// Prov searches ports for files
 func Prov(args []string) {
 	// Define opts
 	shortopts := "hi"

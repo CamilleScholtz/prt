@@ -10,7 +10,7 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Info prints ports information
+// Info prints port information
 func Info(args []string) {
 	// Define opts
 	shortopts := "hdumeovr"
