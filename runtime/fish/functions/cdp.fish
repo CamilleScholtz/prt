@@ -1,5 +1,5 @@
 function cdp
-    set prtdir (cat /etc/prt/config.toml | string match -r 'prtdir.*' | string trim '" ')
+    set prtdir (cat /etc/prt/config.toml | string match -r 'prtdir.*' | string trim -c '" ')
     set loc (prt loc $argv ^/dev/null)
 
     if test "$prtdir/$loc"
