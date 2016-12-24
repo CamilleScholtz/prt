@@ -1,1 +1,1 @@
-complete -c cdp -x -a "(prt list)"
+complete -c cdp -f -x -a "(prt list)"
