@@ -1,10 +1,10 @@
 function cdp
-    set prtdir (cat /etc/prt/config.toml | string match -r 'prtdir.*' | string trim -c '" ')
+    set portdir (cat /etc/prt/config.toml | string match -r 'portdir.*' | string trim -c '" ')
     set loc (prt loc $argv ^/dev/null)
 
-    if test "$prtdir/$loc"
-        cd $prtdir/$loc
+    if test "$portdir/$loc"
+        cd $portdir/$loc
     else
-        cd $prtdir
+        cd $portdir
     end
 end
