@@ -49,7 +49,7 @@ func Pull(args []string) {
 		// Skip repos if needed
 		if len(vals) != 0 {
 			if !utils.StringInList(name, vals) {
-				continue
+				return
 			}
 		}
 		i++
@@ -70,37 +70,39 @@ func Pull(args []string) {
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
-			continue
+			return
 		}
 
 		err = git.Checkout(repo.Branch, loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			continue
+			return
 		}
 		err = git.Fetch(loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			continue
+			return
 		}
 
 		// Output changes
-		diff, err := git.Diff(repo.Branch, loc)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
+		// TODO: Does this actually output anything?
+		diff := git.Diff(repo.Branch, loc)
+		for _, l := range diff {
+			color.Set(config.Struct.DarkColor)
+			fmt.Print(config.Struct.IndentChar)
+			color.Unset()
+			fmt.Println(l)
 		}
-		fmt.Println(diff)
 
 		err = git.Clean(loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			continue
+			return
 		}
 		err = git.Reset(repo.Branch, loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			continue
+			return
 		}
 	}
 }

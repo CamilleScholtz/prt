@@ -20,10 +20,11 @@ type config struct {
 	IndentChar string
 	DarkColor  color.Attribute
 	LightColor color.Attribute
-	Pull       map[string]pull
+	Pull       map[string]Pull
 }
 
-type pull struct {
+// Pull is a struct with info about repos
+type Pull struct {
 	URL    string
 	Branch string
 }

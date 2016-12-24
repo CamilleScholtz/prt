@@ -47,27 +47,31 @@ func Clone(url, branch, loc string) error {
 }
 
 // Diff checks a repo for differences
-func Diff(branch, loc string) ([]string, error) {
+func Diff(branch, loc string) []string {
 	cmd := exec.Command("diff", "--name-status", branch)
 	cmd.Dir = loc
-
 	b := new(bytes.Buffer)
 	cmd.Stdout = b
 
-	err := cmd.Run()
-	if err != nil {
-		return []string{}, fmt.Errorf("Could not git diff repo!")
+	cmd.Run()
+	// TODO: For some reason this cmd always exits with a 2 exit code
+	//if err != nil {
+	//	return fmt.Errorf("Could not git clone repo!")
+	//}
+
+	diff := b.String()
+	if len(diff) < 1 {
+		return []string{}
 	}
 
 	// Make output pretty
-	diff := b.String()
 	diff = strings.Replace(diff, "A", "Adding", 1)
 	diff = strings.Replace(diff, "C", "Copying", 1)
 	diff = strings.Replace(diff, "D", "Deleting", 1)
 	diff = strings.Replace(diff, "M", "Modifying", 1)
 	diff = strings.Replace(diff, "R", "Renaming", 1)
 
-	return strings.Split(diff, "\n"), nil
+	return strings.Split(diff, "\n")
 }
 
 // Fetch fetches a repo

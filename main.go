@@ -20,7 +20,7 @@ func main() {
 		fmt.Println("commands:")
 		fmt.Println("  depends                 list dependencies recursivly")
 		fmt.Println("  diff                    list outdated packages")
-		//fmt.Println("  build                   build and install ports")
+		fmt.Println("  build                   build ports")
 		fmt.Println("  info                    print port information")
 		fmt.Println("  list                    list ports")
 		fmt.Println("  loc                     print port locations")
@@ -37,9 +37,9 @@ func main() {
 	case "diff":
 		commands.Diff(os.Args[2:])
 		os.Exit(0)
-		//	case "build":
-		//		commands.Build(os.Args[1:])
-		//		os.Exit(0)
+	case "build":
+		commands.Build(os.Args[2:])
+		os.Exit(0)
 	case "info":
 		commands.Info(os.Args[2:])
 		os.Exit(0)
