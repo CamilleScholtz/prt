@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/utils"
@@ -25,15 +24,17 @@ func Alias(port string) string {
 // All lists all ports found in the PortDir
 func All() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
-	dirs, err := filepath.Glob(config.Struct.PortDir + "/*/*/Pkgfile")
+	dirs, err := filepath.Glob(filepath.Join(config.Struct.PortDir, "/*/*/Pkgfile"))
 	if err != nil {
-		return []string{}, fmt.Errorf("Could not read '" + config.Struct.PortDir + "/*/*/Pkgfile'!")
+		return []string{}, fmt.Errorf("Could not read '" + filepath.Join(config.Struct.PortDir, "/*/*/Pkgfile") + "'!")
 	}
 
 	var ports []string
-	for _, port := range dirs {
-		path := strings.Split(filepath.Dir(port), "/")
-		ports = append(ports, strings.Join(path[len(path)-2:], "/"))
+	for _, loc := range dirs {
+		path := filepath.Dir(loc)
+		repo := filepath.Base(filepath.Dir(path))
+		port := filepath.Base(path)
+		ports = append(ports, filepath.Join(repo, port))
 	}
 
 	return ports, nil
@@ -41,6 +42,7 @@ func All() ([]string, error) {
 
 // Inst lists all installed ports
 func Inst() ([]string, error) {
+	// TODO: Use filepath stuff here?
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")
@@ -64,6 +66,7 @@ func Inst() ([]string, error) {
 
 // InstVers list all installed versions, this should follow the same order as Inst()
 func InstVers() ([]string, error) {
+	// TODO: Use filepath stuff here?
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")
@@ -91,7 +94,7 @@ func InstVers() ([]string, error) {
 func Loc(ports []string, name string) ([]string, error) {
 	var locs []string
 	for _, port := range ports {
-		if strings.Split(port, "/")[1] == name {
+		if filepath.Base(port) == name {
 			locs = append(locs, port)
 		}
 	}
@@ -104,7 +107,7 @@ func Loc(ports []string, name string) ([]string, error) {
 	if len(locs) > 1 {
 		var i int
 		for _, repo := range config.Struct.Order {
-			newLoc := repo + "/" + filepath.Base(locs[i])
+			newLoc := filepath.Join(repo, filepath.Base(locs[i]))
 			if utils.StringInList(newLoc, ports) {
 				locs[i] = newLoc
 				i++

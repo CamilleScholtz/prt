@@ -17,9 +17,9 @@ import (
 
 func recursive(path string) {
 	// Read out Pkgfile
-	f, err := ioutil.ReadFile(path + "/Pkgfile")
+	f, err := ioutil.ReadFile(filepath.Join(path, "Pkgfile"))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read '"+path+"/Pkgfile'!")
+		fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(path, "Pkgfile")+"'!")
 		return
 	}
 
@@ -73,7 +73,7 @@ func recursive(path string) {
 		fmt.Println(loc)
 
 		// Loop
-		recursive(config.Struct.PortDir + "/" + loc)
+		recursive(filepath.Join(config.Struct.PortDir, loc))
 
 		if utils.StringInList("t", o) {
 			i--

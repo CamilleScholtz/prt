@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
@@ -77,9 +78,9 @@ func Diff(args []string) {
 		}
 
 		// Read out Pkgfile
-		f, err := ioutil.ReadFile(config.Struct.PortDir + "/" + loc + "/Pkgfile")
+		f, err := ioutil.ReadFile(filepath.Join(config.Struct.PortDir, loc, "Pkgfile"))
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Could not read '"+config.Struct.PortDir+"/"+loc+"/Pkgfile'!")
+			fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(config.Struct.PortDir, loc, "Pkgfile")+"'!")
 			continue
 		}
 

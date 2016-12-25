@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -58,6 +59,7 @@ func Prov(args []string) {
 
 		// TODO: Use Alias and Loc here to always display repo info?
 		if utils.StringInList("i", o) {
+			// TODO: Should I use filepath stuff here?
 			db, err := os.Open("/var/lib/pkg/db")
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Could not read '/var/lib/pkg/db'!")
@@ -104,9 +106,9 @@ func Prov(args []string) {
 			}
 
 			for _, name := range allPorts {
-				f, err := os.Open(config.Struct.PortDir + "/" + name + "/.footprint")
+				f, err := os.Open(filepath.Join(config.Struct.PortDir, name, "Pkgfile"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+config.Struct.PortDir+"/"+name+"/Pkgfile'!")
+					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(config.Struct.PortDir, name, "Pkgfile")+"'!")
 					continue
 				}
 				s := bufio.NewScanner(f)

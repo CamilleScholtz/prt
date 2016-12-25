@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
@@ -45,11 +46,13 @@ func Pull(args []string) {
 		t = len(vals)
 	}
 
+	// TODO: Actually learn git and check if all these commands are needed
+	// also check if branch is needed for these commands
 	for name, repo := range config.Struct.Pull {
 		// Skip repos if needed
 		if len(vals) != 0 {
 			if !utils.StringInList(name, vals) {
-				return
+				continue
 			}
 		}
 		i++
@@ -61,7 +64,7 @@ func Pull(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		loc := config.Struct.PortDir + "/" + name
+		loc := filepath.Join(config.Struct.PortDir, name)
 
 		// Check if location exists, clone if it doesn't
 		_, err := os.Stat(loc)
@@ -70,23 +73,27 @@ func Pull(args []string) {
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
-			return
+			continue
 		}
 
 		err = git.Checkout(repo.Branch, loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			return
+			continue
 		}
 		err = git.Fetch(loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			return
+			continue
 		}
 
 		// Output changes
 		// TODO: Does this actually output anything?
-		diff := git.Diff(repo.Branch, loc)
+		diff, err := git.Diff(repo.Branch, loc)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
 		for _, l := range diff {
 			color.Set(config.Struct.DarkColor)
 			fmt.Print(config.Struct.IndentChar)
@@ -97,12 +104,12 @@ func Pull(args []string) {
 		err = git.Clean(loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			return
+			continue
 		}
 		err = git.Reset(repo.Branch, loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			return
+			continue
 		}
 	}
 }

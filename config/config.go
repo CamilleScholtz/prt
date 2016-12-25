@@ -75,6 +75,7 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 }
 
 func init() {
+	// TODO: Use filepath stuff here?
 	_, err := toml.DecodeFile("/etc/prt/config.toml", &Struct)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not decode config!")

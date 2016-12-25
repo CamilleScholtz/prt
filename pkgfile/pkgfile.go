@@ -9,7 +9,7 @@ import (
 // Comment reads a comment from a (Pkg)file
 func Comment(file []byte, value string) (string, error) {
 	// We use (?m)^ here because there is always a comment on top of the file
-	// so the use of the (slighly more optimal?) \n is impossible
+	// so the use of (the slighly more optimal?) \n is impossible
 	r := regexp.MustCompile("(?m)^# " + value + ":[[:blank:]]*(.*)")
 	match := r.FindSubmatch(file)
 
