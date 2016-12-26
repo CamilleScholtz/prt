@@ -46,6 +46,7 @@ func Pull(args []string) {
 	}
 
 	// TODO: Actually learn git and check if all these commands are needed
+	// TODO: Sort this?
 	// also check if branch is needed for these commands
 	for name, repo := range c.Pull {
 		// Skip repos if needed
@@ -87,7 +88,6 @@ func Pull(args []string) {
 		}
 
 		// Output changes
-		// TODO: Does this actually output anything?
 		diff, err := git.Diff(repo.Branch, loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

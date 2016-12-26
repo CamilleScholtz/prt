@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"sort"
 	"strings"
 )
 
@@ -67,9 +68,10 @@ func Diff(branch, loc string) ([]string, error) {
 	diff = strings.Replace(diff, "A\t", "Adding ", -1)
 	diff = strings.Replace(diff, "C\t", "Copying ", -1)
 	diff = strings.Replace(diff, "D\t", "Deleting ", -1)
-	diff = strings.Replace(diff, "M\t", "Modifying ", -1)
+	diff = strings.Replace(diff, "M\t", "Editing ", -1)
 	diff = strings.Replace(diff, "R\t", "Renaming ", -1)
 	diffs := strings.Split(diff, "\n")
+	sort.Strings(diffs)
 
 	return diffs[:len(diffs)-1], nil
 }

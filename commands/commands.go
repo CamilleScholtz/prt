@@ -8,9 +8,9 @@ var c = config.Load()
 // Opts
 var o []string
 
-// needed by recursive()
-// TODO: Probably not the smartest way of hangling this?
+// Needed by recursive()
+// TODO: Probably not the smartest way of handling this?
 var i int
 
-// All of these are []strings, again, needed by recursive()
+// Again, needed by recursive()
 var allPorts, instPorts, instVers, checkPorts []string

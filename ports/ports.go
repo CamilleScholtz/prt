@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/utils"
@@ -32,13 +33,10 @@ func All() ([]string, error) {
 		return []string{}, fmt.Errorf("Could not read '" + filepath.Join(c.PortDir, "/*/*/Pkgfile") + "'!")
 	}
 
-	// TODO: Use string replace or delete here
+	// Remove PortDir from output
 	var ports []string
-	for _, loc := range dirs {
-		path := filepath.Dir(loc)
-		repo := filepath.Base(filepath.Dir(path))
-		port := filepath.Base(path)
-		ports = append(ports, filepath.Join(repo, port))
+	for _, dir := range dirs {
+		ports = append(ports, strings.Replace(filepath.Dir(dir), c.PortDir, "", 1))
 	}
 
 	return ports, nil
