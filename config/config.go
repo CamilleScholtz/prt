@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fatih/color"
@@ -40,23 +41,26 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 }
 
 // Load loads the config
-func Load() (*Config, error) {
+func Load() *Config {
 	// TODO: Use filepath stuff here?
-	var config Config
-	_, err := toml.DecodeFile("/etc/prt/config.toml", &config)
+	var c Config
+	_, err := toml.DecodeFile("/etc/prt/config.toml", &c)
 	if err != nil {
-		return nil, fmt.Errorf("Could not decode config!")
+		fmt.Fprintln(os.Stderr, "Could not decode config!")
+		os.Exit(1)
 	}
 
 	// Convert colors to something usable
-	config.DarkColor, err = colorFix(config.DarkColor)
+	c.DarkColor, err = colorFix(c.DarkColor)
 	if err != nil {
-		return nil, err
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
-	config.LightColor, err = colorFix(config.LightColor)
+	c.LightColor, err = colorFix(c.LightColor)
 	if err != nil {
-		return nil, err
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
-	return &config, nil
+	return &c
 }

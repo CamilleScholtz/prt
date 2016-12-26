@@ -77,9 +77,9 @@ func Diff(args []string) {
 		}
 
 		// Read out Pkgfile
-		f, err := ioutil.ReadFile(filepath.Join(conf.PortDir, loc, "Pkgfile"))
+		f, err := ioutil.ReadFile(filepath.Join(c.PortDir, loc, "Pkgfile"))
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(conf.PortDir, loc, "Pkgfile")+"'!")
+			fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, loc, "Pkgfile")+"'!")
 			continue
 		}
 
@@ -106,7 +106,7 @@ func Diff(args []string) {
 			if utils.StringInList("v", o) {
 				fmt.Print(" " + instVer)
 
-				color.Set(conf.DarkColor)
+				color.Set(c.DarkColor)
 				fmt.Print(" -> ")
 				color.Unset()
 

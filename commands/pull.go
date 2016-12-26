@@ -40,14 +40,14 @@ func Pull(args []string) {
 	// Count total repos that need to be pulled
 	var t int
 	if len(vals) == 0 {
-		t = len(conf.Pull)
+		t = len(c.Pull)
 	} else {
 		t = len(vals)
 	}
 
 	// TODO: Actually learn git and check if all these commands are needed
 	// also check if branch is needed for these commands
-	for name, repo := range conf.Pull {
+	for name, repo := range c.Pull {
 		// Skip repos if needed
 		if len(vals) != 0 {
 			if !utils.StringInList(name, vals) {
@@ -58,12 +58,12 @@ func Pull(args []string) {
 
 		// Print some info
 		fmt.Printf("Pulling in repo %d/%d, ", i, t)
-		color.Set(conf.LightColor)
+		color.Set(c.LightColor)
 		fmt.Printf(name)
 		color.Unset()
 		fmt.Println(".")
 
-		loc := filepath.Join(conf.PortDir, name)
+		loc := filepath.Join(c.PortDir, name)
 
 		// Check if location exists, clone if it doesn't
 		_, err := os.Stat(loc)
@@ -94,8 +94,8 @@ func Pull(args []string) {
 			continue
 		}
 		for _, l := range diff {
-			color.Set(conf.DarkColor)
-			fmt.Print(conf.IndentChar)
+			color.Set(c.DarkColor)
+			fmt.Print(c.IndentChar)
 			color.Unset()
 			fmt.Println(l)
 		}

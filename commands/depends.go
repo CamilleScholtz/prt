@@ -61,8 +61,8 @@ func recursive(path string) {
 		// Print tree indentation
 		if utils.StringInList("t", o) {
 			if i > 0 {
-				color.Set(conf.DarkColor)
-				fmt.Printf(strings.Repeat(conf.IndentChar, i))
+				color.Set(c.DarkColor)
+				fmt.Printf(strings.Repeat(c.IndentChar, i))
 				color.Unset()
 			}
 			i++
@@ -72,7 +72,7 @@ func recursive(path string) {
 		fmt.Println(loc)
 
 		// Loop
-		recursive(filepath.Join(conf.PortDir, loc))
+		recursive(filepath.Join(c.PortDir, loc))
 
 		if utils.StringInList("t", o) {
 			i--

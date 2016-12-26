@@ -88,8 +88,8 @@ func Prov(args []string) {
 				}
 
 				// Print files
-				color.Set(conf.DarkColor)
-				fmt.Print(conf.IndentChar)
+				color.Set(c.DarkColor)
+				fmt.Print(c.IndentChar)
 				color.Unset()
 				fmt.Println(file[1])
 
@@ -105,9 +105,9 @@ func Prov(args []string) {
 			}
 
 			for _, name := range allPorts {
-				f, err := os.Open(filepath.Join(conf.PortDir, name, "Pkgfile"))
+				f, err := os.Open(filepath.Join(c.PortDir, name, "Pkgfile"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(conf.PortDir, name, "Pkgfile")+"'!")
+					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, name, "Pkgfile")+"'!")
 					continue
 				}
 				s := bufio.NewScanner(f)
@@ -126,8 +126,8 @@ func Prov(args []string) {
 
 				// Print files
 				for _, file := range files {
-					color.Set(conf.DarkColor)
-					fmt.Print(conf.IndentChar)
+					color.Set(c.DarkColor)
+					fmt.Print(c.IndentChar)
 					color.Unset()
 					fmt.Println(strings.Split(file, "\t")[2])
 				}

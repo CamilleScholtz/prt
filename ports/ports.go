@@ -10,11 +10,12 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-var conf, _ = config.Load()
+// Load config
+var c = config.Load()
 
 // Alias aliases ports using the config values
 func Alias(port string) string {
-	for _, alias := range conf.Alias {
+	for _, alias := range c.Alias {
 		if alias[0] == port {
 			port = alias[1]
 		}
@@ -26,11 +27,12 @@ func Alias(port string) string {
 // All lists all ports found in the PortDir
 func All() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
-	dirs, err := filepath.Glob(filepath.Join(conf.PortDir, "/*/*/Pkgfile"))
+	dirs, err := filepath.Glob(filepath.Join(c.PortDir, "/*/*/Pkgfile"))
 	if err != nil {
-		return []string{}, fmt.Errorf("Could not read '" + filepath.Join(conf.PortDir, "/*/*/Pkgfile") + "'!")
+		return []string{}, fmt.Errorf("Could not read '" + filepath.Join(c.PortDir, "/*/*/Pkgfile") + "'!")
 	}
 
+	// TODO: Use string replace or delete here
 	var ports []string
 	for _, loc := range dirs {
 		path := filepath.Dir(loc)
@@ -108,7 +110,7 @@ func Loc(ports []string, name string) ([]string, error) {
 	// If there are multiple matches, sort using the config Order value
 	if len(locs) > 1 {
 		var i int
-		for _, repo := range conf.Order {
+		for _, repo := range c.Order {
 			newLoc := filepath.Join(repo, filepath.Base(locs[i]))
 			if utils.StringInList(newLoc, ports) {
 				locs[i] = newLoc

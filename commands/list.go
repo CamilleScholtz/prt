@@ -93,9 +93,9 @@ func List(args []string) {
 				ver = instVers[i]
 			} else {
 				// Read out Pkgfile
-				f, err := ioutil.ReadFile(filepath.Join(conf.PortDir, port, "Pkgfile"))
+				f, err := ioutil.ReadFile(filepath.Join(c.PortDir, port, "Pkgfile"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(conf.PortDir, port, "Pkgfile")+"'!")
+					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, port, "Pkgfile")+"'!")
 					continue
 				}
 
