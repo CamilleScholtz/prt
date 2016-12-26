@@ -9,7 +9,6 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
-	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
@@ -62,8 +61,8 @@ func recursive(path string) {
 		// Print tree indentation
 		if utils.StringInList("t", o) {
 			if i > 0 {
-				color.Set(config.Struct.DarkColor)
-				fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
+				color.Set(conf.DarkColor)
+				fmt.Printf(strings.Repeat(conf.IndentChar, i))
 				color.Unset()
 			}
 			i++
@@ -73,7 +72,7 @@ func recursive(path string) {
 		fmt.Println(loc)
 
 		// Loop
-		recursive(filepath.Join(config.Struct.PortDir, loc))
+		recursive(filepath.Join(conf.PortDir, loc))
 
 		if utils.StringInList("t", o) {
 			i--

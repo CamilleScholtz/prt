@@ -7,7 +7,6 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
-	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
 )
@@ -84,8 +83,8 @@ func Loc(args []string) {
 			// Print duplicate indentation
 			if utils.StringInList("d", o) {
 				if i > 0 {
-					color.Set(config.Struct.DarkColor)
-					fmt.Printf(strings.Repeat(config.Struct.IndentChar, i))
+					color.Set(conf.DarkColor)
+					fmt.Printf(strings.Repeat(conf.IndentChar, i))
 					color.Unset()
 				}
 				i++

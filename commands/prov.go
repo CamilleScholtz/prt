@@ -10,7 +10,6 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
-	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
 )
@@ -89,8 +88,8 @@ func Prov(args []string) {
 				}
 
 				// Print files
-				color.Set(config.Struct.DarkColor)
-				fmt.Print(config.Struct.IndentChar)
+				color.Set(conf.DarkColor)
+				fmt.Print(conf.IndentChar)
 				color.Unset()
 				fmt.Println(file[1])
 
@@ -106,9 +105,9 @@ func Prov(args []string) {
 			}
 
 			for _, name := range allPorts {
-				f, err := os.Open(filepath.Join(config.Struct.PortDir, name, "Pkgfile"))
+				f, err := os.Open(filepath.Join(conf.PortDir, name, "Pkgfile"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(config.Struct.PortDir, name, "Pkgfile")+"'!")
+					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(conf.PortDir, name, "Pkgfile")+"'!")
 					continue
 				}
 				s := bufio.NewScanner(f)
@@ -127,8 +126,8 @@ func Prov(args []string) {
 
 				// Print files
 				for _, file := range files {
-					color.Set(config.Struct.DarkColor)
-					fmt.Print(config.Struct.IndentChar)
+					color.Set(conf.DarkColor)
+					fmt.Print(conf.IndentChar)
 					color.Unset()
 					fmt.Println(strings.Split(file, "\t")[2])
 				}

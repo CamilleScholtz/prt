@@ -8,7 +8,6 @@ import (
 	"sort"
 
 	"github.com/chiyouhen/getopt"
-	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
@@ -94,9 +93,9 @@ func List(args []string) {
 				ver = instVers[i]
 			} else {
 				// Read out Pkgfile
-				f, err := ioutil.ReadFile(filepath.Join(config.Struct.PortDir, port, "Pkgfile"))
+				f, err := ioutil.ReadFile(filepath.Join(conf.PortDir, port, "Pkgfile"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(config.Struct.PortDir, port, "Pkgfile")+"'!")
+					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(conf.PortDir, port, "Pkgfile")+"'!")
 					continue
 				}
 

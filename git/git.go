@@ -55,7 +55,7 @@ func Diff(branch, loc string) ([]string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return []string{}, fmt.Errorf("Could not git clone repo!")
+		return []string{}, fmt.Errorf("Could not git diff repo!")
 	}
 
 	diff := b.String()
@@ -74,7 +74,7 @@ func Diff(branch, loc string) ([]string, error) {
 	return diffs[:len(diffs)-1], nil
 }
 
-// Fetch fetches a repo.np
+// Fetch fetches a repo
 func Fetch(loc string) error {
 	cmd := exec.Command("git", "fetch", "--depth", "1")
 	cmd.Dir = loc

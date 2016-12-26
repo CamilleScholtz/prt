@@ -7,7 +7,6 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
-	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/git"
 	"github.com/onodera-punpun/prt/utils"
 )
@@ -41,14 +40,14 @@ func Pull(args []string) {
 	// Count total repos that need to be pulled
 	var t int
 	if len(vals) == 0 {
-		t = len(config.Struct.Pull)
+		t = len(conf.Pull)
 	} else {
 		t = len(vals)
 	}
 
 	// TODO: Actually learn git and check if all these commands are needed
 	// also check if branch is needed for these commands
-	for name, repo := range config.Struct.Pull {
+	for name, repo := range conf.Pull {
 		// Skip repos if needed
 		if len(vals) != 0 {
 			if !utils.StringInList(name, vals) {
@@ -59,12 +58,12 @@ func Pull(args []string) {
 
 		// Print some info
 		fmt.Printf("Pulling in repo %d/%d, ", i, t)
-		color.Set(config.Struct.LightColor)
+		color.Set(conf.LightColor)
 		fmt.Printf(name)
 		color.Unset()
 		fmt.Println(".")
 
-		loc := filepath.Join(config.Struct.PortDir, name)
+		loc := filepath.Join(conf.PortDir, name)
 
 		// Check if location exists, clone if it doesn't
 		_, err := os.Stat(loc)
@@ -95,8 +94,8 @@ func Pull(args []string) {
 			continue
 		}
 		for _, l := range diff {
-			color.Set(config.Struct.DarkColor)
-			fmt.Print(config.Struct.IndentChar)
+			color.Set(conf.DarkColor)
+			fmt.Print(conf.IndentChar)
 			color.Unset()
 			fmt.Println(l)
 		}

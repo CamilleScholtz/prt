@@ -8,7 +8,6 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
-	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
@@ -78,9 +77,9 @@ func Diff(args []string) {
 		}
 
 		// Read out Pkgfile
-		f, err := ioutil.ReadFile(filepath.Join(config.Struct.PortDir, loc, "Pkgfile"))
+		f, err := ioutil.ReadFile(filepath.Join(conf.PortDir, loc, "Pkgfile"))
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(config.Struct.PortDir, loc, "Pkgfile")+"'!")
+			fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(conf.PortDir, loc, "Pkgfile")+"'!")
 			continue
 		}
 
@@ -107,7 +106,7 @@ func Diff(args []string) {
 			if utils.StringInList("v", o) {
 				fmt.Print(" " + instVer)
 
-				color.Set(config.Struct.DarkColor)
+				color.Set(conf.DarkColor)
 				fmt.Print(" -> ")
 				color.Unset()
 
