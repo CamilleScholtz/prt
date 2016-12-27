@@ -18,7 +18,7 @@ func Build(stdout bool) error {
 	// TODO: I'm pretty sure the -f can cause some issues
 	// what I want is this function to ONLY build a port
 	// and -f can cause it to also update n' shit?
-	cmd := exec.Command("pkgmk", "-f")
+	cmd := exec.Command("/usr/share/prt/pkgmk", "-f")
 	if stdout {
 		cmd.Stderr = os.Stdout
 	}
@@ -33,7 +33,7 @@ func Build(stdout bool) error {
 
 // Download downloads a port sources
 func Download(stdout bool) error {
-	cmd := exec.Command("pkgmk", "-do")
+	cmd := exec.Command("/usr/share/prt/pkgmk", "-do")
 	if stdout {
 		cmd.Stderr = os.Stdout
 	}
@@ -48,7 +48,7 @@ func Download(stdout bool) error {
 
 // Extract extracts a port sources
 func Extract(stdout bool) error {
-	cmd := exec.Command("pkgmk", "-eo")
+	cmd := exec.Command("/usr/share/prt/pkgmk", "-eo")
 	if stdout {
 		cmd.Stderr = os.Stdout
 	}
