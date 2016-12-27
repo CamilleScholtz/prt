@@ -13,7 +13,7 @@ import (
 
 // Loc prints port locations
 func Loc(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "hdn"
 	longopts := []string{
 		"--help",
@@ -21,7 +21,7 @@ func Loc(args []string) {
 		"--duplicate",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -45,11 +45,13 @@ func Loc(args []string) {
 		}
 	}
 
+	// This command needs a value.
 	if len(vals) == 0 {
 		fmt.Fprintln(os.Stderr, "Please specify a port!")
 		os.Exit(1)
 	}
 
+	// Get all ports.
 	allPorts, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -57,13 +59,11 @@ func Loc(args []string) {
 	}
 
 	for _, port := range vals {
-		// Continue if already checked
+		// Continue if already checked.
 		if utils.StringInList(port, checkPorts) {
 			continue
 		}
 		checkPorts = append(checkPorts, port)
-
-		var i int
 
 		locs, err := ports.Loc(allPorts, port)
 		if err != nil {
@@ -75,12 +75,12 @@ func Loc(args []string) {
 		}
 
 		for _, loc := range locs {
-			// Alias if needed
+			// Alias if needed.
 			if !utils.StringInList("a", o) {
 				loc = ports.Alias(loc)
 			}
 
-			// Print duplicate indentation
+			// Print duplicate indentation.
 			if utils.StringInList("d", o) {
 				if i > 0 {
 					color.Set(c.DarkColor)
@@ -90,7 +90,7 @@ func Loc(args []string) {
 				i++
 			}
 
-			// Finally print the port :)
+			// Finally print the port.
 			fmt.Println(loc)
 		}
 	}

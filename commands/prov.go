@@ -14,16 +14,16 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Prov searches ports for files
+// Prov searches ports for files.
 func Prov(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "hi"
 	longopts := []string{
 		"--help",
 		"--installed",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -44,12 +44,14 @@ func Prov(args []string) {
 		}
 	}
 
+	// This command needs a value.
 	if len(vals) == 0 {
 		fmt.Fprintln(os.Stderr, "Please specify a query!")
 		os.Exit(1)
 	}
 
 	for _, val := range vals {
+		// Evaluate regex.
 		r, err := regexp.Compile(val)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "'"+val+"' is not a valid regex!")
@@ -58,6 +60,7 @@ func Prov(args []string) {
 
 		// TODO: Use Alias and Loc here to always display repo info?
 		if utils.StringInList("i", o) {
+			// Read out pkg db.
 			// TODO: Should I use filepath stuff here?
 			db, err := os.Open("/var/lib/pkg/db")
 			if err != nil {
@@ -66,6 +69,7 @@ func Prov(args []string) {
 			}
 			s := bufio.NewScanner(db)
 
+			// Search for files.
 			var blank bool
 			var name string
 			var files [][]string
@@ -82,12 +86,12 @@ func Prov(args []string) {
 
 			var oldName string
 			for _, file := range files {
-				// Print port name
+				// Print port name.
 				if oldName != file[0] {
 					fmt.Println(file[0])
 				}
 
-				// Print files
+				// Print matched files.
 				color.Set(c.DarkColor)
 				fmt.Print(c.IndentChar)
 				color.Unset()
@@ -98,6 +102,7 @@ func Prov(args []string) {
 
 			db.Close()
 		} else {
+			// Get all ports.
 			allPorts, err := ports.All()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -105,6 +110,7 @@ func Prov(args []string) {
 			}
 
 			for _, name := range allPorts {
+				// Read out Pkgfile.
 				f, err := os.Open(filepath.Join(c.PortDir, name, ".footprint"))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, name, ".footprint")+"'!")
@@ -112,6 +118,7 @@ func Prov(args []string) {
 				}
 				s := bufio.NewScanner(f)
 
+				// Search for files.
 				var files []string
 				for s.Scan() {
 					if r.MatchString(s.Text()) {
@@ -119,12 +126,12 @@ func Prov(args []string) {
 					}
 				}
 
-				// Print port name
+				// Print port name.
 				if len(files) > 0 {
 					fmt.Println(name)
 				}
 
-				// Print files
+				// Print matched files.
 				for _, file := range files {
 					color.Set(c.DarkColor)
 					fmt.Print(c.IndentChar)

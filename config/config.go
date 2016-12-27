@@ -8,7 +8,7 @@ import (
 	"github.com/fatih/color"
 )
 
-// Config is a stuct with all config values
+// Config is a stuct with all config values.
 type Config struct {
 	PortDir    string
 	SourceDir  string
@@ -22,13 +22,13 @@ type Config struct {
 	Pull       map[string]Pull
 }
 
-// Pull is a struct with values related to repos
+// Pull is a struct with values related to repos.
 type Pull struct {
 	URL    string
 	Branch string
 }
 
-// colorFix converts a config color (0..15) to a color compatible color (30..97)
+// colorFix converts a config color (0..15) to a color compatible color (30..97).
 func colorFix(i color.Attribute) (color.Attribute, error) {
 	if i > 15 {
 		return 0, fmt.Errorf("Could not convert '" + string(i) + "' to color!")
@@ -43,7 +43,7 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 	return i, nil
 }
 
-// Load loads the config
+// Load loads the config.
 func Load() *Config {
 	// TODO: Use filepath stuff here?
 	var c Config
@@ -53,7 +53,7 @@ func Load() *Config {
 		os.Exit(1)
 	}
 
-	// Convert colors to something usable
+	// Convert colors to something usable.
 	c.DarkColor, err = colorFix(c.DarkColor)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

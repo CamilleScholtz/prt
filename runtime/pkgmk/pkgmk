@@ -35,12 +35,15 @@ E_INSTALL=9    # error while installing the package via 'pkgadd'
 E_SIGNATURE=10 # error verifying the signature
 
 info() {
+	echo "$1"
 }
 
 warning() {
+	info "$1" >&2
 }
 
 error() {
+	info "$1" >&2
 }
 
 get_filename() {

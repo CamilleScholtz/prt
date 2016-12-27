@@ -13,9 +13,9 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Diff lists outdated packages
+// Diff lists outdated packages.
 func Diff(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "hnv"
 	longopts := []string{
 		"--help",
@@ -23,7 +23,7 @@ func Diff(args []string) {
 		"--version",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, _, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -47,6 +47,7 @@ func Diff(args []string) {
 		}
 	}
 
+	// Get all and all installed ports.
 	allPorts, err := ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -57,6 +58,8 @@ func Diff(args []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+
+	// Get version of installed ports.
 	instVers, err := ports.InstVers()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -64,26 +67,26 @@ func Diff(args []string) {
 	}
 
 	for i, port := range instPorts {
-		// Get port location
+		// Get port location.
 		locs, err := ports.Loc(allPorts, port)
 		if err != nil {
 			continue
 		}
 		loc := locs[0]
 
-		// Alias if needed
+		// Alias if needed.
 		if !utils.StringInList("a", o) {
 			loc = ports.Alias(loc)
 		}
 
-		// Read out Pkgfile
+		// Read out Pkgfile.
 		f, err := ioutil.ReadFile(filepath.Join(c.PortDir, loc, "Pkgfile"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, loc, "Pkgfile")+"'!")
 			continue
 		}
 
-		// Get available version
+		// Get available version.
 		ver, err := pkgfile.Var(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -96,10 +99,10 @@ func Diff(args []string) {
 		}
 		availVer := ver + "-" + rel
 
-		// Get installed version
+		// Get installed version.
 		instVer := instVers[i]
 
-		// Print if installed and available version don't match
+		// Print if installed and available version don't match.
 		if availVer != instVer {
 			fmt.Print(port)
 
@@ -112,6 +115,7 @@ func Diff(args []string) {
 
 				fmt.Print(availVer)
 			}
+
 			fmt.Println()
 		}
 	}

@@ -15,50 +15,50 @@ import (
 )
 
 func depends(path string) {
-	// Read out Pkgfile
+	// Read out Pkgfile.
 	f, err := ioutil.ReadFile(filepath.Join(path, "Pkgfile"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(path, "Pkgfile")+"'!")
 		return
 	}
 
-	// Read out Pkgfile dependencies
+	// Read out Pkgfile dependencies.
 	deps, err := pkgfile.Depends(f, "Depends on")
 	if err != nil {
 		return
 	}
 
 	for _, dep := range deps {
-		// Continue if already checked
+		// Continue if already checked.
 		if utils.StringInList(dep, checkPorts) {
 			continue
 		}
 		checkPorts = append(checkPorts, dep)
 
-		// Get port location
+		// Get port location.
 		locs, err := ports.Loc(allPorts, dep)
 		if err != nil {
 			continue
 		}
 		loc := locs[0]
 
-		// Alias if needed
+		// Alias if needed.
 		if !utils.StringInList("n", o) {
 			loc = ports.Alias(loc)
 		}
 
-		// Continue if already installed
+		// Continue port is already installed.
 		if !utils.StringInList("a", o) {
 			if utils.StringInList(filepath.Base(loc), instPorts) {
 				continue
 			}
-			// Core packages should always be installed
+			// Core packages should always be installed.
 			if filepath.Dir(loc) == "core" {
 				continue
 			}
 		}
 
-		// Print tree indentation
+		// Print tree indentation.
 		if utils.StringInList("t", o) {
 			if i > 0 {
 				color.Set(c.DarkColor)
@@ -68,10 +68,10 @@ func depends(path string) {
 			i++
 		}
 
-		// Finally print the port :)
+		// Finally print the port.
 		fmt.Println(loc)
 
-		// Loop
+		// Loop.
 		depends(filepath.Join(c.PortDir, loc))
 
 		if utils.StringInList("t", o) {
@@ -80,9 +80,9 @@ func depends(path string) {
 	}
 }
 
-// Depends lists dependencies recursivly
+// Depends lists dependencies recursivly.
 func Depends(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "hant"
 	longopts := []string{
 		"--help",
@@ -90,7 +90,7 @@ func Depends(args []string) {
 		"--tree",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, _, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -117,6 +117,7 @@ func Depends(args []string) {
 		}
 	}
 
+	// Get all and all installed ports.
 	allPorts, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

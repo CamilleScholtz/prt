@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// Checkout checks out a repo
+// Checkout checks out a repo.
 func Checkout(branch, loc string) error {
 	cmd := exec.Command("git", "checkout", branch)
 	cmd.Dir = loc
@@ -21,7 +21,7 @@ func Checkout(branch, loc string) error {
 	return nil
 }
 
-// Clean cleans a repo
+// Clean cleans a repo.
 func Clean(loc string) error {
 	cmd := exec.Command("git", "clean", "-f")
 	cmd.Dir = loc
@@ -34,7 +34,7 @@ func Clean(loc string) error {
 	return nil
 }
 
-// Clone clones a repo
+// Clone clones a repo.
 func Clone(url, branch, loc string) error {
 	cmd := exec.Command("git", "clone", "--depth", "1", "-b", branch, url)
 	cmd.Dir = loc
@@ -47,7 +47,7 @@ func Clone(url, branch, loc string) error {
 	return nil
 }
 
-// Diff checks a repo for differences
+// Diff checks a repo for differences.
 func Diff(branch, loc string) ([]string, error) {
 	cmd := exec.Command("git", "diff", "--name-status", "origin/"+branch)
 	cmd.Dir = loc
@@ -64,7 +64,7 @@ func Diff(branch, loc string) ([]string, error) {
 		return []string{}, nil
 	}
 
-	// Make output pretty
+	// Make output pretty.
 	diff = strings.Replace(diff, "A\t", "Adding ", -1)
 	diff = strings.Replace(diff, "C\t", "Copying ", -1)
 	diff = strings.Replace(diff, "D\t", "Deleting ", -1)
@@ -76,7 +76,7 @@ func Diff(branch, loc string) ([]string, error) {
 	return diffs[1:], nil
 }
 
-// Fetch fetches a repo
+// Fetch fetches a repo.
 func Fetch(loc string) error {
 	cmd := exec.Command("git", "fetch", "--depth", "1")
 	cmd.Dir = loc
@@ -89,7 +89,7 @@ func Fetch(loc string) error {
 	return nil
 }
 
-// Reset resets a repo
+// Reset resets a repo.
 func Reset(branch, loc string) error {
 	cmd := exec.Command("git", "reset", "--hard", "origin/"+branch)
 	cmd.Dir = loc

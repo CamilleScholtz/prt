@@ -15,64 +15,64 @@ import (
 )
 
 func build(path string) {
-	// Read out Pkgfile
+	// Read out Pkgfile.
 	f, err := ioutil.ReadFile(filepath.Join(path, "Pkgfile"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(path, "Pkgfile")+"'!")
 		return
 	}
 
-	// Read out Pkgfile dependencies
+	// Read out Pkgfile dependencies.
 	deps, err := pkgfile.Depends(f, "Depends on")
 	if err != nil {
 		return
 	}
 
 	for _, dep := range deps {
-		// Continue if already checked
+		// Continue if already checked.
 		if utils.StringInList(dep, checkPorts) {
 			continue
 		}
 		checkPorts = append(checkPorts, dep)
 
-		// Get port location
+		// Get port location.
 		locs, err := ports.Loc(allPorts, dep)
 		if err != nil {
 			continue
 		}
 		loc := locs[0]
 
-		// Alias if needed
+		// Alias if needed.
 		if !utils.StringInList("n", o) {
 			loc = ports.Alias(loc)
 		}
 
-		// Continue if already installed
+		// Continue port is already installed.
 		if utils.StringInList(filepath.Base(loc), instPorts) {
 			continue
 		}
-		// Core packages should always be installed
+		// Core packages should always be installed.
 		if filepath.Dir(loc) == "core" {
 			continue
 		}
 
 		toInst = append(toInst, loc)
 
-		// Loop
+		// Loop.
 		build(filepath.Join(c.PortDir, loc))
 	}
 }
 
-// Build builds ports
+// Build builds ports.
 func Build(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "hv"
 	longopts := []string{
 		"--help",
 		"--verbose",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, _, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -93,6 +93,7 @@ func Build(args []string) {
 		}
 	}
 
+	// Get all and all installed ports.
 	allPorts, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -105,16 +106,25 @@ func Build(args []string) {
 	}
 
 	// So uhh... I know I can do this in the opts for loop above
-	// but I like consitensy and I do it like this in all other commands
+	// but I like consitensy and I do it like this in all other commands.
 	if utils.StringInList("v", o) {
 		v = true
 	}
 
+	// Get ports to build.
 	build("./")
-	toInst := append(toInst)
+	wd, err := os.Getwd()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	// TODO: Remove PortDir here.
+	toInst := append(toInst, wd)
 
 	t := len(toInst)
 	for i, port := range toInst {
+		os.Chdir(filepath.Join(c.PortDir, port))
+
 		fmt.Printf("Installing port %d/%d, ", i+1, t)
 		color.Set(c.LightColor)
 		fmt.Printf(port)

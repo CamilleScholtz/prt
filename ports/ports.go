@@ -11,10 +11,10 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Load config
+// Load config.
 var c = config.Load()
 
-// Alias aliases ports using the config values
+// Alias aliases ports using the config values.
 func Alias(port string) string {
 	for _, alias := range c.Alias {
 		if alias[0] == port {
@@ -25,15 +25,15 @@ func Alias(port string) string {
 	return port
 }
 
-// All lists all ports found in the PortDir
+// All lists all ports found in the PortDir.
 func All() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
 	dirs, err := filepath.Glob(filepath.Join(c.PortDir, "/*/*/Pkgfile"))
 	if err != nil {
-		return []string{}, fmt.Errorf("Could not read '" + filepath.Join(c.PortDir, "/*/*/Pkgfile") + "'!")
+		return []string{}, err
 	}
 
-	// Remove PortDir from output
+	// Remove PortDir from output.
 	var ports []string
 	for _, dir := range dirs {
 		ports = append(ports, strings.Replace(filepath.Dir(dir), c.PortDir+"/", "", 1))
@@ -42,16 +42,18 @@ func All() ([]string, error) {
 	return ports, nil
 }
 
-// Inst lists all installed ports
+// Inst lists all installed ports.
 func Inst() ([]string, error) {
+	// Read out pkg db.
 	// TODO: Use filepath stuff here?
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
-		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")
+		return []string{}, err
 	}
 	defer db.Close()
 	s := bufio.NewScanner(db)
 
+	// Check for versions.
 	var blank bool
 	var ports []string
 	for s.Scan() {
@@ -66,16 +68,18 @@ func Inst() ([]string, error) {
 	return ports, nil
 }
 
-// InstVers list all installed versions, this should follow the same order as Inst()
+// InstVers list all installed versions, this should follow the same order as Inst().
 func InstVers() ([]string, error) {
+	// Read out pkg db.
 	// TODO: Use filepath stuff here?
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
-		return []string{}, fmt.Errorf("Could not read '/var/lib/pkg/db'!")
+		return []string{}, err
 	}
 	defer db.Close()
 	s := bufio.NewScanner(db)
 
+	// Check for versions.
 	var blank, name bool
 	var vers []string
 	for s.Scan() {
@@ -92,7 +96,7 @@ func InstVers() ([]string, error) {
 	return vers, nil
 }
 
-// Loc tries to get the location of a port
+// Loc tries to get the location of a port.
 func Loc(ports []string, name string) ([]string, error) {
 	var locs []string
 	for _, port := range ports {
@@ -102,10 +106,10 @@ func Loc(ports []string, name string) ([]string, error) {
 	}
 
 	if len(locs) == 0 {
-		return []string{}, fmt.Errorf("Could not find location for '" + name + "'!")
+		return []string{}, fmt.Errorf("could not find location for %s", name)
 	}
 
-	// If there are multiple matches, sort using the config Order value
+	// If there are multiple matches, sort using the config Order value.
 	if len(locs) > 1 {
 		var i int
 		for _, repo := range c.Order {
@@ -115,7 +119,7 @@ func Loc(ports []string, name string) ([]string, error) {
 				i++
 			}
 
-			// Break if everything has been ordered
+			// Break if everything has been ordered.
 			if i == len(locs) {
 				break
 			}

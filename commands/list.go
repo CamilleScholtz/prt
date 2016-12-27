@@ -13,9 +13,9 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// List lists ports
+// List lists ports.
 func List(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "hirv"
 	longopts := []string{
 		"--help",
@@ -24,7 +24,7 @@ func List(args []string) {
 		"--version",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, _, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -51,13 +51,14 @@ func List(args []string) {
 		}
 	}
 
+	// Get all ports
 	allPorts, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// Only list installed ports
+	// Only list installed ports.
 	if utils.StringInList("i", o) {
 		instPorts, err = ports.Inst()
 		if err != nil {
@@ -92,7 +93,7 @@ func List(args []string) {
 			if utils.StringInList("i", o) {
 				ver = instVers[i]
 			} else {
-				// Read out Pkgfile
+				// Read out Pkgfile.
 				f, err := ioutil.ReadFile(filepath.Join(c.PortDir, port, "Pkgfile"))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, port, "Pkgfile")+"'!")
@@ -109,7 +110,7 @@ func List(args []string) {
 			port = port + " " + ver
 		}
 
-		// Remove repo if needed
+		// Remove repo if needed.
 		if !utils.StringInList("r", o) {
 			port = filepath.Base(port)
 		}

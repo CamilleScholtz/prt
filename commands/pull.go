@@ -11,15 +11,15 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Pull pulls in ports
+// Pull pulls in ports.
 func Pull(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "h"
 	longopts := []string{
 		"--help",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -37,7 +37,7 @@ func Pull(args []string) {
 		}
 	}
 
-	// Count total repos that need to be pulled
+	// Count total repos that need to be pulled.
 	var t int
 	if len(vals) == 0 {
 		t = len(c.Pull)
@@ -45,11 +45,11 @@ func Pull(args []string) {
 		t = len(vals)
 	}
 
-	// TODO: Actually learn git and check if all these commands are needed
+	// TODO: Actually learn git and check if all these commands are needed.
 	// TODO: Sort this?
-	// also check if branch is needed for these commands
+	// also check if branch is needed for these commands.
 	for name, repo := range c.Pull {
-		// Skip repos if needed
+		// Skip repos if needed.
 		if len(vals) != 0 {
 			if !utils.StringInList(name, vals) {
 				continue
@@ -65,7 +65,7 @@ func Pull(args []string) {
 
 		loc := filepath.Join(c.PortDir, name)
 
-		// Check if location exists, clone if it doesn't
+		// Check if location exists, clone if it doesn't.
 		_, err := os.Stat(loc)
 		if err != nil {
 			err := git.Clone(repo.URL, repo.Branch, loc)
@@ -86,7 +86,7 @@ func Pull(args []string) {
 			continue
 		}
 
-		// Output changes
+		// Print changes.
 		diff, err := git.Diff(repo.Branch, loc)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

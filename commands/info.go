@@ -10,9 +10,9 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Info prints port information
+// Info prints port information.
 func Info(args []string) {
-	// Define opts
+	// Define opts.
 	shortopts := "hdumeovr"
 	longopts := []string{
 		"--help",
@@ -25,7 +25,7 @@ func Info(args []string) {
 		"--release",
 	}
 
-	// Read out opts
+	// Read out opts.
 	opts, _, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
@@ -68,14 +68,14 @@ func Info(args []string) {
 		o = []string{"a", "u", "m", "e", "o", "v", "r"}
 	}
 
-	// Read out Pkgfile
+	// Read out Pkgfile.
 	f, err := ioutil.ReadFile("./Pkgfile")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
 		os.Exit(1)
 	}
 
-	// Print stuff
+	// Print info.
 	if utils.StringInList("d", o) {
 		text, _ := pkgfile.Comment(f, "Description")
 		fmt.Println("Description: " + text)
