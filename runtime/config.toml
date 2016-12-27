@@ -1,6 +1,11 @@
 # Location of the ports tree
 portdir = "/usr/ports"
 
+# Location of the pkgmk directories
+sourcedir = "/usr/ports/$REPO/$NAME"
+workdir = "/usr/ports/$REPO/$NAME/work"
+packagedir = "/usr/ports/$REPO/$NAME"
+
 # Repo order, the port found first is used
 order = [
 	"core",

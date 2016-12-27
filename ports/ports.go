@@ -36,7 +36,7 @@ func All() ([]string, error) {
 	// Remove PortDir from output
 	var ports []string
 	for _, dir := range dirs {
-		ports = append(ports, strings.Replace(filepath.Dir(dir), c.PortDir, "", 1))
+		ports = append(ports, strings.Replace(filepath.Dir(dir), c.PortDir+"/", "", 1))
 	}
 
 	return ports, nil

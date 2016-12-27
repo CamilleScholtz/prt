@@ -11,6 +11,9 @@ import (
 // Config is a stuct with all config values
 type Config struct {
 	PortDir    string
+	SourceDir  string
+	WorkDir    string
+	PackageDir string
 	Order      []string
 	Alias      [][]string
 	IndentChar string

@@ -105,9 +105,9 @@ func Prov(args []string) {
 			}
 
 			for _, name := range allPorts {
-				f, err := os.Open(filepath.Join(c.PortDir, name, "Pkgfile"))
+				f, err := os.Open(filepath.Join(c.PortDir, name, ".footprint"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, name, "Pkgfile")+"'!")
+					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, name, ".footprint")+"'!")
 					continue
 				}
 				s := bufio.NewScanner(f)

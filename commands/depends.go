@@ -14,7 +14,7 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-func recursive(path string) {
+func depends(path string) {
 	// Read out Pkgfile
 	f, err := ioutil.ReadFile(filepath.Join(path, "Pkgfile"))
 	if err != nil {
@@ -72,7 +72,7 @@ func recursive(path string) {
 		fmt.Println(loc)
 
 		// Loop
-		recursive(filepath.Join(c.PortDir, loc))
+		depends(filepath.Join(c.PortDir, loc))
 
 		if utils.StringInList("t", o) {
 			i--
@@ -130,5 +130,5 @@ func Depends(args []string) {
 		}
 	}
 
-	recursive("./")
+	depends("./")
 }

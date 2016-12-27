@@ -57,7 +57,6 @@ func Pull(args []string) {
 		}
 		i++
 
-		// Print some info
 		fmt.Printf("Pulling in repo %d/%d, ", i, t)
 		color.Set(c.LightColor)
 		fmt.Printf(name)

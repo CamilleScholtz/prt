@@ -73,7 +73,7 @@ func Diff(branch, loc string) ([]string, error) {
 	diffs := strings.Split(diff, "\n")
 	sort.Strings(diffs)
 
-	return diffs[:len(diffs)-1], nil
+	return diffs[1:], nil
 }
 
 // Fetch fetches a repo

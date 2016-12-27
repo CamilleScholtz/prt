@@ -9,11 +9,10 @@ import (
 // Comment reads a comment from a (Pkg)file
 func Comment(file []byte, value string) (string, error) {
 	// We use (?m)^ here because there is always a comment on top of the file
-	// so the use of (the slighly more optimal?) \n is impossible
+	// so the use of (the slightly more optimal?) \n is impossible
 	r := regexp.MustCompile("(?m)^# " + value + ":[[:blank:]]*(.*)")
 	match := r.FindSubmatch(file)
 
-	// TODO: Use [1] here?
 	if len(match) == 0 {
 		return "", fmt.Errorf("Could not read Pkgfile comment '" + value + "'!")
 	}
@@ -26,7 +25,6 @@ func Depends(file []byte, value string) ([]string, error) {
 	r := regexp.MustCompile("\n# " + value + ":[[:blank:]]*(.*)")
 	match := r.FindSubmatch(file)
 
-	// TODO: Use [1] here?
 	if len(match) == 0 {
 		return []string{}, fmt.Errorf("Could not read Pkgfile comment '" + value + "'!")
 	}
@@ -42,7 +40,6 @@ func Var(file []byte, value string) (string, error) {
 	r := regexp.MustCompile("\n" + value + "=([[:word:].-]*)")
 	match := r.FindSubmatch(file)
 
-	// TODO: Use [1] here?
 	if len(match) == 0 {
 		return "", fmt.Errorf("Could not read Pkgfile variable '" + value + "'!")
 	}
