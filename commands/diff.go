@@ -48,72 +48,69 @@ func Diff(args []string) {
 	}
 
 	// Get all and all installed ports.
-	allPorts, err := ports.All()
+	all, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	instPorts, err := ports.Inst()
+	inst, err = ports.Inst()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get version of installed ports.
-	instVers, err := ports.InstVers()
+	instv, err = ports.InstVers()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	for i, port := range instPorts {
+	for i, p := range inst {
 		// Get port location.
-		locs, err := ports.Loc(allPorts, port)
+		ll, err := ports.Loc(all, p)
 		if err != nil {
 			continue
 		}
-		loc := locs[0]
+		l := ll[0]
 
 		// Alias if needed.
 		if !utils.StringInList("a", o) {
-			loc = ports.Alias(loc)
+			l = ports.Alias(l)
 		}
 
 		// Read out Pkgfile.
-		f, err := ioutil.ReadFile(filepath.Join(c.PortDir, loc, "Pkgfile"))
+		f, err := ioutil.ReadFile(filepath.Join(c.PortDir, l, "Pkgfile"))
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, loc, "Pkgfile")+"'!")
+			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
 
 		// Get available version.
-		ver, err := pkgfile.Var(f, "version")
+		v, err := pkgfile.Var(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		rel, err := pkgfile.Var(f, "release")
+		r, err := pkgfile.Var(f, "release")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		availVer := ver + "-" + rel
-
-		// Get installed version.
-		instVer := instVers[i]
+		availv := v + "-" + r
 
 		// Print if installed and available version don't match.
-		if availVer != instVer {
-			fmt.Print(port)
+		if availv != instv[i] {
+			fmt.Print(p)
 
 			if utils.StringInList("v", o) {
-				fmt.Print(" " + instVer)
+				fmt.Print(" " + instv[i])
 
 				color.Set(c.DarkColor)
 				fmt.Print(" -> ")
 				color.Unset()
 
-				fmt.Print(availVer)
+				fmt.Print(availv)
 			}
 
 			fmt.Println()

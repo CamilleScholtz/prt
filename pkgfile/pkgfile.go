@@ -7,42 +7,39 @@ import (
 )
 
 // Comment reads a comment from a (Pkg)file.
-func Comment(file []byte, value string) (string, error) {
+func Comment(f []byte, v string) (string, error) {
 	// We use (?m)^ here because there is always a comment on top of the file
 	// so the use of (the slightly more optimal?) \n is impossible.
-	r := regexp.MustCompile("(?m)^# " + value + ":[[:blank:]]*(.*)")
-	match := r.FindSubmatch(file)
+	r := regexp.MustCompile("(?m)^# " + v + ":[[:blank:]]*(.*)")
+	m := r.FindSubmatch(f)
 
-	if len(match) == 0 {
-		return "", fmt.Errorf("Could not read Pkgfile comment '" + value + "'!")
+	if len(m) == 0 {
+		return "", fmt.Errorf("comment %s: No such Pkgfile comment", v)
 	}
 
-	return string(match[1]), nil
+	return string(m[1]), nil
 }
 
 // Depends reads the depends comment from a (Pkg)file.
-func Depends(file []byte, value string) ([]string, error) {
-	r := regexp.MustCompile("\n# " + value + ":[[:blank:]]*(.*)")
-	match := r.FindSubmatch(file)
+func Depends(f []byte, v string) ([]string, error) {
+	r := regexp.MustCompile("\n# " + v + ":[[:blank:]]*(.*)")
+	m := r.FindSubmatch(f)
 
-	if len(match) == 0 {
-		return []string{}, fmt.Errorf("Could not read Pkgfile comment '" + value + "'!")
+	if len(m) == 0 {
+		return []string{}, fmt.Errorf("depends %s: No such Pkgfile comment", v)
 	}
 
-	// Some Pkgfiles use commas, remove them.
-	fix := strings.Replace(string(match[1]), ",", "", -1)
-
-	return strings.Split(fix, " "), nil
+	return strings.Split(strings.Replace(string(m[1]), ",", "", -1), " "), nil
 }
 
 // Var reads a variable from a (Pkg)file.
-func Var(file []byte, value string) (string, error) {
-	r := regexp.MustCompile("\n" + value + "=([[:word:].-]*)")
-	match := r.FindSubmatch(file)
+func Var(f []byte, v string) (string, error) {
+	r := regexp.MustCompile("\n" + v + "=([[:word:].-]*)")
+	m := r.FindSubmatch(f)
 
-	if len(match) == 0 {
-		return "", fmt.Errorf("Could not read Pkgfile variable '" + value + "'!")
+	if len(m) == 0 {
+		return "", fmt.Errorf("var %s: No such Pkgfile variable", v)
 	}
 
-	return string(match[1]), nil
+	return string(m[1]), nil
 }

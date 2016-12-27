@@ -71,37 +71,37 @@ func Info(args []string) {
 	// Read out Pkgfile.
 	f, err := ioutil.ReadFile("./Pkgfile")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read Pkgfile!")
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Print info.
 	if utils.StringInList("d", o) {
-		text, _ := pkgfile.Comment(f, "Description")
-		fmt.Println("Description: " + text)
+		s, _ := pkgfile.Comment(f, "Description")
+		fmt.Println("Description: " + s)
 	}
 	if utils.StringInList("u", o) {
-		text, _ := pkgfile.Comment(f, "URL")
-		fmt.Println("URL: " + text)
+		s, _ := pkgfile.Comment(f, "URL")
+		fmt.Println("URL: " + s)
 	}
 	if utils.StringInList("m", o) {
-		text, _ := pkgfile.Comment(f, "Maintainer")
-		fmt.Println("Maintainer: " + text)
+		s, _ := pkgfile.Comment(f, "Maintainer")
+		fmt.Println("Maintainer: " + s)
 	}
 	if utils.StringInList("e", o) {
-		text, _ := pkgfile.Comment(f, "Depends on")
-		fmt.Println("Depends on: " + text)
+		s, _ := pkgfile.Comment(f, "Depends on")
+		fmt.Println("Depends on: " + s)
 	}
 	if utils.StringInList("o", o) {
-		text, _ := pkgfile.Comment(f, "Nice to have|Optional")
-		fmt.Println("Nice to have: " + text)
+		s, _ := pkgfile.Comment(f, "Nice to have|Optional")
+		fmt.Println("Nice to have: " + s)
 	}
 	if utils.StringInList("v", o) {
-		text, _ := pkgfile.Var(f, "version")
-		fmt.Println("Version: " + text)
+		s, _ := pkgfile.Var(f, "version")
+		fmt.Println("Version: " + s)
 	}
 	if utils.StringInList("r", o) {
-		text, _ := pkgfile.Var(f, "release")
-		fmt.Println("Release: " + text)
+		s, _ := pkgfile.Var(f, "release")
+		fmt.Println("Release: " + s)
 	}
 }

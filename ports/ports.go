@@ -15,14 +15,14 @@ import (
 var c = config.Load()
 
 // Alias aliases ports using the config values.
-func Alias(port string) string {
-	for _, alias := range c.Alias {
-		if alias[0] == port {
-			port = alias[1]
+func Alias(p string) string {
+	for _, a := range c.Alias {
+		if a[0] == p {
+			p = a[1]
 		}
 	}
 
-	return port
+	return p
 }
 
 // All lists all ports found in the PortDir.
@@ -34,12 +34,12 @@ func All() ([]string, error) {
 	}
 
 	// Remove PortDir from output.
-	var ports []string
-	for _, dir := range dirs {
-		ports = append(ports, strings.Replace(filepath.Dir(dir), c.PortDir+"/", "", 1))
+	var p []string
+	for _, d := range dirs {
+		p = append(p, strings.Replace(filepath.Dir(d), c.PortDir+"/", "", 1))
 	}
 
-	return ports, nil
+	return p, nil
 }
 
 // Inst lists all installed ports.
@@ -54,18 +54,18 @@ func Inst() ([]string, error) {
 	s := bufio.NewScanner(db)
 
 	// Check for versions.
-	var blank bool
-	var ports []string
+	var b bool
+	var p []string
 	for s.Scan() {
-		if blank {
-			ports = append(ports, s.Text())
-			blank = false
+		if b {
+			p = append(p, s.Text())
+			b = false
 		} else if s.Text() == "" {
-			blank = true
+			b = true
 		}
 	}
 
-	return ports, nil
+	return p, nil
 }
 
 // InstVers list all installed versions, this should follow the same order as Inst().
@@ -80,51 +80,51 @@ func InstVers() ([]string, error) {
 	s := bufio.NewScanner(db)
 
 	// Check for versions.
-	var blank, name bool
-	var vers []string
+	var b, n bool
+	var v []string
 	for s.Scan() {
-		if blank {
-			blank, name = false, true
-		} else if name {
-			vers = append(vers, s.Text())
-			name = false
+		if b {
+			b, n = false, true
+		} else if n {
+			v = append(v, s.Text())
+			n = false
 		} else if s.Text() == "" {
-			blank = true
+			b = true
 		}
 	}
 
-	return vers, nil
+	return v, nil
 }
 
 // Loc tries to get the location of a port.
-func Loc(ports []string, name string) ([]string, error) {
-	var locs []string
-	for _, port := range ports {
-		if filepath.Base(port) == name {
-			locs = append(locs, port)
+func Loc(ports []string, n string) ([]string, error) {
+	var l []string
+	for _, p := range ports {
+		if filepath.Base(p) == n {
+			l = append(l, p)
 		}
 	}
 
-	if len(locs) == 0 {
-		return []string{}, fmt.Errorf("could not find location for %s", name)
+	if len(l) == 0 {
+		return []string{}, fmt.Errorf("loc %s: Could not find location", n)
 	}
 
 	// If there are multiple matches, sort using the config Order value.
-	if len(locs) > 1 {
+	if len(l) > 1 {
 		var i int
-		for _, repo := range c.Order {
-			newLoc := filepath.Join(repo, filepath.Base(locs[i]))
-			if utils.StringInList(newLoc, ports) {
-				locs[i] = newLoc
+		for _, r := range c.Order {
+			nl := filepath.Join(r, filepath.Base(l[i]))
+			if utils.StringInList(nl, ports) {
+				l[i] = nl
 				i++
 			}
 
 			// Break if everything has been ordered.
-			if i == len(locs) {
+			if i == len(l) {
 				break
 			}
 		}
 	}
 
-	return locs, nil
+	return l, nil
 }

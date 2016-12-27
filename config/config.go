@@ -17,7 +17,9 @@ type Config struct {
 	Order      []string
 	Alias      [][]string
 	IndentChar string
+	ErrorChar  string
 	DarkColor  color.Attribute
+	ErrorColor color.Attribute
 	LightColor color.Attribute
 	Pull       map[string]Pull
 }
@@ -55,6 +57,11 @@ func Load() *Config {
 
 	// Convert colors to something usable.
 	c.DarkColor, err = colorFix(c.DarkColor)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	c.ErrorColor, err = colorFix(c.ErrorColor)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

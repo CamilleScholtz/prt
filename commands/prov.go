@@ -50,11 +50,11 @@ func Prov(args []string) {
 		os.Exit(1)
 	}
 
-	for _, val := range vals {
+	for _, v := range vals {
 		// Evaluate regex.
-		r, err := regexp.Compile(val)
+		r, err := regexp.Compile(v)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "'"+val+"' is not a valid regex!")
+			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
 
@@ -64,79 +64,79 @@ func Prov(args []string) {
 			// TODO: Should I use filepath stuff here?
 			db, err := os.Open("/var/lib/pkg/db")
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "Could not read '/var/lib/pkg/db'!")
+				fmt.Fprintln(os.Stderr, err)
 				continue
 			}
 			s := bufio.NewScanner(db)
 
 			// Search for files.
-			var blank bool
-			var name string
-			var files [][]string
+			var b bool
+			var n string
+			var ll [][]string
 			for s.Scan() {
-				if blank {
-					name = s.Text()
-					blank = false
+				if b {
+					n = s.Text()
+					b = false
 				} else if s.Text() == "" {
-					blank = true
+					b = true
 				} else if r.MatchString(s.Text()) {
-					files = append(files, []string{name, s.Text()})
+					ll = append(ll, []string{n, s.Text()})
 				}
 			}
 
-			var oldName string
-			for _, file := range files {
+			var on string
+			for _, l := range ll {
 				// Print port name.
-				if oldName != file[0] {
-					fmt.Println(file[0])
+				if on != l[0] {
+					fmt.Println(l[0])
 				}
 
 				// Print matched files.
 				color.Set(c.DarkColor)
 				fmt.Print(c.IndentChar)
 				color.Unset()
-				fmt.Println(file[1])
+				fmt.Println(l[1])
 
-				oldName = file[0]
+				on = l[0]
 			}
 
 			db.Close()
 		} else {
 			// Get all ports.
-			allPorts, err := ports.All()
+			all, err = ports.All()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				continue
 			}
 
-			for _, name := range allPorts {
+			for _, p := range all {
 				// Read out Pkgfile.
-				f, err := os.Open(filepath.Join(c.PortDir, name, ".footprint"))
+				f, err := os.Open(filepath.Join(c.PortDir, p, ".footprint"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, name, ".footprint")+"'!")
+					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
 				s := bufio.NewScanner(f)
 
 				// Search for files.
-				var files []string
+				var ll []string
 				for s.Scan() {
 					if r.MatchString(s.Text()) {
-						files = append(files, s.Text())
+						ll = append(ll, s.Text())
 					}
 				}
 
 				// Print port name.
-				if len(files) > 0 {
-					fmt.Println(name)
+				if len(ll) > 0 {
+					fmt.Println(p)
 				}
 
 				// Print matched files.
-				for _, file := range files {
+				for _, l := range ll {
 					color.Set(c.DarkColor)
 					fmt.Print(c.IndentChar)
 					color.Unset()
-					fmt.Println(strings.Split(file, "\t")[2])
+					fmt.Println(strings.Split(l, "\t")[2])
 				}
 
 				f.Close()

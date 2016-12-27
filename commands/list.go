@@ -52,7 +52,7 @@ func List(args []string) {
 	}
 
 	// Get all ports
-	allPorts, err = ports.All()
+	all, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -60,12 +60,12 @@ func List(args []string) {
 
 	// Only list installed ports.
 	if utils.StringInList("i", o) {
-		instPorts, err = ports.Inst()
+		inst, err = ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		instVers, err = ports.InstVers()
+		instv, err = ports.InstVers()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -73,48 +73,48 @@ func List(args []string) {
 
 		// Get port locations
 		if utils.StringInList("r", o) {
-			for i, port := range instPorts {
-				locs, err := ports.Loc(allPorts, port)
+			for i, p := range inst {
+				ll, err := ports.Loc(all, p)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
-				instPorts[i] = locs[0]
+				inst[i] = ll[0]
 			}
 		}
 
-		sort.Strings(instPorts)
-		allPorts = instPorts
+		sort.Strings(inst)
+		all = inst
 	}
 
-	for i, port := range allPorts {
+	for i, p := range all {
 		if utils.StringInList("v", o) {
-			var ver string
+			var v string
 			if utils.StringInList("i", o) {
-				ver = instVers[i]
+				v = instv[i]
 			} else {
 				// Read out Pkgfile.
-				f, err := ioutil.ReadFile(filepath.Join(c.PortDir, port, "Pkgfile"))
+				f, err := ioutil.ReadFile(filepath.Join(c.PortDir, p, "Pkgfile"))
 				if err != nil {
-					fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(c.PortDir, port, "Pkgfile")+"'!")
+					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
 
-				ver, err = pkgfile.Var(f, "version")
+				v, err = pkgfile.Var(f, "version")
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
 			}
 
-			port = port + " " + ver
+			p += " " + v
 		}
 
 		// Remove repo if needed.
 		if !utils.StringInList("r", o) {
-			port = filepath.Base(port)
+			p = filepath.Base(p)
 		}
 
-		fmt.Println(port)
+		fmt.Println(p)
 	}
 }

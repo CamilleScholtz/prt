@@ -26,8 +26,14 @@ alias = [
 # Characters used for indentation
 indentchar = "-  "
 
+# Characters used for errors
+errorchar = "!  "
+
 # Color used for indentation, arrows, et cetera
 darkcolor = 8
+
+# Color used for errors
+darkcolor = 9
 
 # Color used to highlight repos to pull, ports to install, et cetera
 lightcolor = 11

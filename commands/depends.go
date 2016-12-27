@@ -14,46 +14,46 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-func depends(path string) {
+func depends(l string) {
 	// Read out Pkgfile.
-	f, err := ioutil.ReadFile(filepath.Join(path, "Pkgfile"))
+	f, err := ioutil.ReadFile(filepath.Join(l, "Pkgfile"))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(path, "Pkgfile")+"'!")
+		utils.Printe(err.Error())
 		return
 	}
 
 	// Read out Pkgfile dependencies.
-	deps, err := pkgfile.Depends(f, "Depends on")
+	dl, err := pkgfile.Depends(f, "Depends on")
 	if err != nil {
 		return
 	}
 
-	for _, dep := range deps {
+	for _, p := range dl {
 		// Continue if already checked.
-		if utils.StringInList(dep, checkPorts) {
+		if utils.StringInList(p, cp) {
 			continue
 		}
-		checkPorts = append(checkPorts, dep)
+		cp = append(cp, p)
 
 		// Get port location.
-		locs, err := ports.Loc(allPorts, dep)
+		ll, err := ports.Loc(all, p)
 		if err != nil {
 			continue
 		}
-		loc := locs[0]
+		l := ll[0]
 
 		// Alias if needed.
 		if !utils.StringInList("n", o) {
-			loc = ports.Alias(loc)
+			l = ports.Alias(l)
 		}
 
 		// Continue port is already installed.
 		if !utils.StringInList("a", o) {
-			if utils.StringInList(filepath.Base(loc), instPorts) {
+			if utils.StringInList(filepath.Base(l), inst) {
 				continue
 			}
 			// Core packages should always be installed.
-			if filepath.Dir(loc) == "core" {
+			if filepath.Dir(l) == "core" {
 				continue
 			}
 		}
@@ -69,10 +69,10 @@ func depends(path string) {
 		}
 
 		// Finally print the port.
-		fmt.Println(loc)
+		fmt.Println(l)
 
 		// Loop.
-		depends(filepath.Join(c.PortDir, loc))
+		depends(filepath.Join(c.PortDir, l))
 
 		if utils.StringInList("t", o) {
 			i--
@@ -118,13 +118,13 @@ func Depends(args []string) {
 	}
 
 	// Get all and all installed ports.
-	allPorts, err = ports.All()
+	all, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	if !utils.StringInList("a", o) {
-		instPorts, err = ports.Inst()
+		inst, err = ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

@@ -52,32 +52,32 @@ func Loc(args []string) {
 	}
 
 	// Get all ports.
-	allPorts, err = ports.All()
+	all, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	for _, port := range vals {
+	for _, p := range vals {
 		// Continue if already checked.
-		if utils.StringInList(port, checkPorts) {
+		if utils.StringInList(p, cp) {
 			continue
 		}
-		checkPorts = append(checkPorts, port)
+		cp = append(cp, p)
 
-		locs, err := ports.Loc(allPorts, port)
+		ll, err := ports.Loc(all, p)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
 		if !utils.StringInList("d", o) {
-			locs = []string{locs[0]}
+			ll = []string{ll[0]}
 		}
 
-		for _, loc := range locs {
+		for _, l := range ll {
 			// Alias if needed.
 			if !utils.StringInList("a", o) {
-				loc = ports.Alias(loc)
+				l = ports.Alias(l)
 			}
 
 			// Print duplicate indentation.
@@ -91,7 +91,7 @@ func Loc(args []string) {
 			}
 
 			// Finally print the port.
-			fmt.Println(loc)
+			fmt.Println(l)
 		}
 	}
 }

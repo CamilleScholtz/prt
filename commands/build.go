@@ -14,52 +14,52 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-func build(path string) {
+func build(l string) {
 	// Read out Pkgfile.
-	f, err := ioutil.ReadFile(filepath.Join(path, "Pkgfile"))
+	f, err := ioutil.ReadFile(filepath.Join(l, "Pkgfile"))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not read '"+filepath.Join(path, "Pkgfile")+"'!")
+		fmt.Fprintln(os.Stderr, err)
 		return
 	}
 
 	// Read out Pkgfile dependencies.
-	deps, err := pkgfile.Depends(f, "Depends on")
+	dl, err := pkgfile.Depends(f, "Depends on")
 	if err != nil {
 		return
 	}
 
-	for _, dep := range deps {
-		// Continue if already checked.
-		if utils.StringInList(dep, checkPorts) {
+	for _, p := range dl {
+		// Continue if already dependency has already been checked.
+		if utils.StringInList(p, cp) {
 			continue
 		}
-		checkPorts = append(checkPorts, dep)
+		cp = append(cp, p)
 
 		// Get port location.
-		locs, err := ports.Loc(allPorts, dep)
+		ll, err := ports.Loc(all, p)
 		if err != nil {
 			continue
 		}
-		loc := locs[0]
+		l := ll[0]
 
 		// Alias if needed.
 		if !utils.StringInList("n", o) {
-			loc = ports.Alias(loc)
+			l = ports.Alias(l)
 		}
 
 		// Continue port is already installed.
-		if utils.StringInList(filepath.Base(loc), instPorts) {
+		if utils.StringInList(filepath.Base(l), inst) {
 			continue
 		}
 		// Core packages should always be installed.
-		if filepath.Dir(loc) == "core" {
+		if filepath.Dir(l) == "core" {
 			continue
 		}
 
-		toInst = append(toInst, loc)
+		toInst = append(toInst, l)
 
 		// Loop.
-		build(filepath.Join(c.PortDir, loc))
+		build(filepath.Join(c.PortDir, l))
 	}
 }
 
@@ -94,12 +94,12 @@ func Build(args []string) {
 	}
 
 	// Get all and all installed ports.
-	allPorts, err = ports.All()
+	all, err = ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	instPorts, err = ports.Inst()
+	inst, err = ports.Inst()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -107,6 +107,7 @@ func Build(args []string) {
 
 	// So uhh... I know I can do this in the opts for loop above
 	// but I like consitensy and I do it like this in all other commands.
+	var v bool
 	if utils.StringInList("v", o) {
 		v = true
 	}
@@ -122,52 +123,40 @@ func Build(args []string) {
 	toInst := append(toInst, wd)
 
 	t := len(toInst)
-	for i, port := range toInst {
-		os.Chdir(filepath.Join(c.PortDir, port))
+	for i, p := range toInst {
+		os.Chdir(filepath.Join(c.PortDir, p))
 
 		fmt.Printf("Installing port %d/%d, ", i+1, t)
 		color.Set(c.LightColor)
-		fmt.Printf(port)
+		fmt.Printf(p)
 		color.Unset()
 		fmt.Println(".")
 
-		color.Set(c.DarkColor)
-		fmt.Printf(c.IndentChar)
-		color.Unset()
-		fmt.Println("Downloading sources")
+		utils.Printi("Downloading sources")
 		err = pkg.Download(v)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			utils.Printe(err.Error())
 			continue
 		}
 
-		color.Set(c.DarkColor)
-		fmt.Printf(c.IndentChar)
-		color.Unset()
-		fmt.Println("Extracting sources")
-		err = pkg.Extract(v)
+		utils.Printi("Unpacking sources")
+		err = pkg.Unpack(v)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			utils.Printe(err.Error())
 			continue
 		}
 
-		color.Set(c.DarkColor)
-		fmt.Printf(c.IndentChar)
-		color.Unset()
-		fmt.Println("Building package")
+		utils.Printi("Building package")
 		err = pkg.Build(v)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			utils.Printe(err.Error())
 			continue
 		}
 
-		color.Set(c.DarkColor)
-		fmt.Printf(c.IndentChar)
-		color.Unset()
-		fmt.Println("Installing package")
+		utils.Printi("Installing package sources")
 		err = pkg.Install("TODO", v)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			utils.Printe(err.Error())
 			continue
 		}
 	}
