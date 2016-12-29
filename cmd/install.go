@@ -1,4 +1,4 @@
-package commands
+package cmd
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/pkg"
 	"github.com/onodera-punpun/prt/pkgfile"
-	"github.com/onodera-punpun/prt/pkgmk"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
 )
@@ -152,7 +152,7 @@ func Install(args []string) {
 		_, err = os.Stat(path.Join(l, "pre-install"))
 		if err == nil {
 			utils.Printi("Running pre-install")
-			err = pkgmk.PreInstall(l, utils.StringInList("v", o))
+			err = pkg.PreInstall(l, utils.StringInList("v", o))
 			if err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
@@ -160,28 +160,28 @@ func Install(args []string) {
 		}
 
 		utils.Printi("Downloading sources")
-		err = pkgmk.Download(l, utils.StringInList("v", o))
+		err = pkg.Download(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Unpacking sources")
-		err = pkgmk.Unpack(l, utils.StringInList("v", o))
+		err = pkg.Unpack(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Building package")
-		err = pkgmk.Build(l, utils.StringInList("v", o))
+		err = pkg.Build(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Installing package")
-		err = pkgmk.Install(l, utils.StringInList("v", o))
+		err = pkg.Install(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
@@ -190,7 +190,7 @@ func Install(args []string) {
 		_, err = os.Stat(path.Join(l, "post-install"))
 		if err == nil {
 			utils.Printi("Running post-install")
-			err = pkgmk.PostInstall(l, utils.StringInList("v", o))
+			err = pkg.PostInstall(l, utils.StringInList("v", o))
 			if err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)

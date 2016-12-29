@@ -1,4 +1,4 @@
-package pkgmk
+package pkg
 
 import (
 	"fmt"
@@ -18,23 +18,23 @@ var c = config.Load()
 func trErr(i int, f, p string) error {
 	switch i {
 	default:
-		return fmt.Errorf("pkgmk %s %s: Something went wrong", f, p)
+		return fmt.Errorf("pkg %s %s: Something went wrong", f, p)
 	case 2:
-		return fmt.Errorf("pkgmk %s %s: Invalid Pkgfile", f, p)
+		return fmt.Errorf("pkg %s %s: Invalid Pkgfile", f, p)
 	case 3:
-		return fmt.Errorf("pkgmk %s %s: Directory missing or missing read/write permission", f, p)
+		return fmt.Errorf("pkg %s %s: Directory missing or missing read/write permission", f, p)
 	case 4:
-		return fmt.Errorf("pkgmk %s %s: Could not download source", f, p)
+		return fmt.Errorf("pkg %s %s: Could not download source", f, p)
 	case 5:
-		return fmt.Errorf("pkgmk %s %s: Could not unpack source", f, p)
+		return fmt.Errorf("pkg %s %s: Could not unpack source", f, p)
 	case 6:
-		return fmt.Errorf("pkgmk %s %s: Md5sum verification failed", f, p)
+		return fmt.Errorf("pkg %s %s: Md5sum verification failed", f, p)
 	case 7:
-		return fmt.Errorf("pkgmk %s %s: Footprint check failed", f, p)
+		return fmt.Errorf("pkg %s %s: Footprint check failed", f, p)
 	case 8:
-		return fmt.Errorf("pkgmk %s %s: Error while running build()", f, p)
+		return fmt.Errorf("pkg %s %s: Error while running build()", f, p)
 	case 10:
-		return fmt.Errorf("pkgmk %s %s: Signature verification failed", f, p)
+		return fmt.Errorf("pkg %s %s: Signature verification failed", f, p)
 	}
 }
 
@@ -103,7 +103,7 @@ func PostInstall(l string, v bool) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("pkgmk post-install %s: Something went wrong", ports.BaseLoc(l))
+		return fmt.Errorf("pkg post-install %s: Something went wrong", ports.BaseLoc(l))
 	}
 
 	return nil
@@ -120,7 +120,7 @@ func PreInstall(l string, v bool) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("pkgmk pre-install %s: Something went wrong", ports.BaseLoc(l))
+		return fmt.Errorf("pkg pre-install %s: Something went wrong", ports.BaseLoc(l))
 
 	}
 

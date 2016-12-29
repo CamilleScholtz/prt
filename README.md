@@ -2,7 +2,7 @@
 
 # prt
 
-CRUX port utility writtin in go, aiming to replace prt-get, ports, and some pkgutils (on my machine). 
+CRUX port utility writtin in Go, aiming to replace prt-get, ports, and some pkgutils (on my machine). 
 
 
 ## Difference from `prt-get`
@@ -34,7 +34,7 @@ CRUX port utility writtin in go, aiming to replace prt-get, ports, and some pkgu
 
 https://github.com/onodera-punpun/crux-ports/blob/master/prt/Pkgfile
 
-Make sure to check `/etc/prt/config.toml` after Installation and edit values to fir your needs and setup.
+Make sure to check `/etc/prt/config.toml` after installation and edit values to fit your needs and setup.
 
 If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some handy completions.
 
@@ -61,4 +61,4 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 
 ## Notes
 
-Since this is my first go project I'm probably making some mistakes, feedback is highly appreciated!
+Since this is my first Go project I'm probably making some mistakes, feedback is highly appreciated!

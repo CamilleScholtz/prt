@@ -28,7 +28,7 @@ errorchar = "!  "
 darkcolor = 8
 
 # Color used for errors.
-darkcolor = 9
+errorcolor = 9
 
 # Color used to highlight repos to pull, ports to install, et cetera.
 lightcolor = 11

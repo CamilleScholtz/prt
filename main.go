@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/onodera-punpun/prt/commands"
+	"github.com/onodera-punpun/prt/cmd"
 )
 
 func main() {
@@ -32,37 +32,37 @@ func main() {
 		fmt.Println("  help                    print help and exit")
 		os.Exit(0)
 	case "depends":
-		commands.Depends(os.Args[2:])
+		cmd.Depends(os.Args[2:])
 		os.Exit(0)
 	case "diff":
-		commands.Diff(os.Args[2:])
+		cmd.Diff(os.Args[2:])
 		os.Exit(0)
 	case "info":
-		commands.Info(os.Args[2:])
+		cmd.Info(os.Args[2:])
 		os.Exit(0)
 	case "install":
-		commands.Install(os.Args[2:])
+		cmd.Install(os.Args[2:])
 		os.Exit(0)
 	case "list":
-		commands.List(os.Args[2:])
+		cmd.List(os.Args[2:])
 		os.Exit(0)
 	case "loc":
-		commands.Loc(os.Args[2:])
+		cmd.Loc(os.Args[2:])
 		os.Exit(0)
 		//	case "patch":
-		//		command.Patch(os.Args[1:])
+		//		cmd.Patch(os.Args[2:])
 		//		os.Exit(0)
 	case "prov":
-		commands.Prov(os.Args[2:])
+		cmd.Prov(os.Args[2:])
 		os.Exit(0)
 		//	case "remove":
-		//		command.Remove(os.Args[1:])
+		//		cmd.Remove(os.Args[2:])
 		//		os.Exit(0)
 	case "pull":
-		commands.Pull(os.Args[2:])
+		cmd.Pull(os.Args[2:])
 		os.Exit(0)
 	case "sysup":
-		commands.Sysup(os.Args[2:])
+		cmd.Sysup(os.Args[2:])
 		os.Exit(0)
 	default:
 		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")

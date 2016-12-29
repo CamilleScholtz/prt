@@ -47,7 +47,7 @@ func Load() *Config {
 	var c Config
 	_, err := toml.DecodeFile("/etc/prt/config.toml", &c)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Could not decode config!")
+		fmt.Fprintln(os.Stderr, "config load /etc/prt/config.toml: "+err.Error())
 		os.Exit(1)
 	}
 
