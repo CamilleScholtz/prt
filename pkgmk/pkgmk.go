@@ -107,8 +107,6 @@ func PostInstall(l string, v bool) error {
 	}
 
 	return nil
-
-	return nil
 }
 
 // PreInstall runs a pre-install scripts.
@@ -125,8 +123,6 @@ func PreInstall(l string, v bool) error {
 		return fmt.Errorf("pkgmk pre-install %s: Something went wrong", ports.BaseLoc(l))
 
 	}
-
-	return nil
 
 	return nil
 }

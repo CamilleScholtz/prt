@@ -17,28 +17,35 @@ import (
 // Sysup updates outdated packages.
 func Sysup(args []string) {
 	// Define opts.
-	shortopts := "hv"
+	shortopts := "hsv"
 	longopts := []string{
 		"--help",
+		"--skip",
 		"--verbose",
 	}
 
 	// Read out opts.
-	opts, _, err := getopt.Getopt(args, shortopts, longopts)
+	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	for _, opt := range opts {
+	var skip []string
+	for i, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt sysup [arguments]")
 			fmt.Println("")
 			fmt.Println("arguments:")
+			fmt.Println("  -s,   --skip            skip port from updating")
 			fmt.Println("  -v,   --verbose         enable verbose output")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
+		case "-s", "--skip":
+			o = append(o, "s")
+			// TODO: This isn't 100% perfect.
+			skip = append(skip, vals[i])
 		case "-v", "--verbose":
 			o = append(o, "v")
 		}
@@ -61,13 +68,6 @@ func Sysup(args []string) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
-	}
-
-	// So uhh... I know I can do this in the opts for loop above
-	// but I like consitensy and I do it like this in all other commands.
-	var v bool
-	if utils.StringInList("v", o) {
-		v = true
 	}
 
 	// Get out of date ports.
@@ -108,6 +108,13 @@ func Sysup(args []string) {
 		}
 	}
 
+	// Remove ports from toInst if needed.
+	if utils.StringInList("s", o) {
+		for _, val := range vals {
+			fmt.Println(val)
+		}
+	}
+
 	t := len(toInst)
 	for i, p := range toInst {
 		// Set location.
@@ -122,7 +129,7 @@ func Sysup(args []string) {
 		_, err = os.Stat(path.Join(l, "pre-install"))
 		if err == nil {
 			utils.Printi("Running pre-install")
-			err = pkgmk.PreInstall(l, v)
+			err = pkgmk.PreInstall(l, utils.StringInList("v", o))
 			if err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
@@ -130,28 +137,28 @@ func Sysup(args []string) {
 		}
 
 		utils.Printi("Downloading sources")
-		err = pkgmk.Download(l, v)
+		err = pkgmk.Download(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Unpacking sources")
-		err = pkgmk.Unpack(l, v)
+		err = pkgmk.Unpack(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Building package")
-		err = pkgmk.Build(l, v)
+		err = pkgmk.Build(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Updating package")
-		err = pkgmk.Update(l, v)
+		err = pkgmk.Update(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			continue
@@ -160,7 +167,7 @@ func Sysup(args []string) {
 		_, err = os.Stat(path.Join(l, "post-install"))
 		if err == nil {
 			utils.Printi("Running post-install")
-			err = pkgmk.PostInstall(l, v)
+			err = pkgmk.PostInstall(l, utils.StringInList("v", o))
 			if err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)

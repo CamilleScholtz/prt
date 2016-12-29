@@ -107,13 +107,6 @@ func Install(args []string) {
 		os.Exit(1)
 	}
 
-	// So uhh... I know I can do this in the opts for loop above
-	// but I like consitensy and I do it like this in all other commands.
-	var v bool
-	if utils.StringInList("v", o) {
-		v = true
-	}
-
 	// Get ports to build.
 	install("./")
 	wd, err := os.Getwd()
@@ -159,7 +152,7 @@ func Install(args []string) {
 		_, err = os.Stat(path.Join(l, "pre-install"))
 		if err == nil {
 			utils.Printi("Running pre-install")
-			err = pkgmk.PreInstall(l, v)
+			err = pkgmk.PreInstall(l, utils.StringInList("v", o))
 			if err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
@@ -167,28 +160,28 @@ func Install(args []string) {
 		}
 
 		utils.Printi("Downloading sources")
-		err = pkgmk.Download(l, v)
+		err = pkgmk.Download(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Unpacking sources")
-		err = pkgmk.Unpack(l, v)
+		err = pkgmk.Unpack(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Building package")
-		err = pkgmk.Build(l, v)
+		err = pkgmk.Build(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Installing package")
-		err = pkgmk.Install(l, v)
+		err = pkgmk.Install(l, utils.StringInList("v", o))
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
@@ -197,7 +190,7 @@ func Install(args []string) {
 		_, err = os.Stat(path.Join(l, "post-install"))
 		if err == nil {
 			utils.Printi("Running post-install")
-			err = pkgmk.PostInstall(l, v)
+			err = pkgmk.PostInstall(l, utils.StringInList("v", o))
 			if err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
