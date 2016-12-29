@@ -21,14 +21,14 @@ func main() {
 		fmt.Println("  depends                 list dependencies recursivly")
 		fmt.Println("  diff                    list outdated packages")
 		fmt.Println("  info                    print port information")
-		fmt.Println("  install                 build and install ports")
+		fmt.Println("  install                 build and install packages")
 		fmt.Println("  list                    list ports")
 		fmt.Println("  loc                     print port locations")
 		//fmt.Println("  patch                   patch ports")
 		fmt.Println("  prov                    search ports for files")
 		//fmt.Println("  remove                  remove installed ports")
 		fmt.Println("  pull                    pull in ports")
-		//fmt.Println("  sysup                   update outdated packages")
+		fmt.Println("  sysup                   update outdated packages")
 		fmt.Println("  help                    print help and exit")
 		os.Exit(0)
 	case "depends":
@@ -61,9 +61,9 @@ func main() {
 	case "pull":
 		commands.Pull(os.Args[2:])
 		os.Exit(0)
-		//	case "sysup":
-		//		command.Sysup(os.Args[1:])
-		//		os.Exit(0)
+	case "sysup":
+		commands.Sysup(os.Args[2:])
+		os.Exit(0)
 	default:
 		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")
 		os.Exit(1)

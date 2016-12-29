@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
@@ -15,58 +14,8 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// TODO: Make this return something instead of filling a list.
-func install(l string) {
-	// Read out Pkgfile.
-	f, err := ioutil.ReadFile(path.Join(l, "Pkgfile"))
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
-	}
-
-	// Read out Pkgfile dependencies.
-	dl, err := pkgfile.Depends(f, "Depends on")
-	if err != nil {
-		return
-	}
-
-	for _, p := range dl {
-		// Continue if already dependency has already been checked.
-		if utils.StringInList(p, cp) {
-			continue
-		}
-		cp = append(cp, p)
-
-		// Get port location.
-		ll, err := ports.Loc(all, p)
-		if err != nil {
-			continue
-		}
-		l := ll[0]
-
-		// Alias if needed.
-		if !utils.StringInList("n", o) {
-			l = ports.Alias(l)
-		}
-
-		// Continue port is already installed.
-		if utils.StringInList(path.Base(l), inst) {
-			continue
-		}
-		// Core packages should always be installed.
-		if path.Dir(l) == "core" {
-			continue
-		}
-
-		toInst = append(toInst, l)
-
-		// Loop.
-		install(ports.FullLoc(l))
-	}
-}
-
-// Install builds and installs packages.
-func Install(args []string) {
+// Sysup updates outdated packages.
+func Sysup(args []string) {
 	// Define opts.
 	shortopts := "hv"
 	longopts := []string{
@@ -84,7 +33,7 @@ func Install(args []string) {
 	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
-			fmt.Println("Usage: prt install [arguments]")
+			fmt.Println("Usage: prt sysup [arguments]")
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -v,   --verbose         enable verbose output")
@@ -107,6 +56,13 @@ func Install(args []string) {
 		os.Exit(1)
 	}
 
+	// Get version of installed ports.
+	instv, err = ports.InstVers()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
 	// So uhh... I know I can do this in the opts for loop above
 	// but I like consitensy and I do it like this in all other commands.
 	var v bool
@@ -114,43 +70,50 @@ func Install(args []string) {
 		v = true
 	}
 
-	// Get ports to build.
-	install("./")
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+	// Get out of date ports.
+	for i, p := range inst {
+		// Get port location.
+		ll, err := ports.Loc(all, p)
+		if err != nil {
+			continue
+		}
+		l := ll[0]
 
-	// Add current working dir to ports to install.
-	if strings.Contains(wd, c.PortDir) {
-		toInst = append(toInst, ports.BaseLoc(wd))
-	} else {
+		// Alias.
+		l = ports.Alias(l)
+
 		// Read out Pkgfile.
-		f, err := ioutil.ReadFile("./Pkgfile")
+		f, err := ioutil.ReadFile(path.Join(ports.FullLoc(l), "Pkgfile"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			continue
 		}
-		d, err := pkgfile.Var(f, "name")
+
+		// Get available version.
+		v, err := pkgfile.Var(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			continue
 		}
-		toInst = append(toInst, d)
+		r, err := pkgfile.Var(f, "release")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
+		availv := v + "-" + r
+
+		// Add to toInst if installed and available version don't match.
+		if availv != instv[i] {
+			toInst = append(toInst, l)
+		}
 	}
 
 	t := len(toInst)
 	for i, p := range toInst {
 		// Set location.
-		var l string
-		if strings.Contains(p, "/") {
-			l = ports.FullLoc(p)
-		} else {
-			l = wd
-		}
+		l := ports.FullLoc(p)
 
-		fmt.Printf("Installing port %d/%d, ", i+1, t)
+		fmt.Printf("Updating port %d/%d, ", i+1, t)
 		color.Set(c.LightColor)
 		fmt.Printf(p)
 		color.Unset()
@@ -160,28 +123,28 @@ func Install(args []string) {
 		err = pkg.Download(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			os.Exit(1)
+			continue
 		}
 
 		utils.Printi("Unpacking sources")
 		err = pkg.Unpack(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			os.Exit(1)
+			continue
 		}
 
 		utils.Printi("Building package")
 		err = pkg.Build(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			os.Exit(1)
+			continue
 		}
 
-		utils.Printi("Installing package")
-		err = pkg.Install(l, v)
+		utils.Printi("Updating package")
+		err = pkg.Update(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			os.Exit(1)
+			continue
 		}
 	}
 }
