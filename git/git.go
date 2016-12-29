@@ -15,7 +15,7 @@ func Checkout(b, l string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("checkout %s: Could not run git command", l)
+		return fmt.Errorf("git checkout %s: Something went wrong", l)
 	}
 
 	return nil
@@ -28,7 +28,7 @@ func Clean(l string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("clean %s: Could not run git command", l)
+		return fmt.Errorf("git clean %s: Something went wrong", l)
 	}
 
 	return nil
@@ -41,7 +41,7 @@ func Clone(u, b, l string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("clone %s: Could not run git command", l)
+		return fmt.Errorf("git clone %s: Something went wrong", l)
 	}
 
 	return nil
@@ -56,7 +56,7 @@ func Diff(b, l string) ([]string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return []string{}, fmt.Errorf("diff %s: Could not run git command", l)
+		return []string{}, fmt.Errorf("git diff %s: Something went wrong", l)
 	}
 
 	d := bb.String()
@@ -83,7 +83,7 @@ func Fetch(l string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fetch %s: Could not run git command", l)
+		return fmt.Errorf("git fetch %s: Something went wrong", l)
 	}
 
 	return nil
@@ -96,7 +96,7 @@ func Reset(b, l string) error {
 
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("reset %s: Could not run git command", l)
+		return fmt.Errorf("git reset %s: Something went wrong", l)
 	}
 
 	return nil

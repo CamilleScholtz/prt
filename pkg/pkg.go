@@ -4,127 +4,125 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/onodera-punpun/prt/config"
+	"github.com/onodera-punpun/prt/ports"
 )
 
 // Load config.
 var c = config.Load()
 
 // pkgmkErr translates pkgmk error codes to error strings.
-func pkgmkErr(i int, p string) error {
+func pkgmkErr(i int, f, p string) error {
 	switch i {
 	default:
-		return fmt.Errorf("pkgmk %s: Something went wrong", p)
+		return fmt.Errorf("pkgmk %s %s: Something went wrong", f, p)
 	case 2:
-		return fmt.Errorf("pkgmk %s: Invalid Pkgfile", p)
+		return fmt.Errorf("pkgmk %s %s: Invalid Pkgfile", f, p)
 	case 3:
-		return fmt.Errorf("pkgmk %s: Directory missing or missing read/write permission", p)
+		return fmt.Errorf("pkgmk %s %s: Directory missing or missing read/write permission", f, p)
 	case 4:
-		return fmt.Errorf("pkgmk %s: Could not download source", p)
+		return fmt.Errorf("pkgmk %s %s: Could not download source", f, p)
 	case 5:
-		return fmt.Errorf("pkgmk %s: Could not unpack source", p)
+		return fmt.Errorf("pkgmk %s %s: Could not unpack source", f, p)
 	case 6:
-		return fmt.Errorf("pkgmk %s: Md5sum verification failed", p)
+		return fmt.Errorf("pkgmk %s %s: Md5sum verification failed", f, p)
 	case 7:
-		return fmt.Errorf("pkgmk %s: Footprint check failed", p)
+		return fmt.Errorf("pkgmk %s %s: Footprint check failed", f, p)
 	case 8:
-		return fmt.Errorf("pkgmk %s: Error while running build()", p)
+		return fmt.Errorf("pkgmk %s %s: Error while running build()", f, p)
 	case 10:
-		return fmt.Errorf("pkgmk %s: Signature verification failed", p)
+		return fmt.Errorf("pkgmk %s %s: Signature verification failed", f, p)
 	}
 }
 
 // Build builds a port.
-func Build(v bool) error {
-	// TODO: I'm pretty sure the -f can cause some issues
-	// what I want is this function to ONLY build a port
-	// and -f can cause it to also update n' shit?
-	cmd := exec.Command("/usr/share/prt/pkgmk", "-f")
+func Build(l string, v bool) error {
+	cmd := exec.Command("/usr/share/prt/pkgmk", "-bo")
+	cmd.Dir = l
 	if v {
-		cmd.Stderr = os.Stdout
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		p, _ := os.Getwd()
-		return pkgmkErr(i, p)
+		return pkgmkErr(i, "build", ports.BaseLoc(l))
 	}
 
 	return nil
 }
 
 // Download downloads a port sources.
-func Download(v bool) error {
+func Download(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-do")
+	cmd.Dir = l
 	if v {
-		cmd.Stderr = os.Stdout
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		p, _ := os.Getwd()
-		return pkgmkErr(i, p)
+		return pkgmkErr(i, "download", ports.BaseLoc(l))
 	}
 
 	return nil
 }
 
 // Install installs a port.
-func Install(p string, v bool) error {
-	// Get and fix location from config.
-	loc := strings.Replace(c.PackageDir, "$REPO", filepath.Dir(p), -1)
-	loc = strings.Replace(c.PackageDir, "$NAME", filepath.Base(p), -1)
-
-	cmd := exec.Command("pkgadd", loc)
+func Install(l string, v bool) error {
+	cmd := exec.Command("/usr/share/prt/pkgmk", "-io")
+	cmd.Dir = l
 	if v {
 		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		p, _ := os.Getwd()
-		return pkgmkErr(i, p)
+		return pkgmkErr(i, "install", ports.BaseLoc(l))
 	}
 
 	return nil
 }
 
 // Unpack unpacks a port sources.
-func Unpack(v bool) error {
+func Unpack(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-eo")
+	cmd.Dir = l
 	if v {
-		cmd.Stderr = os.Stdout
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		p, _ := os.Getwd()
-		return pkgmkErr(i, p)
+		return pkgmkErr(i, "unpack", ports.BaseLoc(l))
 	}
 
 	return nil
 }
 
 // Update updates a port.
-func Update(v bool) error {
-	cmd := exec.Command("pkgadd", "-u", "TODO")
+func Update(l string, v bool) error {
+	cmd := exec.Command("/usr/share/prt/pkgmk", "-uo")
+	cmd.Dir = l
 	if v {
-		cmd.Stderr = os.Stdout
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	}
 
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		p, _ := os.Getwd()
-		return pkgmkErr(i, p)
+		return pkgmkErr(i, "update", ports.BaseLoc(l))
 	}
 
 	return nil

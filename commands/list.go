@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
+	"path"
 	"sort"
 
 	"github.com/chiyouhen/getopt"
@@ -94,7 +94,7 @@ func List(args []string) {
 				v = instv[i]
 			} else {
 				// Read out Pkgfile.
-				f, err := ioutil.ReadFile(filepath.Join(c.PortDir, p, "Pkgfile"))
+				f, err := ioutil.ReadFile(path.Join(ports.FullLoc(p), "Pkgfile"))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
@@ -112,7 +112,7 @@ func List(args []string) {
 
 		// Remove repo if needed.
 		if !utils.StringInList("r", o) {
-			p = filepath.Base(p)
+			p = path.Base(p)
 		}
 
 		fmt.Println(p)

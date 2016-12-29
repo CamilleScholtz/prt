@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
+	"path"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
@@ -80,7 +80,7 @@ func Diff(args []string) {
 		}
 
 		// Read out Pkgfile.
-		f, err := ioutil.ReadFile(filepath.Join(c.PortDir, l, "Pkgfile"))
+		f, err := ioutil.ReadFile(path.Join(ports.FullLoc(l), "Pkgfile"))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue

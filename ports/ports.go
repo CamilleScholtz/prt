@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -28,24 +29,33 @@ func Alias(p string) string {
 // All lists all ports found in the PortDir.
 func All() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
-	dirs, err := filepath.Glob(filepath.Join(c.PortDir, "/*/*/Pkgfile"))
+	dl, err := filepath.Glob(path.Join(c.PortDir, "/*/*/Pkgfile"))
 	if err != nil {
 		return []string{}, err
 	}
 
 	// Remove PortDir from output.
 	var p []string
-	for _, d := range dirs {
-		p = append(p, strings.Replace(filepath.Dir(d), c.PortDir+"/", "", 1))
+	for _, d := range dl {
+		p = append(p, BaseLoc(path.Dir(d)))
 	}
 
 	return p, nil
 }
 
+// BaseLoc removes the PortDir from a string.
+func BaseLoc(d string) string {
+	return strings.Replace(d, c.PortDir+"/", "", 1)
+}
+
+// FullLoc adds the PortDir to a string.
+func FullLoc(d string) string {
+	return path.Join(c.PortDir, d)
+}
+
 // Inst lists all installed ports.
 func Inst() ([]string, error) {
 	// Read out pkg db.
-	// TODO: Use filepath stuff here?
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return []string{}, err
@@ -71,7 +81,6 @@ func Inst() ([]string, error) {
 // InstVers list all installed versions, this should follow the same order as Inst().
 func InstVers() ([]string, error) {
 	// Read out pkg db.
-	// TODO: Use filepath stuff here?
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return []string{}, err
@@ -100,7 +109,7 @@ func InstVers() ([]string, error) {
 func Loc(ports []string, n string) ([]string, error) {
 	var l []string
 	for _, p := range ports {
-		if filepath.Base(p) == n {
+		if path.Base(p) == n {
 			l = append(l, p)
 		}
 	}
@@ -113,7 +122,7 @@ func Loc(ports []string, n string) ([]string, error) {
 	if len(l) > 1 {
 		var i int
 		for _, r := range c.Order {
-			nl := filepath.Join(r, filepath.Base(l[i]))
+			nl := path.Join(r, path.Base(l[i]))
 			if utils.StringInList(nl, ports) {
 				l[i] = nl
 				i++

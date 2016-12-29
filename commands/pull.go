@@ -3,11 +3,11 @@ package commands
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
 	"github.com/onodera-punpun/prt/git"
+	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
 )
 
@@ -63,7 +63,7 @@ func Pull(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		l := filepath.Join(c.PortDir, n)
+		l := ports.FullLoc(n)
 
 		// Check if location exists, clone if it doesn't.
 		_, err := os.Stat(l)

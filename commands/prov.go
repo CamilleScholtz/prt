@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
+	"path"
 	"regexp"
 	"strings"
 
@@ -51,7 +51,6 @@ func Prov(args []string) {
 	}
 
 	for _, v := range vals {
-		// Evaluate regex.
 		r, err := regexp.Compile(v)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -61,7 +60,6 @@ func Prov(args []string) {
 		// TODO: Use Alias and Loc here to always display repo info?
 		if utils.StringInList("i", o) {
 			// Read out pkg db.
-			// TODO: Should I use filepath stuff here?
 			db, err := os.Open("/var/lib/pkg/db")
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -111,7 +109,7 @@ func Prov(args []string) {
 
 			for _, p := range all {
 				// Read out Pkgfile.
-				f, err := os.Open(filepath.Join(c.PortDir, p, ".footprint"))
+				f, err := os.Open(path.Join(ports.FullLoc(p), ".footprint"))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue

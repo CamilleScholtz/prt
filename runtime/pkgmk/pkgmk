@@ -34,16 +34,19 @@ E_BUILD=8      # error while running 'build()'
 E_INSTALL=9    # error while installing the package via 'pkgadd'
 E_SIGNATURE=10 # error verifying the signature
 
+# prt: Disabled info output
 info() {
-	echo "$1"
+	:
 }
 
+# prt: Disabled warning output
 warning() {
-	info "$1" >&2
+	:
 }
 
+# prt: Disabled error output
 error() {
-	info "$1" >&2
+	:
 }
 
 get_filename() {
@@ -537,6 +540,8 @@ build_package() {
 	unpack_source
 	
 	cd $SRC
+	# prt: Disabled PS4 prefix
+	export PS4=""
 	(set -e -x ; build)
 	
 	if [ $? = 0 ]; then
@@ -686,8 +691,10 @@ print_help() {
 	echo "  -u,   --upgrade             build and install package (as upgrade)"
 	echo "  -r,   --recursive           search for and build packages recursively"
 	echo "  -d,   --download            download missing source file(s)"
-	echo "  -do,  --download-only       do not build, only download missing source file(s)"
-	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
+	echo "  -do,  --download-only       only download missing source file(s)"
+	echo "  -eo,  --extract-only        only extract source file(s)"
+	echo "  -bo,  --build-only          only build package"
+	echo "  -io,  --install-only        onsly install package"
 	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
 	echo "  -uf,  --update-footprint    update footprint using result from last build"
 	echo "  -if,  --ignore-footprint    build package without checking footprint"
@@ -726,6 +733,12 @@ parse_options() {
 				PKGMK_DOWNLOAD_ONLY="yes" ;;
 			-eo|--extract-only)
 				PKGMK_EXTRACT_ONLY="yes" ;;
+			-bo|--build-only)
+				PKGMK_BUILD_ONLY="yes" ;;
+			-io|--install-only)
+				PKGMK_INSTALL_ONLY="yes" ;;
+			-uo|--update-only)
+				PKGMK_UPDATE_ONLY="yes" ;;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
 			-uf|--update-footprint)
@@ -870,10 +883,33 @@ main() {
 	fi
 	
 	if [ "$PKGMK_EXTRACT_ONLY" = "yes" ]; then
-		download_source
+		# prt: ONLY extract source
+		#download_source
 		make_work_dir
 		info "Extracting sources of package '$name-$version'."
 		unpack_source
+		exit 0
+	fi
+
+	# prt: Add build only option
+	if [ "$PKGMK_BUILD_ONLY" = "yes" ]; then
+		if [ "`build_needed`" = "yes" ]; then
+			build_package
+		fi
+		exit 0
+	fi
+
+	# prt: Add install only option
+	if [ "$PKGMK_INSTALL_ONLY" = "yes" ]; then
+		PKGMK_INSTALL="install"
+		install_package
+		exit 0
+	fi
+
+	# prt: Add update only option
+	if [ "$PKGMK_UPDATE_ONLY" = "yes" ]; then
+		PKGMK_INSTALL="upgrade"
+		install_package
 		exit 0
 	fi
 	
@@ -927,6 +963,9 @@ PKGMK_RECURSIVE="no"
 PKGMK_DOWNLOAD="no"
 PKGMK_DOWNLOAD_ONLY="no"
 PKGMK_EXTRACT_ONLY="no"
+PKGMK_BUILD_ONLY="no"
+PKGMK_INSTALL_ONLY="no"
+PKGMK_UPDATE_ONLY="no"
 PKGMK_UP_TO_DATE="no"
 PKGMK_UPDATE_FOOTPRINT="no"
 PKGMK_IGNORE_FOOTPRINT="no"

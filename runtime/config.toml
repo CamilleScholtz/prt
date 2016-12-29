@@ -1,12 +1,7 @@
-# Location of the ports tree
+# Location of the ports tree.
 portdir = "/usr/ports"
 
-# Location of the pkgmk directories
-sourcedir = "/usr/ports/$REPO/$NAME"
-workdir = "/usr/ports/$REPO/$NAME/work"
-packagedir = "/usr/ports/$REPO/$NAME"
-
-# Repo order, the port found first is used
+# Repo order, the port found first is used.
 order = [
 	"core",
 	"opt",
@@ -14,7 +9,7 @@ order = [
 	"contrib"
 ]
 
-# Alias ports
+# Alias ports.
 alias = [
 #	[ "core/openssl", "6c37-dropin/libressl" ],
 #	[ "core/pkg-config", "6c37-dropin/pkgconf" ],
@@ -23,22 +18,22 @@ alias = [
 #	[ "opt/freetype", "6c37-dropin/freetype-iu" ]
 ]
 
-# Characters used for indentation
+# Characters used for indentation.
 indentchar = "-  "
 
-# Characters used for errors
+# Characters used for errors.
 errorchar = "!  "
 
-# Color used for indentation, arrows, et cetera
+# Color used for indentation, arrows, et cetera.
 darkcolor = 8
 
-# Color used for errors
+# Color used for errors.
 darkcolor = 9
 
-# Color used to highlight repos to pull, ports to install, et cetera
+# Color used to highlight repos to pull, ports to install, et cetera.
 lightcolor = 11
 
-# Repos to pull
+# Repos to pull.
 [pull]
 	[pull.contrib]
 	url = "git://crux.nu/ports/contrib"

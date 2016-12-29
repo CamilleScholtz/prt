@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
+	"path"
 	"strings"
 
 	"github.com/chiyouhen/getopt"
@@ -16,7 +16,7 @@ import (
 
 func depends(l string) {
 	// Read out Pkgfile.
-	f, err := ioutil.ReadFile(filepath.Join(l, "Pkgfile"))
+	f, err := ioutil.ReadFile(path.Join(l, "Pkgfile"))
 	if err != nil {
 		utils.Printe(err.Error())
 		return
@@ -49,11 +49,11 @@ func depends(l string) {
 
 		// Continue port is already installed.
 		if !utils.StringInList("a", o) {
-			if utils.StringInList(filepath.Base(l), inst) {
+			if utils.StringInList(path.Base(l), inst) {
 				continue
 			}
 			// Core packages should always be installed.
-			if filepath.Dir(l) == "core" {
+			if path.Dir(l) == "core" {
 				continue
 			}
 		}
@@ -72,7 +72,7 @@ func depends(l string) {
 		fmt.Println(l)
 
 		// Loop.
-		depends(filepath.Join(c.PortDir, l))
+		depends(ports.FullLoc(l))
 
 		if utils.StringInList("t", o) {
 			i--

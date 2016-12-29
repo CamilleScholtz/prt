@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
+	"path"
+	"strings"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
@@ -14,9 +15,9 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-func build(l string) {
+func install(l string) {
 	// Read out Pkgfile.
-	f, err := ioutil.ReadFile(filepath.Join(l, "Pkgfile"))
+	f, err := ioutil.ReadFile(path.Join(l, "Pkgfile"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
@@ -48,23 +49,23 @@ func build(l string) {
 		}
 
 		// Continue port is already installed.
-		if utils.StringInList(filepath.Base(l), inst) {
+		if utils.StringInList(path.Base(l), inst) {
 			continue
 		}
 		// Core packages should always be installed.
-		if filepath.Dir(l) == "core" {
+		if path.Dir(l) == "core" {
 			continue
 		}
 
 		toInst = append(toInst, l)
 
 		// Loop.
-		build(filepath.Join(c.PortDir, l))
+		install(ports.FullLoc(l))
 	}
 }
 
-// Build builds ports.
-func Build(args []string) {
+// Install installs ports.
+func Install(args []string) {
 	// Define opts.
 	shortopts := "hv"
 	longopts := []string{
@@ -82,7 +83,7 @@ func Build(args []string) {
 	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
-			fmt.Println("Usage: prt build [arguments]")
+			fmt.Println("Usage: prt install [arguments]")
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -v,   --verbose         toggle verbose output")
@@ -113,18 +114,40 @@ func Build(args []string) {
 	}
 
 	// Get ports to build.
-	build("./")
+	install("./")
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	// TODO: Remove PortDir here.
-	toInst := append(toInst, wd)
+
+	// Add current working dir to ports to install.
+	if strings.Contains(wd, c.PortDir) {
+		toInst = append(toInst, ports.BaseLoc(wd))
+	} else {
+		// Read out Pkgfile.
+		f, err := ioutil.ReadFile("./Pkgfile")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		d, err := pkgfile.Var(f, "name")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		toInst = append(toInst, d)
+	}
 
 	t := len(toInst)
 	for i, p := range toInst {
-		os.Chdir(filepath.Join(c.PortDir, p))
+		// Set location.
+		var l string
+		if strings.Contains(p, "/") {
+			l = ports.FullLoc(p)
+		} else {
+			l = wd
+		}
 
 		fmt.Printf("Installing port %d/%d, ", i+1, t)
 		color.Set(c.LightColor)
@@ -133,31 +156,31 @@ func Build(args []string) {
 		fmt.Println(".")
 
 		utils.Printi("Downloading sources")
-		err = pkg.Download(v)
+		err = pkg.Download(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			continue
+			os.Exit(1)
 		}
 
 		utils.Printi("Unpacking sources")
-		err = pkg.Unpack(v)
+		err = pkg.Unpack(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			continue
+			os.Exit(1)
 		}
 
 		utils.Printi("Building package")
-		err = pkg.Build(v)
+		err = pkg.Build(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			continue
+			os.Exit(1)
 		}
 
-		utils.Printi("Installing package sources")
-		err = pkg.Install("TODO", v)
+		utils.Printi("Installing package")
+		err = pkg.Install(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
-			continue
+			os.Exit(1)
 		}
 	}
 }
