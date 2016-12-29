@@ -9,8 +9,8 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
-	"github.com/onodera-punpun/prt/pkg"
 	"github.com/onodera-punpun/prt/pkgfile"
+	"github.com/onodera-punpun/prt/pkgmk"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
 )
@@ -156,32 +156,52 @@ func Install(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
+		_, err = os.Stat(path.Join(l, "pre-install"))
+		if err == nil {
+			utils.Printi("Running pre-install")
+			err = pkgmk.PreInstall(l, v)
+			if err != nil {
+				utils.Printe(err.Error())
+				os.Exit(1)
+			}
+		}
+
 		utils.Printi("Downloading sources")
-		err = pkg.Download(l, v)
+		err = pkgmk.Download(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Unpacking sources")
-		err = pkg.Unpack(l, v)
+		err = pkgmk.Unpack(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Building package")
-		err = pkg.Build(l, v)
+		err = pkgmk.Build(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
 		}
 
 		utils.Printi("Installing package")
-		err = pkg.Install(l, v)
+		err = pkgmk.Install(l, v)
 		if err != nil {
 			utils.Printe(err.Error())
 			os.Exit(1)
+		}
+
+		_, err = os.Stat(path.Join(l, "post-install"))
+		if err == nil {
+			utils.Printi("Running post-install")
+			err = pkgmk.PostInstall(l, v)
+			if err != nil {
+				utils.Printe(err.Error())
+				os.Exit(1)
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package pkg
+package pkgmk
 
 import (
 	"fmt"
@@ -14,8 +14,8 @@ import (
 // Load config.
 var c = config.Load()
 
-// pkgmkErr translates pkgmk error codes to error strings.
-func pkgmkErr(i int, f, p string) error {
+// trErr translates pkgmk error codes to error strings.
+func trErr(i int, f, p string) error {
 	switch i {
 	default:
 		return fmt.Errorf("pkgmk %s %s: Something went wrong", f, p)
@@ -50,7 +50,7 @@ func Build(l string, v bool) error {
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return pkgmkErr(i, "build", ports.BaseLoc(l))
+		return trErr(i, "build", ports.BaseLoc(l))
 	}
 
 	return nil
@@ -68,7 +68,7 @@ func Download(l string, v bool) error {
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return pkgmkErr(i, "download", ports.BaseLoc(l))
+		return trErr(i, "download", ports.BaseLoc(l))
 	}
 
 	return nil
@@ -86,8 +86,47 @@ func Install(l string, v bool) error {
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return pkgmkErr(i, "install", ports.BaseLoc(l))
+		return trErr(i, "install", ports.BaseLoc(l))
 	}
+
+	return nil
+}
+
+// PostInstall runs a pre-install scripts.
+func PostInstall(l string, v bool) error {
+	cmd := exec.Command("bash", "./post-install")
+	cmd.Dir = l
+	if v {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("pkgmk post-install %s: Something went wrong", ports.BaseLoc(l))
+	}
+
+	return nil
+
+	return nil
+}
+
+// PreInstall runs a pre-install scripts.
+func PreInstall(l string, v bool) error {
+	cmd := exec.Command("bash", "./pre-install")
+	cmd.Dir = l
+	if v {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("pkgmk pre-install %s: Something went wrong", ports.BaseLoc(l))
+
+	}
+
+	return nil
 
 	return nil
 }
@@ -104,7 +143,7 @@ func Unpack(l string, v bool) error {
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return pkgmkErr(i, "unpack", ports.BaseLoc(l))
+		return trErr(i, "unpack", ports.BaseLoc(l))
 	}
 
 	return nil
@@ -122,7 +161,7 @@ func Update(l string, v bool) error {
 	err := cmd.Run()
 	if err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return pkgmkErr(i, "update", ports.BaseLoc(l))
+		return trErr(i, "update", ports.BaseLoc(l))
 	}
 
 	return nil
