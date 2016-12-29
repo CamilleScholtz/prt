@@ -82,6 +82,13 @@ func Sysup(args []string) {
 		// Alias.
 		l = ports.Alias(l)
 
+		// Remove ports from toInst if needed.
+		if utils.StringInList("s", o) {
+			if utils.StringInList(l, vals) {
+				continue
+			}
+		}
+
 		// Read out Pkgfile.
 		f, err := ioutil.ReadFile(path.Join(ports.FullLoc(l), "Pkgfile"))
 		if err != nil {
@@ -105,13 +112,6 @@ func Sysup(args []string) {
 		// Add to toInst if installed and available version don't match.
 		if availv != instv[i] {
 			toInst = append(toInst, l)
-		}
-	}
-
-	// Remove ports from toInst if needed.
-	if utils.StringInList("s", o) {
-		for _, val := range vals {
-			fmt.Println(val)
 		}
 	}
 

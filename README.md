@@ -2,7 +2,7 @@
 
 # prt
 
-CRUX port utility writtin in go, aiming to replace prt-get, ports, and some pkgutils. 
+CRUX port utility writtin in go, aiming to replace prt-get, ports, and some pkgutils (on my machine). 
 
 
 ## Difference from `prt-get`
@@ -16,8 +16,8 @@ CRUX port utility writtin in go, aiming to replace prt-get, ports, and some pkgu
 
 * `prt-get` takes a port name for most commands, for example `prt-get depinst portname`, `prt` does it more
    like `pkgmk`, so first you `cd` to `portname`, and then you run `prt install`. This has a few advantages, for
-   example you can quickly `httpup sync` a port anywhere in the filesystem,and install it *and* its dependencies
-   using `prt install`. Since `prt-get depinst` needs a port name, you can *only* install ports that are in a
+   example you can quickly `httpup sync` a port anywhere in the filesystem, and install it *and* its dependencies
+   using `prt install`. Since `prt-get depinst` needs a port name, you can *only* install ports that are located in a
    predefined `prtdir`.
 
 * `prt` has some pretty colors you can customize using `config.toml`.
@@ -26,6 +26,17 @@ CRUX port utility writtin in go, aiming to replace prt-get, ports, and some pkgu
   `prt pull` over `ports -u`), repo ordering, aliasing, et cetera.
 
 * I tried to keep `prt` pretty minimal. `prt-get` is around 7500 lines of C++, `prt` is around 2000 lines of go.
+
+* `prt-get` aliases ports based on name, `prt` on name and repo. This makes it possible to alias `foo/bar` to `baz/bar`.
+
+
+## Installation
+
+https://github.com/onodera-punpun/crux-ports/blob/master/prt/Pkgfile
+
+Make sure to check `/etc/prt/config.toml` after Installation and edit values to fir your needs and setup.
+
+If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some handy completions.
 
 
 ## Todo
