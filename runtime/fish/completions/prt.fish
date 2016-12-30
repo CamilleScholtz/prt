@@ -19,11 +19,11 @@ complete -c prt -f -n '__fish_seen_subcommand_from info' -o v -l version -d 'pri
 complete -c prt -f -n '__fish_seen_subcommand_from info' -o r -l release -d 'print release'
 complete -c prt -f -n '__fish_seen_subcommand_from info' -o h -l help -d 'print help and exit'
 
-complete -c prt -f -n '__fish_use_subcommand' -a install -d 'update outdated packages'
+complete -c prt -f -n '__fish_use_subcommand' -a install -d 'build and install packages'
 complete -c prt -f -n '__fish_seen_subcommand_from install' -o v -l verbose -d 'enable verbose output'
 complete -c prt -f -n '__fish_seen_subcommand_from install' -o h -l help -d 'print help and exit'
 
-complete -c prt -f -n '__fish_use_subcommand' -a list -d 'list ports'
+complete -c prt -f -n '__fish_use_subcommand' -a list -d 'list ports and packages'
 complete -c prt -f -n '__fish_seen_subcommand_from list' -o i -l installed -d 'list installed ports only'
 complete -c prt -f -n '__fish_seen_subcommand_from list' -o r -l repo -d 'list with repo info'
 complete -c prt -f -n '__fish_seen_subcommand_from list' -o b -l version -d 'list with version info'
@@ -42,8 +42,11 @@ complete -c prt -f -n '__fish_seen_subcommand_from prov' -o h -l help -d 'print 
 complete -c prt -f -n '__fish_use_subcommand' -a pull -d 'pull in ports'
 complete -c prt -f -n '__fish_seen_subcommand_from pull' -o h -l help -d 'print help and exit'
 
-complete -c prt -f -n '__fish_use_subcommand' -a sysup -d 'update outdated packages'
+complete -c prt -f -n '__fish_use_subcommand' -a sysup -d 'update outdated packages' -a "(prt diff)"
 complete -c prt -f -n '__fish_seen_subcommand_from sysup' -o v -l verbose -d 'enable verbose output'
 complete -c prt -f -n '__fish_seen_subcommand_from sysup' -o h -l help -d 'print help and exit'
+
+complete -c prt -f -n '__fish_use_subcommand' -a uninstall -d 'uninstall packages' -a "(prt list -i)"
+complete -c prt -f -n '__fish_seen_subcommand_from uninstall' -o h -l help -d 'print help and exit'
 
 complete -c prt -f -n '__fish_use_subcommand' -a help -d 'print help and exit'

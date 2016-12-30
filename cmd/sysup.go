@@ -124,11 +124,15 @@ func Sysup(args []string) {
 		// Set location.
 		l := ports.FullLoc(p)
 
-		fmt.Printf("Updating port %d/%d, ", i+1, t)
+		fmt.Printf("Updating package %d/%d, ", i+1, t)
 		color.Set(conf.LightColor)
 		fmt.Printf(p)
 		color.Unset()
 		fmt.Println(".")
+
+		if _, err := os.Stat(path.Join(l, "README")); err == nil {
+			utils.Printi("This port has a README")
+		}
 
 		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
 			utils.Printi("Running pre-install")

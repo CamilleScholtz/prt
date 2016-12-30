@@ -46,8 +46,6 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 * Add `prt patch` command, this will patch ports using user created diff files. This removes the need
   to fork ports for minor changes.
 
-* Add `prt remove` command, pretty self explanatory.
-
 * Add `prt rebuild` command, again, pretty self explanatory.
 
 * Add `prt maildiff`, what this is basically going to do is generate a diff with changes the user made to a port, 
@@ -59,9 +57,6 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
   I can merge these?
 
 * Add Bash completions.
-
-* The config gets loaded multiple times now I think (for example first by `commands.go`, but if `ports` get called also by `ports.go`).
-  This isn't really a problem but it just annoys me.
 
 
 ## Notes

@@ -7,12 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/ports"
 )
-
-// Load config.
-var c = config.Load()
 
 // trErr translates pkgmk error codes to error strings.
 func trErr(i int, f, p string) error {
@@ -47,8 +43,7 @@ func Build(l string, v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
 		return trErr(i, "build", ports.BaseLoc(l))
 	}
@@ -65,8 +60,7 @@ func Download(l string, v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
 		return trErr(i, "download", ports.BaseLoc(l))
 	}
@@ -74,7 +68,7 @@ func Download(l string, v bool) error {
 	return nil
 }
 
-// Install installs a port.
+// Install installs a package.
 func Install(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-io")
 	cmd.Dir = l
@@ -83,8 +77,7 @@ func Install(l string, v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
 		return trErr(i, "install", ports.BaseLoc(l))
 	}
@@ -101,8 +94,7 @@ func PostInstall(l string, v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("pkg post-install %s: Something went wrong", ports.BaseLoc(l))
 	}
 
@@ -118,10 +110,19 @@ func PreInstall(l string, v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("pkg pre-install %s: Something went wrong", ports.BaseLoc(l))
+	}
 
+	return nil
+}
+
+// Uninstall uninstalls a package.
+func Uninstall(p string) error {
+	cmd := exec.Command("pkgrm", p)
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("pkg uninstall %s: Something went wrong", p)
 	}
 
 	return nil
@@ -136,8 +137,7 @@ func Unpack(l string, v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
 		return trErr(i, "unpack", ports.BaseLoc(l))
 	}
@@ -145,7 +145,7 @@ func Unpack(l string, v bool) error {
 	return nil
 }
 
-// Update updates a port.
+// Update updates a package.
 func Update(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-uo")
 	cmd.Dir = l
@@ -154,8 +154,7 @@ func Update(l string, v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
 		return trErr(i, "update", ports.BaseLoc(l))
 	}

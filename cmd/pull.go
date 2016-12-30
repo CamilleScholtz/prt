@@ -30,8 +30,8 @@ func Pull(args []string) {
 		os.Exit(1)
 	}
 
-	for _, opt := range opts {
-		switch opt[0] {
+	for _, o := range opts {
+		switch o[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt pull [arguments] [repos]")
 			fmt.Println("")

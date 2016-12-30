@@ -22,13 +22,13 @@ func main() {
 		fmt.Println("  diff                    list outdated packages")
 		fmt.Println("  info                    print port information")
 		fmt.Println("  install                 build and install packages")
-		fmt.Println("  list                    list ports")
+		fmt.Println("  list                    list ports and packages")
 		fmt.Println("  loc                     print port locations")
 		//fmt.Println("  patch                   patch ports")
 		fmt.Println("  prov                    search ports for files")
-		//fmt.Println("  remove                  remove installed ports")
 		fmt.Println("  pull                    pull in ports")
 		fmt.Println("  sysup                   update outdated packages")
+		fmt.Println("  uninstall               uninstall packages")
 		fmt.Println("  help                    print help and exit")
 		os.Exit(0)
 	case "depends":
@@ -55,14 +55,14 @@ func main() {
 	case "prov":
 		cmd.Prov(os.Args[2:])
 		os.Exit(0)
-		//	case "remove":
-		//		cmd.Remove(os.Args[2:])
-		//		os.Exit(0)
 	case "pull":
 		cmd.Pull(os.Args[2:])
 		os.Exit(0)
 	case "sysup":
 		cmd.Sysup(os.Args[2:])
+		os.Exit(0)
+	case "uninstall":
+		cmd.Uninstall(os.Args[2:])
 		os.Exit(0)
 	default:
 		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")

@@ -13,8 +13,7 @@ func Checkout(b, l string) error {
 	cmd := exec.Command("git", "checkout", b)
 	cmd.Dir = l
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git checkout %s: Something went wrong", l)
 	}
 
@@ -26,8 +25,7 @@ func Clean(l string) error {
 	cmd := exec.Command("git", "clean", "-f")
 	cmd.Dir = l
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git clean %s: Something went wrong", l)
 	}
 
@@ -39,8 +37,7 @@ func Clone(u, b, l string) error {
 	cmd := exec.Command("git", "clone", "--depth", "1", "-b", b, u)
 	cmd.Dir = l
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git clone %s: Something went wrong", l)
 	}
 
@@ -54,8 +51,7 @@ func Diff(b, l string) ([]string, error) {
 	bb := new(bytes.Buffer)
 	cmd.Stdout = bb
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return []string{}, fmt.Errorf("git diff %s: Something went wrong", l)
 	}
 
@@ -81,8 +77,7 @@ func Fetch(l string) error {
 	cmd := exec.Command("git", "fetch", "--depth", "1")
 	cmd.Dir = l
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git fetch %s: Something went wrong", l)
 	}
 
@@ -94,8 +89,7 @@ func Reset(b, l string) error {
 	cmd := exec.Command("git", "reset", "--hard", "origin/"+b)
 	cmd.Dir = l
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git reset %s: Something went wrong", l)
 	}
 
