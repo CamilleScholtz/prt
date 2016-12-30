@@ -9,80 +9,18 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
 )
 
-func depends(l string) {
-	// Read out Pkgfile.
-	f, err := ioutil.ReadFile(path.Join(l, "Pkgfile"))
-	if err != nil {
-		utils.Printe(err.Error())
-		return
-	}
-
-	// Read out Pkgfile dependencies.
-	dl, err := pkgfile.Depends(f, "Depends on")
-	if err != nil {
-		return
-	}
-
-	for _, p := range dl {
-		// Continue if already checked.
-		if utils.StringInList(p, cp) {
-			continue
-		}
-		cp = append(cp, p)
-
-		// Get port location.
-		ll, err := ports.Loc(all, p)
-		if err != nil {
-			continue
-		}
-		l := ll[0]
-
-		// Alias if needed.
-		if !utils.StringInList("n", o) {
-			l = ports.Alias(l)
-		}
-
-		// Continue port is already installed.
-		if !utils.StringInList("a", o) {
-			if utils.StringInList(path.Base(l), inst) {
-				continue
-			}
-			// Core packages should always be installed.
-			if path.Dir(l) == "core" {
-				continue
-			}
-		}
-
-		// Print tree indentation.
-		if utils.StringInList("t", o) {
-			if i > 0 {
-				color.Set(c.DarkColor)
-				fmt.Printf(strings.Repeat(c.IndentChar, i))
-				color.Unset()
-			}
-			i++
-		}
-
-		// Finally print the port.
-		fmt.Println(l)
-
-		// Loop.
-		depends(ports.FullLoc(l))
-
-		if utils.StringInList("t", o) {
-			i--
-		}
-	}
-}
-
 // Depends lists dependencies recursivly.
 func Depends(args []string) {
-	// Define opts.
+	// Load config.
+	var conf = config.Load()
+
+	// Define allowed opts.
 	shortopts := "hant"
 	longopts := []string{
 		"--help",
@@ -97,8 +35,15 @@ func Depends(args []string) {
 		os.Exit(1)
 	}
 
-	for _, opt := range opts {
-		switch opt[0] {
+	type optStruct struct {
+		a bool
+		n bool
+		t bool
+	}
+
+	var opt optStruct
+	for _, o := range opts {
+		switch o[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt depends [arguments]")
 			fmt.Println("")
@@ -109,21 +54,24 @@ func Depends(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-a", "--all":
-			o = append(o, "a")
+			opt.a = true
 		case "-n", "--no-alias":
-			o = append(o, "n")
+			opt.n = true
 		case "-t", "--tree":
-			o = append(o, "t")
+			opt.t = true
 		}
 	}
 
-	// Get all and all installed ports.
-	all, err = ports.All()
+	// Get all ports.
+	all, err := ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	if !utils.StringInList("a", o) {
+
+	// Get installed ports.
+	var inst []string
+	if !opt.a {
 		inst, err = ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -131,5 +79,78 @@ func Depends(args []string) {
 		}
 	}
 
-	depends("./")
+	// Recursive loop that prints dependencies.
+	var c []string
+	var i int
+	var recursive func(l string)
+	recursive = func(l string) {
+		// Read out Pkgfile.
+		f, err := ioutil.ReadFile(path.Join(l, "Pkgfile"))
+		if err != nil {
+			utils.Printe(err.Error())
+			return
+		}
+
+		// Get dependencies.
+		dl, err := pkgfile.Depends(f, "Depends on")
+		if err != nil {
+			return
+		}
+
+		for _, p := range dl {
+			// Continue if already checked.
+			if utils.StringInList(p, c) {
+				continue
+			}
+			// Add to checked ports.
+			c = append(c, p)
+
+			// Get port location.
+			ll, err := ports.Loc(all, p)
+			if err != nil {
+				continue
+			}
+			l := ll[0]
+
+			// Alias ports if needed.
+			if !opt.n {
+				l = ports.Alias(l)
+			}
+
+			// Continue port is already installed.
+			if !opt.a {
+				if utils.StringInList(path.Base(l), inst) {
+					continue
+				}
+
+				// Core packages should always be installed.
+				if path.Dir(l) == "core" {
+					continue
+				}
+			}
+
+			// Print tree indentation.
+			if opt.t {
+				if i > 0 {
+					color.Set(conf.DarkColor)
+					fmt.Printf(strings.Repeat(conf.IndentChar, i))
+					color.Unset()
+				}
+				i++
+			}
+
+			// Finally print the port.
+			fmt.Println(l)
+
+			// Loop.
+			recursive(ports.FullLoc(l))
+
+			// If we end up here, remove one tree indentation level
+			if opt.t {
+				i--
+			}
+		}
+	}
+
+	recursive("./")
 }

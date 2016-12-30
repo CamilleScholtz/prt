@@ -8,6 +8,7 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkg"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
@@ -16,7 +17,10 @@ import (
 
 // Sysup updates outdated packages.
 func Sysup(args []string) {
-	// Define opts.
+	// Load config.
+	var conf = config.Load()
+
+	// Define allowed opts.
 	shortopts := "hsv"
 	longopts := []string{
 		"--help",
@@ -31,46 +35,48 @@ func Sysup(args []string) {
 		os.Exit(1)
 	}
 
-	var skip []string
-	for _, opt := range opts {
-		switch opt[0] {
+	type optStruct struct {
+		v bool
+	}
+
+	var opt optStruct
+	for _, o := range opts {
+		switch o[0] {
 		case "-h", "--help":
-			fmt.Println("Usage: prt sysup [arguments]")
+			fmt.Println("Usage: prt sysup [arguments] [ports to skip]")
 			fmt.Println("")
 			fmt.Println("arguments:")
-			fmt.Println("  -s,   --skip            skip port from updating")
 			fmt.Println("  -v,   --verbose         enable verbose output")
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
-		case "-s", "--skip":
-			o = append(o, "s")
-			// TODO: This isn't 100% perfect...
-			skip = append(skip, vals...)
 		case "-v", "--verbose":
-			o = append(o, "v")
+			opt.v = true
 		}
 	}
 
-	// Get all and all installed ports.
-	all, err = ports.All()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	inst, err = ports.Inst()
+	// Get all ports.
+	all, err := ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// Get version of installed ports.
-	instv, err = ports.InstVers()
+	// Get installed ports.
+	inst, err := ports.Inst()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	// Get installed port versions.
+	instv, err := ports.InstVers()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get out of date ports.
+	var instMe []string
 	for i, p := range inst {
 		// Get port location.
 		ll, err := ports.Loc(all, p)
@@ -82,11 +88,9 @@ func Sysup(args []string) {
 		// Alias.
 		l = ports.Alias(l)
 
-		// Remove ports from toInst if needed.
-		if utils.StringInList("s", o) {
-			if utils.StringInList(l, vals) {
-				continue
-			}
+		// Don't add ports to instMe if in vals.
+		if utils.StringInList(l, vals) {
+			continue
 		}
 
 		// Read out Pkgfile.
@@ -111,64 +115,56 @@ func Sysup(args []string) {
 
 		// Add to toInst if installed and available version don't match.
 		if availv != instv[i] {
-			toInst = append(toInst, l)
+			instMe = append(instMe, l)
 		}
 	}
 
-	t := len(toInst)
-	for i, p := range toInst {
+	t := len(instMe)
+	for i, p := range instMe {
 		// Set location.
 		l := ports.FullLoc(p)
 
 		fmt.Printf("Updating port %d/%d, ", i+1, t)
-		color.Set(c.LightColor)
+		color.Set(conf.LightColor)
 		fmt.Printf(p)
 		color.Unset()
 		fmt.Println(".")
 
-		_, err = os.Stat(path.Join(l, "pre-install"))
-		if err == nil {
+		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
 			utils.Printi("Running pre-install")
-			err = pkg.PreInstall(l, utils.StringInList("v", o))
-			if err != nil {
+			if err = pkg.PreInstall(l, opt.v); err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
 		utils.Printi("Downloading sources")
-		err = pkg.Download(l, utils.StringInList("v", o))
-		if err != nil {
+		if err := pkg.Download(l, opt.v); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Unpacking sources")
-		err = pkg.Unpack(l, utils.StringInList("v", o))
-		if err != nil {
+		if err := pkg.Unpack(l, opt.v); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Building package")
-		err = pkg.Build(l, utils.StringInList("v", o))
-		if err != nil {
+		if err := pkg.Build(l, opt.v); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Updating package")
-		err = pkg.Update(l, utils.StringInList("v", o))
-		if err != nil {
+		if err := pkg.Update(l, opt.v); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
-		_, err = os.Stat(path.Join(l, "post-install"))
-		if err == nil {
+		if _, err := os.Stat(path.Join(l, "post-install")); err == nil {
 			utils.Printi("Running post-install")
-			err = pkg.PostInstall(l, utils.StringInList("v", o))
-			if err != nil {
+			if err := pkg.PostInstall(l, opt.v); err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
 			}

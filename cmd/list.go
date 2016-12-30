@@ -10,12 +10,11 @@ import (
 	"github.com/chiyouhen/getopt"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
 // List lists ports.
 func List(args []string) {
-	// Define opts.
+	// Define allowed opts.
 	shortopts := "hirv"
 	longopts := []string{
 		"--help",
@@ -31,8 +30,15 @@ func List(args []string) {
 		os.Exit(1)
 	}
 
-	for _, opt := range opts {
-		switch opt[0] {
+	type optStruct struct {
+		i bool
+		r bool
+		v bool
+	}
+
+	var opt optStruct
+	for _, o := range opts {
+		switch o[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt list [arguments]")
 			fmt.Println("")
@@ -43,36 +49,41 @@ func List(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-i", "--installed":
-			o = append(o, "i")
+			opt.i = true
 		case "-r", "--repo":
-			o = append(o, "r")
+			opt.r = true
 		case "-v", "--version":
-			o = append(o, "v")
+			opt.v = true
 		}
 	}
 
-	// Get all ports
-	all, err = ports.All()
+	// Get all ports.
+	all, err := ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// Only list installed ports.
-	if utils.StringInList("i", o) {
-		inst, err = ports.Inst()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		instv, err = ports.InstVers()
+	var instv []string
+	if opt.i {
+		// Get installed ports.
+		inst, err := ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
-		// Get port locations
-		if utils.StringInList("r", o) {
+		// Get installed port versions if needed.
+		if opt.v {
+			instv, err = ports.InstVers()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+		}
+
+		// Get port locations if needed.
+		if opt.r {
 			for i, p := range inst {
 				ll, err := ports.Loc(all, p)
 				if err != nil {
@@ -83,14 +94,18 @@ func List(args []string) {
 			}
 		}
 
+		// We want pretty output, so sort.
 		sort.Strings(inst)
+
+		// I'm using all in the the following for loop, so alias inst to all.
 		all = inst
 	}
 
 	for i, p := range all {
-		if utils.StringInList("v", o) {
+		if opt.v {
 			var v string
-			if utils.StringInList("i", o) {
+			if opt.i {
+				// Get installed version.
 				v = instv[i]
 			} else {
 				// Read out Pkgfile.
@@ -100,6 +115,7 @@ func List(args []string) {
 					continue
 				}
 
+				// Get available version from Pkgfile.
 				v, err = pkgfile.Var(f, "version")
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
@@ -107,11 +123,12 @@ func List(args []string) {
 				}
 			}
 
+			// Merge port and version.
 			p += " " + v
 		}
 
 		// Remove repo if needed.
-		if !utils.StringInList("r", o) {
+		if !opt.r && !opt.i {
 			p = path.Base(p)
 		}
 

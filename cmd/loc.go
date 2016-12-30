@@ -3,17 +3,22 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
 )
 
 // Loc prints port locations
 func Loc(args []string) {
-	// Define opts.
+	// Load config.
+	var conf = config.Load()
+
+	// Define allowed opts.
 	shortopts := "hdn"
 	longopts := []string{
 		"--help",
@@ -28,8 +33,14 @@ func Loc(args []string) {
 		os.Exit(1)
 	}
 
-	for _, opt := range opts {
-		switch opt[0] {
+	type optStruct struct {
+		d bool
+		n bool
+	}
+
+	var opt optStruct
+	for _, o := range opts {
+		switch o[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt loc [arguments] [ports]")
 			fmt.Println("")
@@ -39,9 +50,9 @@ func Loc(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-d", "--duplicate":
-			o = append(o, "d")
+			opt.d = true
 		case "-n", "--no-alias":
-			o = append(o, "n")
+			opt.n = true
 		}
 	}
 
@@ -52,39 +63,50 @@ func Loc(args []string) {
 	}
 
 	// Get all ports.
-	all, err = ports.All()
+	all, err := ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
+	var c []string
+	var i int
 	for _, p := range vals {
 		// Continue if already checked.
-		if utils.StringInList(p, cp) {
+		if utils.StringInList(p, c) {
 			continue
 		}
-		cp = append(cp, p)
+		// Add to checked ports.
+		c = append(c, p)
 
+		// Get port location.
 		ll, err := ports.Loc(all, p)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		if !utils.StringInList("d", o) {
+		if !opt.d {
 			ll = []string{ll[0]}
 		}
 
+		var op string
 		for _, l := range ll {
 			// Alias if needed.
-			if !utils.StringInList("a", o) {
+			if !opt.n {
 				l = ports.Alias(l)
 			}
 
 			// Print duplicate indentation.
-			if utils.StringInList("d", o) {
+			if opt.d {
+				// Reset indentation on new port
+				if path.Base(l) != op {
+					i = 0
+				}
+				op = path.Base(l)
+
 				if i > 0 {
-					color.Set(c.DarkColor)
-					fmt.Printf(strings.Repeat(c.IndentChar, i))
+					color.Set(conf.DarkColor)
+					fmt.Printf(strings.Repeat(conf.IndentChar, i))
 					color.Unset()
 				}
 				i++

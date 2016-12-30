@@ -25,7 +25,7 @@ CRUX port utility writtin in Go, aiming to replace prt-get, ports, and some pkgu
 * Pretty much everything port related is defined in `config.toml`. The git repos you want to pull (if you choose to use
   `prt pull` over `ports -u`), repo ordering, aliasing, et cetera.
 
-* `prt` has less commands, I implemented only things I acvutally use myself (as of now).
+* `prt` has less commands, I implemented only things I actually use myself (as of now).
 
 * I tried to keep `prt` pretty minimal. `prt-get` is around 7500 lines of C++, `prt` is around 2000 lines of go.
 
@@ -53,9 +53,12 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 * Add `prt maildiff`, what this is basically going to do is generate a diff with changes the user made to a port, 
   and semi-automatically mail it to the maintainer.
 
-* Handle flags differently maybe.
+* Split up commands into smaller functions.
 
-* Handle commands differently maybe.
+* I kind of define opts like three times now: optStruct, shortOpts, and in the opts for loop, is there a way
+  I can merge these?
+
+* Add Bash completions.
 
 * The config gets loaded multiple times now I think (for example first by `commands.go`, but if `ports` get called also by `ports.go`).
   This isn't really a problem but it just annoys me.

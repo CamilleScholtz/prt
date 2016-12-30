@@ -10,13 +10,16 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
 // Prov searches ports for files.
 func Prov(args []string) {
-	// Define opts.
+	// Load config.
+	var conf = config.Load()
+
+	// Define allowed opts.
 	shortopts := "hi"
 	longopts := []string{
 		"--help",
@@ -30,8 +33,13 @@ func Prov(args []string) {
 		os.Exit(1)
 	}
 
-	for _, opt := range opts {
-		switch opt[0] {
+	type optStruct struct {
+		i bool
+	}
+
+	var opt optStruct
+	for _, o := range opts {
+		switch o[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt print [arguments] [queries]")
 			fmt.Println("")
@@ -40,7 +48,7 @@ func Prov(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-i", "--installed":
-			o = append(o, "i")
+			opt.i = true
 		}
 	}
 
@@ -58,7 +66,7 @@ func Prov(args []string) {
 		}
 
 		// TODO: Use Alias and Loc here to always display repo info?
-		if utils.StringInList("i", o) {
+		if opt.i {
 			// Read out pkg db.
 			db, err := os.Open("/var/lib/pkg/db")
 			if err != nil {
@@ -90,8 +98,8 @@ func Prov(args []string) {
 				}
 
 				// Print matched files.
-				color.Set(c.DarkColor)
-				fmt.Print(c.IndentChar)
+				color.Set(conf.DarkColor)
+				fmt.Print(conf.IndentChar)
 				color.Unset()
 				fmt.Println(l[1])
 
@@ -101,7 +109,7 @@ func Prov(args []string) {
 			db.Close()
 		} else {
 			// Get all ports.
-			all, err = ports.All()
+			all, err := ports.All()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				continue
@@ -131,8 +139,8 @@ func Prov(args []string) {
 
 				// Print matched files.
 				for _, l := range ll {
-					color.Set(c.DarkColor)
-					fmt.Print(c.IndentChar)
+					color.Set(conf.DarkColor)
+					fmt.Print(conf.IndentChar)
 					color.Unset()
 					fmt.Println(strings.Split(l, "\t")[2])
 				}

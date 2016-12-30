@@ -6,6 +6,7 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/git"
 	"github.com/onodera-punpun/prt/ports"
 	"github.com/onodera-punpun/prt/utils"
@@ -13,7 +14,10 @@ import (
 
 // Pull pulls in ports.
 func Pull(args []string) {
-	// Define opts.
+	// Load config.
+	var conf = config.Load()
+
+	// Define allowed opts.
 	shortopts := "h"
 	longopts := []string{
 		"--help",
@@ -40,7 +44,7 @@ func Pull(args []string) {
 	// Count total repos that need to be pulled.
 	var t int
 	if len(vals) == 0 {
-		t = len(c.Pull)
+		t = len(conf.Pull)
 	} else {
 		t = len(vals)
 	}
@@ -48,7 +52,8 @@ func Pull(args []string) {
 	// TODO: Actually learn git and check if all these commands are needed.
 	// TODO: Sort this?
 	// also check if branch is needed for these commands.
-	for n, r := range c.Pull {
+	var i int
+	for n, r := range conf.Pull {
 		// Skip repos if needed.
 		if len(vals) != 0 {
 			if !utils.StringInList(n, vals) {
@@ -58,7 +63,7 @@ func Pull(args []string) {
 		i++
 
 		fmt.Printf("Pulling in repo %d/%d, ", i, t)
-		color.Set(c.LightColor)
+		color.Set(conf.LightColor)
 		fmt.Printf(n)
 		color.Unset()
 		fmt.Println(".")
@@ -66,8 +71,7 @@ func Pull(args []string) {
 		l := ports.FullLoc(n)
 
 		// Check if location exists, clone if it doesn't.
-		_, err := os.Stat(l)
-		if err != nil {
+		if _, err := os.Stat(l); err != nil {
 			err := git.Clone(r.URL, r.Branch, l)
 			if err != nil {
 				utils.Printe(err.Error())
@@ -75,13 +79,11 @@ func Pull(args []string) {
 			continue
 		}
 
-		err = git.Checkout(r.Branch, l)
-		if err != nil {
+		if err := git.Checkout(r.Branch, l); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
-		err = git.Fetch(l)
-		if err != nil {
+		if err := git.Fetch(l); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
@@ -93,19 +95,17 @@ func Pull(args []string) {
 			continue
 		}
 		for _, d := range dl {
-			color.Set(c.DarkColor)
-			fmt.Print(c.IndentChar)
+			color.Set(conf.DarkColor)
+			fmt.Print(conf.IndentChar)
 			color.Unset()
 			fmt.Println(d)
 		}
 
-		err = git.Clean(l)
-		if err != nil {
+		if err := git.Clean(l); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
-		err = git.Reset(r.Branch, l)
-		if err != nil {
+		if err := git.Reset(r.Branch, l); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}

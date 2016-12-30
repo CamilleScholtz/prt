@@ -8,14 +8,17 @@ import (
 
 	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
 // Diff lists outdated packages.
 func Diff(args []string) {
-	// Define opts.
+	// Load config.
+	var conf = config.Load()
+
+	// Define allowed opts.
 	shortopts := "hnv"
 	longopts := []string{
 		"--help",
@@ -30,8 +33,14 @@ func Diff(args []string) {
 		os.Exit(1)
 	}
 
-	for _, opt := range opts {
-		switch opt[0] {
+	type optStruct struct {
+		n bool
+		v bool
+	}
+
+	var opt optStruct
+	for _, o := range opts {
+		switch o[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt diff [arguments]")
 			fmt.Println("")
@@ -41,26 +50,28 @@ func Diff(args []string) {
 			fmt.Println("  -h,   --help            print help and exit")
 			os.Exit(0)
 		case "-n", "--no-alias":
-			o = append(o, "n")
+			opt.n = true
 		case "-v", "--version":
-			o = append(o, "v")
+			opt.v = true
 		}
 	}
 
-	// Get all and all installed ports.
-	all, err = ports.All()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	inst, err = ports.Inst()
+	// Get all ports.
+	all, err := ports.All()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// Get version of installed ports.
-	instv, err = ports.InstVers()
+	// Get installed ports.
+	inst, err := ports.Inst()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	// Get installed port versions.
+	instv, err := ports.InstVers()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -75,7 +86,7 @@ func Diff(args []string) {
 		l := ll[0]
 
 		// Alias if needed.
-		if !utils.StringInList("a", o) {
+		if opt.n {
 			l = ports.Alias(l)
 		}
 
@@ -103,10 +114,10 @@ func Diff(args []string) {
 		if availv != instv[i] {
 			fmt.Print(p)
 
-			if utils.StringInList("v", o) {
+			if opt.v {
 				fmt.Print(" " + instv[i])
 
-				color.Set(c.DarkColor)
+				color.Set(conf.DarkColor)
 				fmt.Print(" -> ")
 				color.Unset()
 

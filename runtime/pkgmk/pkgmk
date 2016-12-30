@@ -538,7 +538,7 @@ build_package() {
 	
 	info "Building '$TARGET'."
 
-	# prt: Disable unpacking of source, since that -eo should do that
+	# prt: Disable unpacking of source, since -eo should do that
 	#unpack_source
 	
 	cd $SRC
