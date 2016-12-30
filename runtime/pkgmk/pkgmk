@@ -507,7 +507,8 @@ make_work_dir() {
 	umask 022
 	
 	cd $PKGMK_ROOT
-	remove_work_dir
+	# prt: Don't remove work dir actually
+	#remove_work_dir
 	mkdir -p $SRC $PKG
 
 	if [ "$PKGMK_IGNORE_SIGNATURE" = "no" ] || [ "$PKGMK_CHECK_SIGNATURE" = "yes" ]; then
@@ -536,8 +537,9 @@ build_package() {
 	fi
 	
 	info "Building '$TARGET'."
-	
-	unpack_source
+
+	# prt: Disable unpacking of source, since that -eo should do that
+	#unpack_source
 	
 	cd $SRC
 	# prt: Disabled PS4 prefix

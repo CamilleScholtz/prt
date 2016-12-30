@@ -32,7 +32,7 @@ func Sysup(args []string) {
 	}
 
 	var skip []string
-	for i, opt := range opts {
+	for _, opt := range opts {
 		switch opt[0] {
 		case "-h", "--help":
 			fmt.Println("Usage: prt sysup [arguments]")
@@ -44,8 +44,8 @@ func Sysup(args []string) {
 			os.Exit(0)
 		case "-s", "--skip":
 			o = append(o, "s")
-			// TODO: This isn't 100% perfect.
-			skip = append(skip, vals[i])
+			// TODO: This isn't 100% perfect...
+			skip = append(skip, vals...)
 		case "-v", "--verbose":
 			o = append(o, "v")
 		}
