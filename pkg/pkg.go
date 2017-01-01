@@ -35,8 +35,13 @@ func trErr(i int, f, p string) error {
 }
 
 // Build builds a port.
-func Build(l string, v bool) error {
-	cmd := exec.Command("/usr/share/prt/pkgmk", "-bo")
+func Build(l string, f, v bool) error {
+	var cmd *exec.Cmd
+	if f {
+		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo", "-f")
+	} else {
+		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo")
+	}
 	cmd.Dir = l
 	if v {
 		cmd.Stdout = os.Stdout

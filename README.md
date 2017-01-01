@@ -27,7 +27,7 @@ CRUX port utility writtin in Go, aiming to replace prt-get, ports, and some pkgu
 
 * `prt` has less commands, I implemented only things I actually use myself (as of now).
 
-* I tried to keep `prt` pretty minimal. `prt-get` is around 7500 lines of C++, `prt` is around 2000 lines of go.
+* I tried to keep `prt` pretty minimal. `prt-get` is around 7500 lines of C++, `prt` is around 2000 lines of Go.
 
 * `prt-get` aliases ports based on name, `prt` on name and repo. This makes it possible to alias `foo/bar` to `baz/bar`.
 

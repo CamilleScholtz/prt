@@ -155,7 +155,7 @@ func Sysup(args []string) {
 		}
 
 		utils.Printi("Building package")
-		if err := pkg.Build(l, opt.v); err != nil {
+		if err := pkg.Build(l, false, opt.v); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}

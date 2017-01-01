@@ -165,7 +165,11 @@ func Install(args []string) {
 			l = wd
 		}
 
-		fmt.Printf("Installing package %d/%d, ", i+1, t)
+		if utils.StringInList(path.Base(p), inst) {
+			fmt.Printf("Updating package %d/%d, ", i+1, t)
+		} else {
+			fmt.Printf("Installing package %d/%d, ", i+1, t)
+		}
 		color.Set(conf.LightColor)
 		fmt.Printf(p)
 		color.Unset()
@@ -197,15 +201,30 @@ func Install(args []string) {
 		}
 
 		utils.Printi("Building package")
-		if err := pkg.Build(l, opt.v); err != nil {
-			utils.Printe(err.Error())
-			os.Exit(1)
+		if utils.StringInList(path.Base(p), inst) {
+			if err := pkg.Build(l, true, opt.v); err != nil {
+				utils.Printe(err.Error())
+				os.Exit(1)
+			}
+		} else {
+			if err := pkg.Build(l, false, opt.v); err != nil {
+				utils.Printe(err.Error())
+				os.Exit(1)
+			}
 		}
 
-		utils.Printi("Installing package")
-		if err := pkg.Install(l, opt.v); err != nil {
-			utils.Printe(err.Error())
-			os.Exit(1)
+		if utils.StringInList(path.Base(p), inst) {
+			utils.Printi("Updating package")
+			if err := pkg.Update(l, opt.v); err != nil {
+				utils.Printe(err.Error())
+				os.Exit(1)
+			}
+		} else {
+			utils.Printi("Installing package")
+			if err := pkg.Install(l, opt.v); err != nil {
+				utils.Printe(err.Error())
+				os.Exit(1)
+			}
 		}
 
 		if _, err = os.Stat(path.Join(l, "post-install")); err == nil {

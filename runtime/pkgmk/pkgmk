@@ -895,7 +895,7 @@ main() {
 
 	# prt: Add build only option
 	if [ "$PKGMK_BUILD_ONLY" = "yes" ]; then
-		if [ "`build_needed`" = "yes" ]; then
+		if [ "`build_needed`" = "yes" ] || [ "$PKGMK_FORCE" = "yes" ]; then
 			build_package
 		fi
 		exit 0

@@ -20,6 +20,7 @@ complete -c prt -f -n '__fish_seen_subcommand_from info' -o r -l release -d 'pri
 complete -c prt -f -n '__fish_seen_subcommand_from info' -o h -l help -d 'print help and exit'
 
 complete -c prt -f -n '__fish_use_subcommand' -a install -d 'build and install packages'
+complete -c prt -f -n '__fish_seen_subcommand_from install' -a "(prt depends)"
 complete -c prt -f -n '__fish_seen_subcommand_from install' -o v -l verbose -d 'enable verbose output'
 complete -c prt -f -n '__fish_seen_subcommand_from install' -o h -l help -d 'print help and exit'
 
@@ -40,13 +41,16 @@ complete -c prt -f -n '__fish_seen_subcommand_from prov' -o i -l installed -d 's
 complete -c prt -f -n '__fish_seen_subcommand_from prov' -o h -l help -d 'print help and exit'
 
 complete -c prt -f -n '__fish_use_subcommand' -a pull -d 'pull in ports'
+complete -c prt -f -n '__fish_seen_subcommand_from pull' -a "(ls (cat /etc/prt/config.toml | string match -r 'portdir.*' | cut -d '=' -f 2 | string trim -c '\" '))"
 complete -c prt -f -n '__fish_seen_subcommand_from pull' -o h -l help -d 'print help and exit'
 
-complete -c prt -f -n '__fish_use_subcommand' -a sysup -d 'update outdated packages' -a "(prt diff)"
+complete -c prt -f -n '__fish_use_subcommand' -a sysup -d 'update outdated packages'
+complete -c prt -f -n '__fish_seen_subcommand_from sysup' -a "(prt loc (prt diff))"
 complete -c prt -f -n '__fish_seen_subcommand_from sysup' -o v -l verbose -d 'enable verbose output'
 complete -c prt -f -n '__fish_seen_subcommand_from sysup' -o h -l help -d 'print help and exit'
 
-complete -c prt -f -n '__fish_use_subcommand' -a uninstall -d 'uninstall packages' -a "(prt list -i)"
+complete -c prt -f -n '__fish_use_subcommand' -a uninstall -d 'uninstall packages'
+complete -c prt -f -n '__fish_seen_subcommand_from uninstall' -a "(prt list -i)"
 complete -c prt -f -n '__fish_seen_subcommand_from uninstall' -o h -l help -d 'print help and exit'
 
 complete -c prt -f -n '__fish_use_subcommand' -a help -d 'print help and exit'
