@@ -15,7 +15,7 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Depends lists dependencies recursivly.
+// Depends lists dependencies recursively.
 func Depends(args []string) {
 	// Load config.
 	var conf = config.Load()

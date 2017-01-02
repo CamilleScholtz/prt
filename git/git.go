@@ -46,7 +46,7 @@ func Clone(u, b, l string) error {
 
 // Diff checks a repo for differences.
 func Diff(b, l string) ([]string, error) {
-	cmd := exec.Command("git", "diff", "--name-status", "origin/"+b)
+	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter", "ACDMR", "origin/"+b)
 	cmd.Dir = l
 	bb := new(bytes.Buffer)
 	cmd.Stdout = bb

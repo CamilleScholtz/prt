@@ -1,4 +1,4 @@
-complete -c prt -f -n '__fish_use_subcommand' -a depends -d 'list dependencies recursivly'
+complete -c prt -f -n '__fish_use_subcommand' -a depends -d 'list dependencies recursively'
 complete -c prt -f -n '__fish_seen_subcommand_from depends' -o a -l all -d 'also list installed dependencies'
 complete -c prt -f -n '__fish_seen_subcommand_from depends' -o n -l no-alias -d 'disable aliasing'
 complete -c prt -f -n '__fish_seen_subcommand_from depends' -o t -l tree -d 'list using tree view'
@@ -41,7 +41,8 @@ complete -c prt -f -n '__fish_seen_subcommand_from prov' -o i -l installed -d 's
 complete -c prt -f -n '__fish_seen_subcommand_from prov' -o h -l help -d 'print help and exit'
 
 complete -c prt -f -n '__fish_use_subcommand' -a pull -d 'pull in ports'
-complete -c prt -f -n '__fish_seen_subcommand_from pull' -a "(ls (cat /etc/prt/config.toml | string match -r 'portdir.*' | cut -d '=' -f 2 | string trim -c '\" '))"
+complete -c prt -f -n '__fish_seen_subcommand_from pull' -a "(ls (cat /etc/prt/config.toml | string match -r 'portdir.*' | cut -d '=' -f 2 | string trim -c '\
+" '))"
 complete -c prt -f -n '__fish_seen_subcommand_from pull' -o h -l help -d 'print help and exit'
 
 complete -c prt -f -n '__fish_use_subcommand' -a sysup -d 'update outdated packages'

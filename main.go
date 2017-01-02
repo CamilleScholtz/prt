@@ -18,7 +18,7 @@ func main() {
 		fmt.Println("Usage: prt command [arguments]")
 		fmt.Println("")
 		fmt.Println("commands:")
-		fmt.Println("  depends                 list dependencies recursivly")
+		fmt.Println("  depends                 list dependencies recursively")
 		fmt.Println("  diff                    list outdated packages")
 		fmt.Println("  info                    print port information")
 		fmt.Println("  install                 build and install packages")
