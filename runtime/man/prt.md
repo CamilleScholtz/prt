@@ -1,6 +1,9 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/onodera-punpun/prt)](https://goreportcard.com/report/github.com/onodera-punpun/prt)
+# prt 8 "2017-01-02" prt "General Commands Manual"
+
+## NAME
 
 prt - CRUX port utility written in Go, aiming to replace prt-get, ports, and some pkgutils (on my machine)
+
 
 ## SYNOPSIS
 
@@ -44,7 +47,8 @@ This makes it possible to alias `foo/bar` to `baz/bar`.
 ## COMMANDS
 
 The prt syntax is inspired by `prt-get(8)`, `git(8)` and `go(8)`, and thus uses so called commands which always have to be the first
-non-option argument passed. The commands are:
+non-option argument passed. Each command is documented in its own manpage. For example, the install command is documented in
+`prt-install(8)`. The commands are:
 
 `depends`   list dependencies recursively,
 
@@ -69,13 +73,9 @@ non-option argument passed. The commands are:
 `help`      print help and exit
 
 
-## INSTALLATION
+## CONFIGURATION
 
-https://github.com/onodera-punpun/crux-ports/blob/master/prt/Pkgfile
-
-Make sure to check `/etc/prt/config.toml` after installation and edit values to fit your needs and setup.
-
-If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some handy completions.
+See man `prt.toml(5)`
 
 
 ## AUTHORS
@@ -88,8 +88,3 @@ Camille Scholtz
 `prt.toml(5)`, `prt-depends(8)`, `prt-diff(8)`, `prt-info(8)`, `prt-install(8)`, `prt-list(8)`,
 `prt-loc(8)`, `prt-prov(8)`, `prt-pull(8)`, `prt-sysup(8)`, `prt-uninstall(8)`, `prt-get(8)`,
 `pkgmk(8)`, `pkgrm(8)`, `pkgadd(8)`, `ports(8)`, `pkginfo(8)`, `prt-utils(1)`
-
-
-## NOTES
-
-Since this is my first Go project I'm probably making some mistakes, feedback is highly appreciated!

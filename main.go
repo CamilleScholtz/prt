@@ -21,7 +21,7 @@ func main() {
 		fmt.Println("  depends                 list dependencies recursively")
 		fmt.Println("  diff                    list outdated packages")
 		fmt.Println("  info                    print port information")
-		fmt.Println("  install                 build and install packages")
+		fmt.Println("  install                 build and install ports and their dependencies")
 		fmt.Println("  list                    list ports and packages")
 		fmt.Println("  loc                     print port locations")
 		//fmt.Println("  patch                   patch ports")
