@@ -126,6 +126,9 @@ func Install(args []string) {
 		}
 	}
 
+	// Actually run function.
+	recursive("./")
+
 	// Add current working dir to ports to install.
 	wd, err := os.Getwd()
 	if err != nil {
