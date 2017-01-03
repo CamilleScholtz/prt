@@ -43,7 +43,7 @@ func Install(args []string) {
 	for _, o := range opts {
 		switch o[0] {
 		case "-h", "--help":
-			fmt.Println("Usage: prt install [arguments]")
+			fmt.Println("Usage: prt install [arguments] [ports to skip]")
 			fmt.Println("")
 			fmt.Println("arguments:")
 			fmt.Println("  -v,   --verbose         enable verbose output")

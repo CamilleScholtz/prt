@@ -83,13 +83,6 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 Camille Scholtz
 
 
-## SEE ALSO
-
-`prt.toml(5)`, `prt-depends(8)`, `prt-diff(8)`, `prt-info(8)`, `prt-install(8)`, `prt-list(8)`,
-`prt-loc(8)`, `prt-prov(8)`, `prt-pull(8)`, `prt-sysup(8)`, `prt-uninstall(8)`, `prt-get(8)`,
-`pkgmk(8)`, `pkgrm(8)`, `pkgadd(8)`, `ports(8)`, `pkginfo(8)`, `prt-utils(1)`
-
-
 ## NOTES
 
 Since this is my first Go project I'm probably making some mistakes, feedback is highly appreciated!
