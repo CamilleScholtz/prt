@@ -30,7 +30,7 @@ CRUX pkgutils. It works with the local ports tree and is therefore fully compati
 
 like `prt-get(8)`, prt is basically a wrapper around `pkgmk(8)`/`pkgadd(8)` and provides some nice functionality such as
 listing and installing dependencies, getting the location of a port, aliasing ports (for example `core/openssl`
-to `6c37-dropin/libressl`) and ordering ports with the same name depending on how "important" the repo is the reside in.
+to `6c37-dropin/libressl`), and ordering ports with the same name depending on how "important" the repo is the port resides in.
 
 There are a few differences though, for example, unlike `prt-get(8)` you need to  be in the port's directory for most
 commands to work, like how `pkgmk(8)` works. This has a few advantages, for example you can quickly download a port

@@ -72,7 +72,7 @@ func Pull(args []string) {
 
 		// Check if location exists, clone if it doesn't.
 		if _, err := os.Stat(l); err != nil {
-			err := git.Clone(r.URL, r.Branch, l)
+			err := git.Clone(r.URL, r.Branch)
 			if err != nil {
 				utils.Printe(err.Error())
 			}

@@ -33,12 +33,11 @@ func Clean(l string) error {
 }
 
 // Clone clones a repo.
-func Clone(u, b, l string) error {
+func Clone(u, b string) error {
 	cmd := exec.Command("git", "clone", "--depth", "1", "-b", b, u)
-	cmd.Dir = l
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git clone %s: Something went wrong", l)
+		return fmt.Errorf("git clone %s: Something went wrong", u)
 	}
 
 	return nil
