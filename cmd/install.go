@@ -125,9 +125,10 @@ func Install(args []string) {
 			recursive(ports.FullLoc(l))
 		}
 	}
-
-	// Actually run function.
 	recursive("./")
+
+	// Reverse list
+	instMe = utils.ReverseList(instMe)
 
 	// Add current working dir to ports to install.
 	wd, err := os.Getwd()

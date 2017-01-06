@@ -151,6 +151,5 @@ func Depends(args []string) {
 			}
 		}
 	}
-
 	recursive("./")
 }

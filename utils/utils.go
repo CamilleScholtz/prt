@@ -27,6 +27,16 @@ func Printi(s string) {
 	fmt.Println(s)
 }
 
+// ReverseList reverses a list
+func ReverseList(l []string) []string {
+	var nl []string
+	for i := range l {
+		nl = append(nl, l[len(l)-1-i])
+	}
+
+	return nl
+}
+
 // StringInList checks if a string is in a list.
 func StringInList(s string, l []string) bool {
 	for _, ls := range l {
