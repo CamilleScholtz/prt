@@ -114,11 +114,6 @@ func Install(args []string) {
 				continue
 			}
 
-			// Core packages should always be installed.
-			if path.Dir(l) == "core" {
-				continue
-			}
-
 			instMe = append(instMe, l)
 
 			// Loop.

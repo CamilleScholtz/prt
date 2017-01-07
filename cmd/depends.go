@@ -117,14 +117,9 @@ func Depends(args []string) {
 				l = ports.Alias(l)
 			}
 
-			// Continue port is already installed.
-			if !opt.a {
+			// Continue if port is already installed.
+			if opt.a {
 				if utils.StringInList(path.Base(l), inst) {
-					continue
-				}
-
-				// Core packages should always be installed.
-				if path.Dir(l) == "core" {
 					continue
 				}
 			}
