@@ -118,7 +118,7 @@ func Depends(args []string) {
 			}
 
 			// Continue if port is already installed.
-			if opt.a {
+			if !opt.a {
 				if utils.StringInList(path.Base(l), inst) {
 					continue
 				}
