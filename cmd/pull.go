@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/git"
 	"github.com/onodera-punpun/prt/ports"
@@ -15,30 +15,24 @@ import (
 // Pull pulls in ports.
 func Pull(args []string) {
 	// Load config.
-	var conf = config.Load()
+	conf := config.Load()
 
-	// Define allowed opts.
-	shortopts := "h"
-	longopts := []string{
-		"--help",
-	}
+	// Define valid arguments.
+	argh := optparse.Bool("help", 'h', false)
 
-	// Read out opts.
-	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
+	// Parse arguments.
+	vals, err := optparse.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	for _, o := range opts {
-		switch o[0] {
-		case "-h", "--help":
-			fmt.Println("Usage: prt pull [arguments] [repos]")
-			fmt.Println("")
-			fmt.Println("arguments:")
-			fmt.Println("  -h,   --help            print help and exit")
-			os.Exit(0)
-		}
+	if *argh {
+		fmt.Println("Usage: prt pull [arguments] [repos]")
+		fmt.Println("")
+		fmt.Println("arguments:")
+		fmt.Println("  -h,   --help            print help and exit")
+		os.Exit(0)
 	}
 
 	// Count total repos that need to be pulled.

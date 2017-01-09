@@ -5,84 +5,48 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/chiyouhen/getopt"
+	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/pkgfile"
 )
 
 // Info prints port information.
 func Info(args []string) {
-	// Define allowed opts.
-	shortopts := "hdumeovr"
-	longopts := []string{
-		"--help",
-		"--description",
-		"--url",
-		"--maintainer",
-		"--depends",
-		"--optional",
-		"--version",
-		"--release",
+	// Enable all arguments if the user hasn't specified any.
+	var b bool
+	if len(args) == 0 {
+		b = true
 	}
 
-	// Read out opts.
-	opts, _, err := getopt.Getopt(args, shortopts, longopts)
+	// Define valid arguments.
+	argd := optparse.Bool("description", 'd', b)
+	argu := optparse.Bool("url", 'u', b)
+	argm := optparse.Bool("maintainer", 'm', b)
+	arge := optparse.Bool("depends", 'e', b)
+	argo := optparse.Bool("optional", 'o', b)
+	argv := optparse.Bool("version", 'v', b)
+	argr := optparse.Bool("release", 'r', b)
+	argh := optparse.Bool("help", 'h', false)
+
+	// Parse arguments.
+	_, err := optparse.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	type optStruct struct {
-		d bool
-		u bool
-		m bool
-		e bool
-		o bool
-		v bool
-		r bool
-	}
-
-	var opt optStruct
-	for _, o := range opts {
-		switch o[0] {
-		case "-h", "--help":
-			fmt.Println("Usage: prt info [arguments]")
-			fmt.Println("")
-			fmt.Println("arguments:")
-			fmt.Println("  -d,   --description     print description")
-			fmt.Println("  -u,   --url             print url")
-			fmt.Println("  -m,   --maintainer      print maintainer")
-			fmt.Println("  -e,   --depends         print dependencies")
-			fmt.Println("  -o,   --optional        print optional dependencies")
-			fmt.Println("  -v,   --version         print version")
-			fmt.Println("  -r,   --release         print release")
-			fmt.Println("  -h,   --help            print help and exit")
-			os.Exit(0)
-		case "-d", "--description":
-			opt.d = true
-		case "-u", "--url":
-			opt.u = true
-		case "-m", "--maintainer":
-			opt.m = true
-		case "-e", "--depends":
-			opt.e = true
-		case "-o", "--optional":
-			opt.o = true
-		case "-v", "--version":
-			opt.v = true
-		case "-r", "--release":
-			opt.r = true
-		}
-	}
-
-	// Enable all opts if the user hasn't specified any.
-	if len(opts) == 0 {
-		opt.d = true
-		opt.u = true
-		opt.m = true
-		opt.e = true
-		opt.o = true
-		opt.v = true
-		opt.r = true
+	if *argh {
+		fmt.Println("Usage: prt info [arguments]")
+		fmt.Println("")
+		fmt.Println("arguments:")
+		fmt.Println("  -d,   --description     print description")
+		fmt.Println("  -u,   --url             print url")
+		fmt.Println("  -m,   --maintainer      print maintainer")
+		fmt.Println("  -e,   --depends         print dependencies")
+		fmt.Println("  -o,   --optional        print optional dependencies")
+		fmt.Println("  -v,   --version         print version")
+		fmt.Println("  -r,   --release         print release")
+		fmt.Println("  -h,   --help            print help and exit")
+		os.Exit(0)
 	}
 
 	// Read out Pkgfile.
@@ -93,31 +57,31 @@ func Info(args []string) {
 	}
 
 	// Print info.
-	if opt.d {
+	if *argd {
 		s, _ := pkgfile.Comment(f, "Description")
 		fmt.Println("Description: " + s)
 	}
-	if opt.u {
+	if *argu {
 		s, _ := pkgfile.Comment(f, "URL")
 		fmt.Println("URL: " + s)
 	}
-	if opt.m {
+	if *argm {
 		s, _ := pkgfile.Comment(f, "Maintainer")
 		fmt.Println("Maintainer: " + s)
 	}
-	if opt.e {
+	if *arge {
 		s, _ := pkgfile.Comment(f, "Depends on")
 		fmt.Println("Depends on: " + s)
 	}
-	if opt.o {
+	if *argo {
 		s, _ := pkgfile.Comment(f, "Nice to have|Optional")
 		fmt.Println("Nice to have: " + s)
 	}
-	if opt.v {
+	if *argv {
 		s, _ := pkgfile.Var(f, "version")
 		fmt.Println("Version: " + s)
 	}
-	if opt.r {
+	if *argr {
 		s, _ := pkgfile.Var(f, "release")
 		fmt.Println("Release: " + s)
 	}

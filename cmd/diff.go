@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
@@ -16,44 +16,28 @@ import (
 // Diff lists outdated packages.
 func Diff(args []string) {
 	// Load config.
-	var conf = config.Load()
+	conf := config.Load()
 
-	// Define allowed opts.
-	shortopts := "hnv"
-	longopts := []string{
-		"--help",
-		"--no-alias",
-		"--version",
-	}
+	// Define valid arguments.
+	argn := optparse.Bool("no-alias", 'n', false)
+	argv := optparse.Bool("version", 'v', false)
+	argh := optparse.Bool("help", 'h', false)
 
-	// Read out opts.
-	opts, _, err := getopt.Getopt(args, shortopts, longopts)
+	// Parse arguments.
+	_, err := optparse.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	type optStruct struct {
-		n bool
-		v bool
-	}
-
-	var opt optStruct
-	for _, o := range opts {
-		switch o[0] {
-		case "-h", "--help":
-			fmt.Println("Usage: prt diff [arguments]")
-			fmt.Println("")
-			fmt.Println("arguments:")
-			fmt.Println("  -n,   --no-alias        disable aliasing")
-			fmt.Println("  -v,   --version         print with version info")
-			fmt.Println("  -h,   --help            print help and exit")
-			os.Exit(0)
-		case "-n", "--no-alias":
-			opt.n = true
-		case "-v", "--version":
-			opt.v = true
-		}
+	if *argh {
+		fmt.Println("Usage: prt diff [arguments]")
+		fmt.Println("")
+		fmt.Println("arguments:")
+		fmt.Println("  -n,   --no-alias        disable aliasing")
+		fmt.Println("  -v,   --version         print with version info")
+		fmt.Println("  -h,   --help            print help and exit")
+		os.Exit(0)
 	}
 
 	// Get all ports.
@@ -86,7 +70,7 @@ func Diff(args []string) {
 		l := ll[0]
 
 		// Alias if needed.
-		if opt.n {
+		if *argn {
 			l = ports.Alias(l)
 		}
 
@@ -114,7 +98,7 @@ func Diff(args []string) {
 		if availv != instv[i] {
 			fmt.Print(p)
 
-			if opt.v {
+			if *argv {
 				fmt.Print(" " + instv[i])
 
 				color.Set(conf.DarkColor)

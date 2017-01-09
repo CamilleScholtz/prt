@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkg"
 	"github.com/onodera-punpun/prt/pkgfile"
@@ -18,40 +18,26 @@ import (
 // Sysup updates outdated packages.
 func Sysup(args []string) {
 	// Load config.
-	var conf = config.Load()
+	conf := config.Load()
 
-	// Define allowed opts.
-	shortopts := "hsv"
-	longopts := []string{
-		"--help",
-		"--skip",
-		"--verbose",
-	}
+	// Define valid arguments.
+	argv := optparse.Bool("verbose", 'v', false)
+	argh := optparse.Bool("help", 'h', false)
 
-	// Read out opts.
-	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
+	// Parse arguments.
+	vals, err := optparse.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	type optStruct struct {
-		v bool
-	}
-
-	var opt optStruct
-	for _, o := range opts {
-		switch o[0] {
-		case "-h", "--help":
-			fmt.Println("Usage: prt sysup [arguments] [ports to skip]")
-			fmt.Println("")
-			fmt.Println("arguments:")
-			fmt.Println("  -v,   --verbose         enable verbose output")
-			fmt.Println("  -h,   --help            print help and exit")
-			os.Exit(0)
-		case "-v", "--verbose":
-			opt.v = true
-		}
+	if *argh {
+		fmt.Println("Usage: prt sysup [arguments] [ports to skip]")
+		fmt.Println("")
+		fmt.Println("arguments:")
+		fmt.Println("  -v,   --verbose         enable verbose output")
+		fmt.Println("  -h,   --help            print help and exit")
+		os.Exit(0)
 	}
 
 	// Get all ports.
@@ -136,39 +122,39 @@ func Sysup(args []string) {
 
 		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
 			utils.Printi("Running pre-install")
-			if err = pkg.PreInstall(l, opt.v); err != nil {
+			if err = pkg.PreInstall(l, *argv); err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
 		utils.Printi("Downloading sources")
-		if err := pkg.Download(l, opt.v); err != nil {
+		if err := pkg.Download(l, *argv); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Unpacking sources")
-		if err := pkg.Unpack(l, opt.v); err != nil {
+		if err := pkg.Unpack(l, *argv); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Building package")
-		if err := pkg.Build(l, false, opt.v); err != nil {
+		if err := pkg.Build(l, false, *argv); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		utils.Printi("Updating package")
-		if err := pkg.Update(l, opt.v); err != nil {
+		if err := pkg.Update(l, *argv); err != nil {
 			utils.Printe(err.Error())
 			continue
 		}
 
 		if _, err := os.Stat(path.Join(l, "post-install")); err == nil {
 			utils.Printi("Running post-install")
-			if err := pkg.PostInstall(l, opt.v); err != nil {
+			if err := pkg.PostInstall(l, *argv); err != nil {
 				utils.Printe(err.Error())
 				os.Exit(1)
 			}

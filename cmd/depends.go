@@ -7,8 +7,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
@@ -18,48 +18,30 @@ import (
 // Depends lists dependencies recursively.
 func Depends(args []string) {
 	// Load config.
-	var conf = config.Load()
+	conf := config.Load()
 
-	// Define allowed opts.
-	shortopts := "hant"
-	longopts := []string{
-		"--help",
-		"--no-alias",
-		"--tree",
-	}
+	// Define valid arguments.
+	arga := optparse.Bool("all", 'a', false)
+	argn := optparse.Bool("no-alias", 'n', false)
+	argt := optparse.Bool("tree", 't', false)
+	argh := optparse.Bool("help", 'h', false)
 
-	// Read out opts.
-	opts, _, err := getopt.Getopt(args, shortopts, longopts)
+	// Parse arguments.
+	_, err := optparse.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	type optStruct struct {
-		a bool
-		n bool
-		t bool
-	}
-
-	var opt optStruct
-	for _, o := range opts {
-		switch o[0] {
-		case "-h", "--help":
-			fmt.Println("Usage: prt depends [arguments]")
-			fmt.Println("")
-			fmt.Println("arguments:")
-			fmt.Println("  -a,   --all             also list installed dependencies")
-			fmt.Println("  -n,   --no-alias        disable aliasing")
-			fmt.Println("  -t,   --tree            list using tree view")
-			fmt.Println("  -h,   --help            print help and exit")
-			os.Exit(0)
-		case "-a", "--all":
-			opt.a = true
-		case "-n", "--no-alias":
-			opt.n = true
-		case "-t", "--tree":
-			opt.t = true
-		}
+	if *argh {
+		fmt.Println("Usage: prt depends [arguments]")
+		fmt.Println("")
+		fmt.Println("arguments:")
+		fmt.Println("  -a,   --all             also list installed dependencies")
+		fmt.Println("  -n,   --no-alias        disable aliasing")
+		fmt.Println("  -t,   --tree            list using tree view")
+		fmt.Println("  -h,   --help            print help and exit")
+		os.Exit(0)
 	}
 
 	// Get all ports.
@@ -71,7 +53,7 @@ func Depends(args []string) {
 
 	// Get installed ports.
 	var inst []string
-	if !opt.a {
+	if !*arga {
 		inst, err = ports.Inst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -113,19 +95,19 @@ func Depends(args []string) {
 			l := ll[0]
 
 			// Alias ports if needed.
-			if !opt.n {
+			if !*argn {
 				l = ports.Alias(l)
 			}
 
 			// Continue if port is already installed.
-			if !opt.a {
+			if !*arga {
 				if utils.StringInList(path.Base(l), inst) {
 					continue
 				}
 			}
 
 			// Print tree indentation.
-			if opt.t {
+			if *argt {
 				if i > 0 {
 					color.Set(conf.DarkColor)
 					fmt.Printf(strings.Repeat(conf.IndentChar, i))
@@ -141,7 +123,7 @@ func Depends(args []string) {
 			recursive(ports.FullLoc(l))
 
 			// If we end up here, remove one tree indentation level
-			if opt.t {
+			if *argt {
 				i--
 			}
 		}

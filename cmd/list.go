@@ -7,54 +7,35 @@ import (
 	"path"
 	"sort"
 
-	"github.com/chiyouhen/getopt"
+	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/pkgfile"
 	"github.com/onodera-punpun/prt/ports"
 )
 
 // List lists ports.
 func List(args []string) {
-	// Define allowed opts.
-	shortopts := "hirv"
-	longopts := []string{
-		"--help",
-		"--installed",
-		"--repo",
-		"--version",
-	}
+	// Define valid arguments.
+	argi := optparse.Bool("installed", 'i', false)
+	argr := optparse.Bool("repo", 'r', false)
+	argv := optparse.Bool("version", 'v', false)
+	argh := optparse.Bool("help", 'h', false)
 
-	// Read out opts.
-	opts, _, err := getopt.Getopt(args, shortopts, longopts)
+	// Parse arguments.
+	_, err := optparse.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	type optStruct struct {
-		i bool
-		r bool
-		v bool
-	}
-
-	var opt optStruct
-	for _, o := range opts {
-		switch o[0] {
-		case "-h", "--help":
-			fmt.Println("Usage: prt list [arguments]")
-			fmt.Println("")
-			fmt.Println("arguments:")
-			fmt.Println("  -i,   --installed       list installed ports only")
-			fmt.Println("  -r,   --repo            list with repo info")
-			fmt.Println("  -v,   --version         list with version info")
-			fmt.Println("  -h,   --help            print help and exit")
-			os.Exit(0)
-		case "-i", "--installed":
-			opt.i = true
-		case "-r", "--repo":
-			opt.r = true
-		case "-v", "--version":
-			opt.v = true
-		}
+	if *argh {
+		fmt.Println("Usage: prt list [arguments]")
+		fmt.Println("")
+		fmt.Println("arguments:")
+		fmt.Println("  -i,   --installed       list installed ports only")
+		fmt.Println("  -r,   --repo            list with repo info")
+		fmt.Println("  -v,   --version         list with version info")
+		fmt.Println("  -h,   --help            print help and exit")
+		os.Exit(0)
 	}
 
 	// Get all ports.
@@ -65,7 +46,7 @@ func List(args []string) {
 	}
 
 	var instv []string
-	if opt.i {
+	if *argi {
 		// Get installed ports.
 		inst, err := ports.Inst()
 		if err != nil {
@@ -74,7 +55,7 @@ func List(args []string) {
 		}
 
 		// Get installed port versions if needed.
-		if opt.v {
+		if *argv {
 			instv, err = ports.InstVers()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -83,7 +64,7 @@ func List(args []string) {
 		}
 
 		// Get port locations if needed.
-		if opt.r {
+		if *argr {
 			for i, p := range inst {
 				ll, err := ports.Loc(all, p)
 				if err != nil {
@@ -102,9 +83,9 @@ func List(args []string) {
 	}
 
 	for i, p := range all {
-		if opt.v {
+		if *argv {
 			var v string
-			if opt.i {
+			if *argi {
 				// Get installed version.
 				v = instv[i]
 			} else {
@@ -128,7 +109,7 @@ func List(args []string) {
 		}
 
 		// Remove repo if needed.
-		if !opt.r && !opt.i {
+		if !*argr && !*argi {
 			p = path.Base(p)
 		}
 

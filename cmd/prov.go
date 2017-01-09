@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chiyouhen/getopt"
 	"github.com/fatih/color"
+	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/config"
 	"github.com/onodera-punpun/prt/ports"
 )
@@ -17,39 +17,26 @@ import (
 // Prov searches ports for files.
 func Prov(args []string) {
 	// Load config.
-	var conf = config.Load()
+	conf := config.Load()
 
-	// Define allowed opts.
-	shortopts := "hi"
-	longopts := []string{
-		"--help",
-		"--installed",
-	}
+	// Define valid arguments.
+	argi := optparse.Bool("installed", 'i', false)
+	argh := optparse.Bool("help", 'h', false)
 
-	// Read out opts.
-	opts, vals, err := getopt.Getopt(args, shortopts, longopts)
+	// Parse arguments.
+	vals, err := optparse.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
-	type optStruct struct {
-		i bool
-	}
-
-	var opt optStruct
-	for _, o := range opts {
-		switch o[0] {
-		case "-h", "--help":
-			fmt.Println("Usage: prt print [arguments] [queries]")
-			fmt.Println("")
-			fmt.Println("arguments:")
-			fmt.Println("  -i,   --installed       search in installed ports only")
-			fmt.Println("  -h,   --help            print help and exit")
-			os.Exit(0)
-		case "-i", "--installed":
-			opt.i = true
-		}
+	if *argh {
+		fmt.Println("Usage: prt print [arguments] [queries]")
+		fmt.Println("")
+		fmt.Println("arguments:")
+		fmt.Println("  -i,   --installed       search in installed ports only")
+		fmt.Println("  -h,   --help            print help and exit")
+		os.Exit(0)
 	}
 
 	// This command needs a value.
@@ -66,7 +53,7 @@ func Prov(args []string) {
 		}
 
 		// TODO: Use Alias and Loc here to always display repo info?
-		if opt.i {
+		if *argi {
 			// Read out pkg db.
 			db, err := os.Open("/var/lib/pkg/db")
 			if err != nil {
