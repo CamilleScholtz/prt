@@ -44,8 +44,6 @@ func Pull(args []string) {
 	}
 
 	// TODO: Actually learn git and check if all these commands are needed.
-	// TODO: Sort this?
-	// also check if branch is needed for these commands.
 	var i int
 	for n, r := range conf.Pull {
 		// Skip repos if needed.

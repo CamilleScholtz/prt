@@ -161,10 +161,6 @@ func Install(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		if _, err := os.Stat(path.Join(l, "README")); err == nil {
-			utils.Printi("This port has a README")
-		}
-
 		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
 			utils.Printi("Running pre-install")
 			err = pkg.PreInstall(l, *argv)
