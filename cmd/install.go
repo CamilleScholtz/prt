@@ -22,11 +22,12 @@ func Install(args []string) {
 	conf := config.Load()
 
 	// Define valid arguments.
-	argv := optparse.Bool("verbose", 'v', false)
-	argh := optparse.Bool("help", 'h', false)
+	o := optparse.New()
+	argv := o.Bool("verbose", 'v', false)
+	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	vals, err := optparse.Parse(args)
+	vals, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -57,7 +58,6 @@ func Install(args []string) {
 
 	// Recursive loop that add dependencies to instMe.
 	var instMe []string
-	var c []string
 	var recursive func(l string)
 	recursive = func(l string) {
 		// Read out Pkgfile.
@@ -74,13 +74,6 @@ func Install(args []string) {
 		}
 
 		for _, p := range dl {
-			// Continue if already checked.
-			if utils.StringInList(p, c) {
-				continue
-			}
-			// Add to checked ports.
-			c = append(c, p)
-
 			// Get port location.
 			ll, err := ports.Loc(all, p)
 			if err != nil {

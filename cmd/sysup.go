@@ -21,11 +21,12 @@ func Sysup(args []string) {
 	conf := config.Load()
 
 	// Define valid arguments.
-	argv := optparse.Bool("verbose", 'v', false)
-	argh := optparse.Bool("help", 'h', false)
+	o := optparse.New()
+	argv := o.Bool("verbose", 'v', false)
+	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	vals, err := optparse.Parse(args)
+	vals, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)

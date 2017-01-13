@@ -19,12 +19,13 @@ func Diff(args []string) {
 	conf := config.Load()
 
 	// Define valid arguments.
-	argn := optparse.Bool("no-alias", 'n', false)
-	argv := optparse.Bool("version", 'v', false)
-	argh := optparse.Bool("help", 'h', false)
+	o := optparse.New()
+	argn := o.Bool("no-alias", 'n', false)
+	argv := o.Bool("version", 'v', false)
+	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	_, err := optparse.Parse(args)
+	_, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)

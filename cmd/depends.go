@@ -21,13 +21,14 @@ func Depends(args []string) {
 	conf := config.Load()
 
 	// Define valid arguments.
-	arga := optparse.Bool("all", 'a', false)
-	argn := optparse.Bool("no-alias", 'n', false)
-	argt := optparse.Bool("tree", 't', false)
-	argh := optparse.Bool("help", 'h', false)
+	o := optparse.New()
+	arga := o.Bool("all", 'a', false)
+	argn := o.Bool("no-alias", 'n', false)
+	argt := o.Bool("tree", 't', false)
+	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	_, err := optparse.Parse(args)
+	_, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)

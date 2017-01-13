@@ -15,16 +15,17 @@ import (
 
 // Loc prints port locations
 func Loc(args []string) {
-	// Define valid arguments.
-	argd := optparse.Bool("duplicate", 'd', false)
-	argn := optparse.Bool("no-alias", 'n', false)
-	argh := optparse.Bool("help", 'h', false)
-
 	// Load config.
 	conf := config.Load()
 
+	// Define valid arguments.
+	o := optparse.New()
+	argd := o.Bool("duplicate", 'd', false)
+	argn := o.Bool("no-alias", 'n', false)
+	argh := o.Bool("help", 'h', false)
+
 	// Parse arguments.
-	vals, err := optparse.Parse(args)
+	vals, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)

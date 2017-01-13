@@ -15,13 +15,14 @@ import (
 // List lists ports.
 func List(args []string) {
 	// Define valid arguments.
-	argi := optparse.Bool("installed", 'i', false)
-	argr := optparse.Bool("repo", 'r', false)
-	argv := optparse.Bool("version", 'v', false)
-	argh := optparse.Bool("help", 'h', false)
+	o := optparse.New()
+	argi := o.Bool("installed", 'i', false)
+	argr := o.Bool("repo", 'r', false)
+	argv := o.Bool("version", 'v', false)
+	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	_, err := optparse.Parse(args)
+	_, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)

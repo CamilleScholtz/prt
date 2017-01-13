@@ -20,11 +20,12 @@ func Prov(args []string) {
 	conf := config.Load()
 
 	// Define valid arguments.
-	argi := optparse.Bool("installed", 'i', false)
-	argh := optparse.Bool("help", 'h', false)
+	o := optparse.New()
+	argi := o.Bool("installed", 'i', false)
+	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	vals, err := optparse.Parse(args)
+	vals, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)

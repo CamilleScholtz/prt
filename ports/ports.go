@@ -13,11 +13,12 @@ import (
 )
 
 // Load config.
-var c = config.Load()
+// TODO: Maybe remove this?
+var conf = config.Load()
 
 // Alias aliases ports using the config values.
 func Alias(p string) string {
-	for _, a := range c.Alias {
+	for _, a := range conf.Alias {
 		if a[0] == p {
 			p = a[1]
 		}
@@ -29,7 +30,7 @@ func Alias(p string) string {
 // All lists all ports found in the PortDir.
 func All() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
-	dl, err := filepath.Glob(path.Join(c.PortDir, "/*/*/Pkgfile"))
+	dl, err := filepath.Glob(path.Join(conf.PortDir, "/*/*/Pkgfile"))
 	if err != nil {
 		return []string{}, err
 	}
@@ -45,12 +46,12 @@ func All() ([]string, error) {
 
 // BaseLoc removes the PortDir from a string.
 func BaseLoc(d string) string {
-	return strings.Replace(d, c.PortDir+"/", "", 1)
+	return strings.Replace(d, conf.PortDir+"/", "", 1)
 }
 
 // FullLoc adds the PortDir to a string.
 func FullLoc(d string) string {
-	return path.Join(c.PortDir, d)
+	return path.Join(conf.PortDir, d)
 }
 
 // Inst lists all installed ports.
@@ -121,7 +122,7 @@ func Loc(ports []string, n string) ([]string, error) {
 	// If there are multiple matches, sort using the config Order value.
 	if len(l) > 1 {
 		var i int
-		for _, r := range c.Order {
+		for _, r := range conf.Order {
 			nl := path.Join(r, path.Base(l[i]))
 			if utils.StringInList(nl, ports) {
 				l[i] = nl

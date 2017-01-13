@@ -18,17 +18,18 @@ func Info(args []string) {
 	}
 
 	// Define valid arguments.
-	argd := optparse.Bool("description", 'd', b)
-	argu := optparse.Bool("url", 'u', b)
-	argm := optparse.Bool("maintainer", 'm', b)
-	arge := optparse.Bool("depends", 'e', b)
-	argo := optparse.Bool("optional", 'o', b)
-	argv := optparse.Bool("version", 'v', b)
-	argr := optparse.Bool("release", 'r', b)
-	argh := optparse.Bool("help", 'h', false)
+	o := optparse.New()
+	argd := o.Bool("description", 'd', b)
+	argu := o.Bool("url", 'u', b)
+	argm := o.Bool("maintainer", 'm', b)
+	arge := o.Bool("depends", 'e', b)
+	argo := o.Bool("optional", 'o', b)
+	argv := o.Bool("version", 'v', b)
+	argr := o.Bool("release", 'r', b)
+	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	_, err := optparse.Parse(args)
+	_, err := o.Parse(args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
