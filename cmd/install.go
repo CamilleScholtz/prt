@@ -101,16 +101,13 @@ func Install(args []string) {
 				continue
 			}
 
-			instMe = append(instMe, l)
+			instMe = append([]string{l}, instMe...)
 
 			// Loop.
 			recursive(ports.FullLoc(l))
 		}
 	}
 	recursive("./")
-
-	// Reverse list
-	instMe = utils.ReverseList(instMe)
 
 	// Add current working dir to ports to install.
 	wd, err := os.Getwd()
