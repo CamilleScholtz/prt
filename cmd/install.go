@@ -57,7 +57,9 @@ func Install(args []string) {
 	}
 
 	// Recursive loop that adds dependencies to instMe.
-	var c, instMe []string
+	instMeMap := make(map[int][]string)
+	var c []string
+	var i int
 	var recursive func(l string)
 	recursive = func(l string) {
 		// Read out Pkgfile.
@@ -67,20 +69,13 @@ func Install(args []string) {
 			return
 		}
 
-		// Get dependencies.
+		// Get dependencies from Pkgfile.
 		dl, err := pkgfile.Depends(f, "Depends on")
 		if err != nil {
 			return
 		}
 
 		for _, p := range dl {
-			// Continue if already checked.
-			if utils.StringInList(p, c) {
-				continue
-			}
-			// Add to checked ports.
-			c = append(c, p)
-
 			// Get port location.
 			ll, err := ports.Loc(all, p)
 			if err != nil {
@@ -96,19 +91,69 @@ func Install(args []string) {
 				continue
 			}
 
-			// Continue port is already installed.
+			// Continue if port is already installed.
 			if utils.StringInList(path.Base(l), inst) {
 				continue
 			}
 
-			instMe = append([]string{l}, instMe...)
+			// Increment tree level.
+			if !utils.StringInList(p, c) {
+				i++
+			}
+
+			// Finally prepend port to instMeMap.
+			instMeMap[i] = append([]string{l}, instMeMap[i]...)
+
+			// Continue if the port has already been checked.
+			if utils.StringInList(p, c) {
+				// Swap maps.
+				var n int
+				for i := 0; i <= len(instMeMap); i++ {
+					if utils.StringInList(p, instMeMap[i]) {
+						n = i
+					}
+				}
+				t := instMeMap[n]
+				instMeMap[n] = instMeMap[i]
+				instMeMap[i] = t
+
+				continue
+			}
+
+			// Append port to checked ports.
+			c = append(c, p)
 
 			// Loop.
 			recursive(ports.FullLoc(l))
+
+			// If we end up here, decrement tree level.
+			i--
 		}
 	}
 	recursive("./")
-	fmt.Println(instMe)
+
+	// Convert InstMeMap to list
+	c = []string{}
+	var instMe []string
+	for i := len(instMeMap) - 1; i >= 0; i-- {
+		for _, p := range instMeMap[i] {
+			// Continue if the port has already been checked.
+			if utils.StringInList(p, c) {
+				continue
+			}
+
+			// Finally prepend port to instMe.
+			instMe = append(instMe, p)
+
+			// Append port to checked ports.
+			c = append(c, p)
+		}
+	}
+
+	for _, k := range instMe {
+		fmt.Println(k)
+	}
+	os.Exit(0)
 
 	// Add current working dir to ports to install.
 	wd, err := os.Getwd()

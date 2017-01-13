@@ -74,7 +74,7 @@ func Depends(args []string) {
 			return
 		}
 
-		// Get dependencies.
+		// Get dependencies from Pkgfile.
 		dl, err := pkgfile.Depends(f, "Depends on")
 		if err != nil {
 			return
@@ -102,11 +102,14 @@ func Depends(args []string) {
 
 			// Print tree indentation.
 			if *argt {
+				// Print tree indentation character for each tree level.
 				if i > 0 {
 					color.Set(conf.DarkColor)
 					fmt.Printf(strings.Repeat(conf.IndentChar, i))
 					color.Unset()
 				}
+
+				// Increment tree level.
 				if !utils.StringInList(p, c) {
 					i++
 				}
@@ -115,7 +118,7 @@ func Depends(args []string) {
 			// Finally print the port.
 			fmt.Print(l)
 
-			// Print "seen before" star if already checked.
+			// Print "seen before" star if the port has already been checked.
 			if utils.StringInList(p, c) {
 				color.Set(conf.DarkColor)
 				fmt.Println(" *")
@@ -125,13 +128,13 @@ func Depends(args []string) {
 			}
 			fmt.Println()
 
-			// Add to checked ports.
+			// Append port to checked ports.
 			c = append(c, p)
 
 			// Loop.
 			recursive(ports.FullLoc(l))
 
-			// If we end up here, remove one tree indentation level
+			// If we end up here, decrement tree level.
 			if *argt {
 				i--
 			}
