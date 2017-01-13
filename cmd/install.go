@@ -113,9 +113,7 @@ func Install(args []string) {
 						n = i
 					}
 				}
-				t := instMeMap[n]
-				instMeMap[n] = instMeMap[i]
-				instMeMap[i] = t
+				instMeMap[n] = append(instMeMap[n], instMeMap[i]...)
 
 				continue
 			}
@@ -149,11 +147,6 @@ func Install(args []string) {
 			c = append(c, p)
 		}
 	}
-
-	for _, k := range instMe {
-		fmt.Println(k)
-	}
-	os.Exit(0)
 
 	// Add current working dir to ports to install.
 	wd, err := os.Getwd()
