@@ -56,7 +56,7 @@ func Install(args []string) {
 		os.Exit(1)
 	}
 
-	// Recursive loop that add dependencies to instMe.
+	// Recursive loop that adds dependencies to instMe.
 	var c, instMe []string
 	var recursive func(l string)
 	recursive = func(l string) {
@@ -108,6 +108,7 @@ func Install(args []string) {
 		}
 	}
 	recursive("./")
+	fmt.Println(instMe)
 
 	// Add current working dir to ports to install.
 	wd, err := os.Getwd()

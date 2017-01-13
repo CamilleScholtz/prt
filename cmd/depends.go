@@ -81,13 +81,6 @@ func Depends(args []string) {
 		}
 
 		for _, p := range dl {
-			// Continue if already checked.
-			if utils.StringInList(p, c) {
-				continue
-			}
-			// Add to checked ports.
-			c = append(c, p)
-
 			// Get port location.
 			ll, err := ports.Loc(all, p)
 			if err != nil {
@@ -114,11 +107,26 @@ func Depends(args []string) {
 					fmt.Printf(strings.Repeat(conf.IndentChar, i))
 					color.Unset()
 				}
-				i++
+				if !utils.StringInList(p, c) {
+					i++
+				}
 			}
 
 			// Finally print the port.
-			fmt.Println(l)
+			fmt.Print(l)
+
+			// Print "seen before" star if already checked.
+			if utils.StringInList(p, c) {
+				color.Set(conf.DarkColor)
+				fmt.Println(" *")
+				color.Unset()
+
+				continue
+			}
+			fmt.Println()
+
+			// Add to checked ports.
+			c = append(c, p)
 
 			// Loop.
 			recursive(ports.FullLoc(l))
