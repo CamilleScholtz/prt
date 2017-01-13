@@ -57,7 +57,7 @@ func Install(args []string) {
 	}
 
 	// Recursive loop that add dependencies to instMe.
-	var instMe []string
+	var c, instMe []string
 	var recursive func(l string)
 	recursive = func(l string) {
 		// Read out Pkgfile.
@@ -74,6 +74,13 @@ func Install(args []string) {
 		}
 
 		for _, p := range dl {
+			// Continue if already checked.
+			if utils.StringInList(p, c) {
+				continue
+			}
+			// Add to checked ports.
+			c = append(c, p)
+
 			// Get port location.
 			ll, err := ports.Loc(all, p)
 			if err != nil {
