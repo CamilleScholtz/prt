@@ -27,6 +27,7 @@ func Uninstall(args []string) {
 		os.Exit(1)
 	}
 
+	// Print help.
 	if *argh {
 		fmt.Println("Usage: prt uninstall [arguments] [packages]")
 		fmt.Println("")

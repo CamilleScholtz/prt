@@ -32,6 +32,7 @@ func Sysup(args []string) {
 		os.Exit(1)
 	}
 
+	// Print help.
 	if *argh {
 		fmt.Println("Usage: prt sysup [arguments] [ports to skip]")
 		fmt.Println("")

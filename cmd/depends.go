@@ -34,6 +34,7 @@ func Depends(args []string) {
 		os.Exit(1)
 	}
 
+	// Print help.
 	if *argh {
 		fmt.Println("Usage: prt depends [arguments]")
 		fmt.Println("")
@@ -80,6 +81,7 @@ func Depends(args []string) {
 			return
 		}
 
+		// Get location and dependencies for each port in dependency list.
 		for _, p := range dl {
 			// Get port location.
 			ll, err := ports.Loc(all, p)

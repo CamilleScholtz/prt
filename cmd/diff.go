@@ -31,6 +31,7 @@ func Diff(args []string) {
 		os.Exit(1)
 	}
 
+	// Print help.
 	if *argh {
 		fmt.Println("Usage: prt diff [arguments]")
 		fmt.Println("")
@@ -82,7 +83,7 @@ func Diff(args []string) {
 			continue
 		}
 
-		// Get available version.
+		// Get available version and release from Pkgfile.
 		v, err := pkgfile.Var(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -93,12 +94,14 @@ func Diff(args []string) {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
+		// Combine version and release.
 		availv := v + "-" + r
 
 		// Print if installed and available version don't match.
 		if availv != instv[i] {
 			fmt.Print(p)
 
+			// Print version information if needed.
 			if *argv {
 				fmt.Print(" " + instv[i])
 

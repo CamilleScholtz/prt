@@ -33,6 +33,7 @@ func Install(args []string) {
 		os.Exit(1)
 	}
 
+	// Print help.
 	if *argh {
 		fmt.Println("Usage: prt install [arguments] [ports to skip]")
 		fmt.Println("")
@@ -75,6 +76,7 @@ func Install(args []string) {
 			return
 		}
 
+		// Get location and dependencies for each port in dependency list.
 		for _, p := range dl {
 			// Get port location.
 			ll, err := ports.Loc(all, p)
@@ -101,12 +103,31 @@ func Install(args []string) {
 				i++
 			}
 
-			// Finally prepend port to instMeMap.
+			// Prepend port to instMeMap.
 			instMeMap[i] = append([]string{l}, instMeMap[i]...)
 
 			// Continue if the port has already been checked.
 			if utils.StringInList(p, c) {
-				// Swap maps.
+				// We will also "merge maps" here, here is a quick ASCII illustration
+				// using the `prt depends -t` syntax of what this basically does:
+				//
+				// BEFORE:
+				// port1
+				// - port2
+				// - - port3
+				// port4
+				// - port2 *
+				//
+				// AFTER:
+				// port1
+				// - port2
+				// port4
+				// - port2
+				// - - port3
+				//
+				// We do this because without this "merge" port2 would be
+				// complaining about how port3 isn't installed, since we iterrate
+				// over the "list" from bottom to top.
 				var n int
 				for i := 0; i <= len(instMeMap); i++ {
 					if utils.StringInList(p, instMeMap[i]) {
@@ -130,7 +151,7 @@ func Install(args []string) {
 	}
 	recursive("./")
 
-	// Convert InstMeMap to list
+	// Convert InstMeMap to list (instMe).
 	c = []string{}
 	var instMe []string
 	for i := len(instMeMap) - 1; i >= 0; i-- {
@@ -140,7 +161,7 @@ func Install(args []string) {
 				continue
 			}
 
-			// Finally prepend port to instMe.
+			// Prepend port to instMe.
 			instMe = append(instMe, p)
 
 			// Append port to checked ports.
@@ -148,7 +169,7 @@ func Install(args []string) {
 		}
 	}
 
-	// Add current working dir to ports to install.
+	// Add current working dir to ports to instMe.
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -166,7 +187,7 @@ func Install(args []string) {
 			os.Exit(1)
 		}
 
-		// Get port name.
+		// Get port name from Pkgfile.
 		d, err := pkgfile.Var(f, "name")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -177,6 +198,7 @@ func Install(args []string) {
 		instMe = append(instMe, d)
 	}
 
+	// Actually install ports in this loop.
 	t := len(instMe)
 	for i, p := range instMe {
 		// Set location.

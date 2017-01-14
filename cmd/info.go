@@ -35,6 +35,7 @@ func Info(args []string) {
 		os.Exit(1)
 	}
 
+	// Print help.
 	if *argh {
 		fmt.Println("Usage: prt info [arguments]")
 		fmt.Println("")
@@ -57,7 +58,7 @@ func Info(args []string) {
 		os.Exit(1)
 	}
 
-	// Print info.
+	// Print info from Pkgfile..
 	if *argd {
 		s, _ := pkgfile.Comment(f, "Description")
 		fmt.Println("Description: " + s)
