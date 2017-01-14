@@ -154,14 +154,14 @@ func Install(args []string) {
 	// Convert InstMeMap to list (instMe).
 	c = []string{}
 	var instMe []string
-	for i := len(instMeMap) - 1; i >= 0; i-- {
+	for i := len(instMeMap); i >= 0; i-- {
 		for _, p := range instMeMap[i] {
 			// Continue if the port has already been checked.
 			if utils.StringInList(p, c) {
 				continue
 			}
 
-			// Prepend port to instMe.
+			// Append port to instMe.
 			instMe = append(instMe, p)
 
 			// Append port to checked ports.
