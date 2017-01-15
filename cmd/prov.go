@@ -33,7 +33,7 @@ func Prov(args []string) {
 
 	// Print help.
 	if *argh {
-		fmt.Println("Usage: prt print [arguments] [queries]")
+		fmt.Println("Usage: prt prov [arguments] [queries]")
 		fmt.Println("")
 		fmt.Println("arguments:")
 		fmt.Println("  -i,   --installed       search in installed ports only")
