@@ -45,14 +45,13 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 // Load loads the config.
 func Load() *Config {
 	var c Config
-	_, err := toml.DecodeFile("/etc/prt/config.toml", &c)
-	if err != nil {
+	if _, err := toml.DecodeFile("/etc/prt/config.toml", &c); err != nil {
 		fmt.Fprintln(os.Stderr, "config load /etc/prt/config.toml: "+err.Error())
 		os.Exit(1)
 	}
 
 	// Convert colors to something usable.
-	c.DarkColor, err = colorFix(c.DarkColor)
+	c.DarkColor, err := colorFix(c.DarkColor)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

@@ -30,42 +30,31 @@ func main() {
 		fmt.Println("  sysup                   update outdated packages")
 		fmt.Println("  uninstall               uninstall packages")
 		fmt.Println("  help                    print help and exit")
-		os.Exit(0)
 	case "depends":
 		cmd.Depends(os.Args[2:])
-		os.Exit(0)
 	case "diff":
 		cmd.Diff(os.Args[2:])
-		os.Exit(0)
 	case "info":
 		cmd.Info(os.Args[2:])
-		os.Exit(0)
 	case "install":
 		cmd.Install(os.Args[2:])
-		os.Exit(0)
 	case "list":
 		cmd.List(os.Args[2:])
-		os.Exit(0)
 	case "loc":
 		cmd.Loc(os.Args[2:])
-		os.Exit(0)
 		//	case "patch":
 		//		cmd.Patch(os.Args[2:])
-		//		os.Exit(0)
 	case "prov":
 		cmd.Prov(os.Args[2:])
-		os.Exit(0)
 	case "pull":
 		cmd.Pull(os.Args[2:])
-		os.Exit(0)
 	case "sysup":
 		cmd.Sysup(os.Args[2:])
-		os.Exit(0)
 	case "uninstall":
 		cmd.Uninstall(os.Args[2:])
-		os.Exit(0)
 	default:
 		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")
-		os.Exit(1)
 	}
+
+	os.Exit(0)
 }
