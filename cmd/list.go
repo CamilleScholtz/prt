@@ -99,7 +99,7 @@ func List(args []string) {
 				}
 
 				// Get available version from Pkgfile.
-				v, err = pkgfile.Var(f, "version")
+				v, err = pkgfile.Variable(f, "version")
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue

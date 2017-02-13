@@ -80,11 +80,11 @@ func Info(args []string) {
 		fmt.Println("Nice to have: " + s)
 	}
 	if *argv {
-		s, _ := pkgfile.Var(f, "version")
+		s, _ := pkgfile.Variable(f, "version")
 		fmt.Println("Version: " + s)
 	}
 	if *argr {
-		s, _ := pkgfile.Var(f, "release")
+		s, _ := pkgfile.Variable(f, "release")
 		fmt.Println("Release: " + s)
 	}
 }

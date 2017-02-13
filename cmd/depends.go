@@ -17,8 +17,8 @@ import (
 
 // Depends lists dependencies recursively.
 func Depends(args []string) {
-	// Load config.
-	conf := config.Load()
+	// Decode config.
+	conf := config.Decode()
 
 	// Define valid arguments.
 	o := optparse.New()
@@ -76,10 +76,11 @@ func Depends(args []string) {
 		}
 
 		// Get dependencies from Pkgfile.
-		dl, err := pkgfile.Depends(f, "Depends on")
+		d, err := pkgfile.Comment(f, "Depends on")
 		if err != nil {
 			return
 		}
+		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
 
 		// Get location and dependencies for each port in dependency list.
 		for _, p := range dl {
@@ -124,10 +125,11 @@ func Depends(args []string) {
 			if utils.StringInList(p, c) {
 				if *argt {
 					color.Set(conf.DarkColor)
-					fmt.Println(" *")
+					fmt.Print(" *")
 					color.Unset()
 				}
 
+				fmt.Println()
 				continue
 			}
 			fmt.Println()

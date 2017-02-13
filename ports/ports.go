@@ -12,9 +12,9 @@ import (
 	"github.com/onodera-punpun/prt/utils"
 )
 
-// Load config.
-// TODO: Maybe remove this?
-var conf = config.Load()
+// Decode config.
+// TODO: Remove this?
+var conf = config.Decode()
 
 // Alias aliases ports using the config values.
 func Alias(p string) string {

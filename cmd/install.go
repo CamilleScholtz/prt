@@ -18,8 +18,8 @@ import (
 
 // Install builds and installs packages.
 func Install(args []string) {
-	// Load config.
-	conf := config.Load()
+	// Decode config.
+	conf := config.Decode()
 
 	// Define valid arguments.
 	o := optparse.New()
@@ -71,10 +71,11 @@ func Install(args []string) {
 		}
 
 		// Get dependencies from Pkgfile.
-		dl, err := pkgfile.Depends(f, "Depends on")
+		d, err := pkgfile.Comment(f, "Depends on")
 		if err != nil {
 			return
 		}
+		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
 
 		// Get location and dependencies for each port in dependency list.
 		for _, p := range dl {
@@ -188,7 +189,7 @@ func Install(args []string) {
 		}
 
 		// Get port name from Pkgfile.
-		d, err := pkgfile.Var(f, "name")
+		d, err := pkgfile.Variable(f, "name")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

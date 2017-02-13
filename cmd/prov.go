@@ -16,8 +16,8 @@ import (
 
 // Prov searches ports for files.
 func Prov(args []string) {
-	// Load config.
-	conf := config.Load()
+	// Decode config.
+	conf := config.Decode()
 
 	// Define valid arguments.
 	o := optparse.New()

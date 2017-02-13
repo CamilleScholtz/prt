@@ -8,8 +8,8 @@ import (
 	"github.com/onodera-punpun/prt/config"
 )
 
-// Load config.
-var c = config.Load()
+// Decode config.
+var c = config.Decode()
 
 // Printe prints a string with an error character prefix.
 func Printe(s string) {

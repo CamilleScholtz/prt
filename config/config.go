@@ -30,7 +30,7 @@ type Pull struct {
 // colorFix converts a config color (0..15) to a color compatible color (30..97).
 func colorFix(i color.Attribute) (color.Attribute, error) {
 	if i > 15 {
-		return 0, fmt.Errorf("Could not convert '" + string(i) + "' to color!")
+		return 0, fmt.Errorf("config colorFix: Could not convert '" + string(i) + "' to color!")
 	}
 
 	if i <= 7 {
@@ -42,12 +42,13 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 	return i, nil
 }
 
-// Load loads the config.
-func Load() *Config {
+// Decode decodes the config.
+func Decode() *Config {
 	var c Config
 	_, err := toml.DecodeFile("/etc/prt/config.toml", &c)
+	// TODO: Once ports is fixed, make this return and err.
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "config load /etc/prt/config.toml: "+err.Error())
+		fmt.Fprintln(os.Stderr, "config decode /etc/prt/config.toml: "+err.Error())
 		os.Exit(1)
 	}
 

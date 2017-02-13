@@ -15,8 +15,8 @@ import (
 
 // Loc prints port locations
 func Loc(args []string) {
-	// Load config.
-	conf := config.Load()
+	// Decode config.
+	conf := config.Decode()
 
 	// Define valid arguments.
 	o := optparse.New()

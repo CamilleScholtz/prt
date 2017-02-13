@@ -17,8 +17,8 @@ import (
 
 // Sysup updates outdated packages.
 func Sysup(args []string) {
-	// Load config.
-	conf := config.Load()
+	// Decode config.
+	conf := config.Decode()
 
 	// Define valid arguments.
 	o := optparse.New()
@@ -89,12 +89,12 @@ func Sysup(args []string) {
 		}
 
 		// Get available version.
-		v, err := pkgfile.Var(f, "version")
+		v, err := pkgfile.Variable(f, "version")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		r, err := pkgfile.Var(f, "release")
+		r, err := pkgfile.Variable(f, "release")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
