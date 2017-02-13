@@ -122,9 +122,11 @@ func Depends(args []string) {
 
 			// Print "seen before" star if the port has already been checked.
 			if utils.StringInList(p, c) {
-				color.Set(conf.DarkColor)
-				fmt.Println(" *")
-				color.Unset()
+				if *argt {
+					color.Set(conf.DarkColor)
+					fmt.Println(" *")
+					color.Unset()
+				}
 
 				continue
 			}
