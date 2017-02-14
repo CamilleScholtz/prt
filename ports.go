@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// portAlias aliases ports using the config.g values.
+// portsAlias aliases ports using the config.g values.
 func portAlias(p string) string {
 	for _, a := range config.Alias {
 		if a[0] == p {
@@ -20,8 +20,8 @@ func portAlias(p string) string {
 	return p
 }
 
-// portAll lists all ports found in the PortDir.
-func portAll() ([]string, error) {
+// allPorts lists all ports found in the PortDir.
+func allPorts() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
 	dl, err := filepath.Glob(path.Join(config.PortDir, "/*/*/Pkgfile"))
 	if err != nil {
@@ -47,8 +47,8 @@ func portFullLoc(d string) string {
 	return path.Join(config.PortDir, d)
 }
 
-// portInst lists all installed ports.
-func portInst() ([]string, error) {
+// instPorts lists all installed ports.
+func instPorts() ([]string, error) {
 	// Read out pkg db.
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
@@ -72,8 +72,8 @@ func portInst() ([]string, error) {
 	return p, nil
 }
 
-// portInstVers list all installed versions, this should follow the same order as Inst().
-func portInstVers() ([]string, error) {
+// instVersPorts list all installed versions, this should follow the same order as Inst().
+func instVersPorts() ([]string, error) {
 	// Read out pkg db.
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {

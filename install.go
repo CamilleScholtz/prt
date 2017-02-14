@@ -35,14 +35,14 @@ func install(args []string) {
 	}
 
 	// Get all ports.
-	all, err := portAll()
+	all, err := allPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed ports.
-	inst, err := portInst()
+	inst, err := instPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -54,13 +54,22 @@ func install(args []string) {
 	var i int
 	var recursive func(l string)
 	recursive = func(l string) {
-		// Get dependencies from Pkgfile.
-		if err := initPkgfile(l, []string{"Depends"}); err != nil {
+		// Read out Pkgfile.
+		f, err := readPkgfile(path.Join(l, "Pkgfile"))
+		if err != nil {
+			printe(err.Error())
 			return
 		}
 
+		// Get dependencies from Pkgfile.
+		d, err := f.comment("Depends on")
+		if err != nil {
+			return
+		}
+		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
+
 		// Get location and dependencies for each port in dependency list.
-		for _, p := range pkgfile.Depends {
+		for _, p := range dl {
 			// Get port location.
 			ll, err := portLoc(all, p)
 			if err != nil {
@@ -163,40 +172,48 @@ func install(args []string) {
 	if strings.Contains(wd, config.PortDir) {
 		instMe = append(instMe, portBaseLoc(wd))
 	} else {
+		// Read out Pkgfile.
+		f, err := readPkgfile("./Pkgfile")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
 		// Get port name from Pkgfile.
-		if err := initPkgfile(".", []string{"Name"}); err != nil {
+		d, err := f.variable("name")
+		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
 		// Add name to ports to install.
-		instMe = append(instMe, pkgfile.Name)
+		instMe = append(instMe, d)
 	}
 
 	// Actually install ports in this loop.
 	t := len(instMe)
-	for i, p := range instMe {
+	for i, n := range instMe {
 		// Set location.
-		var l string
-		if strings.Contains(p, "/") {
-			l = portFullLoc(p)
+		var p pkg
+		if strings.Contains(n, "/") {
+			p.loc = portFullLoc(n)
 		} else {
-			l = wd
+			p.loc = wd
 		}
 
-		if stringInList(path.Base(p), inst) {
+		if stringInList(path.Base(n), inst) {
 			fmt.Printf("Updating package %d/%d, ", i+1, t)
 		} else {
 			fmt.Printf("Installing package %d/%d, ", i+1, t)
 		}
 		color.Set(config.LightColor)
-		fmt.Printf(p)
+		fmt.Printf(n)
 		color.Unset()
 		fmt.Println(".")
 
-		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
+		if _, err := os.Stat(path.Join(p.loc, "pre-install")); err == nil {
 			printi("Running pre-install")
-			err = pkgPreInstall(l, *argv)
+			err = p.pre(*argv)
 			if err != nil {
 				printe(err.Error())
 				os.Exit(1)
@@ -204,47 +221,47 @@ func install(args []string) {
 		}
 
 		printi("Downloading sources")
-		if err := pkgDownload(l, *argv); err != nil {
+		if err := p.download(*argv); err != nil {
 			printe(err.Error())
 			os.Exit(1)
 		}
 
 		printi("Unpacking sources")
-		if err := pkgUnpack(l, *argv); err != nil {
+		if err := p.unpack(*argv); err != nil {
 			printe(err.Error())
 			os.Exit(1)
 		}
 
 		printi("Building package")
-		if stringInList(path.Base(p), inst) {
-			if err := pkgBuild(l, true, *argv); err != nil {
+		if stringInList(path.Base(n), inst) {
+			if err := p.build(true, *argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		} else {
-			if err := pkgBuild(l, false, *argv); err != nil {
+			if err := p.build(false, *argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		if stringInList(path.Base(p), inst) {
+		if stringInList(path.Base(n), inst) {
 			printi("Updating package")
-			if err := pkgUpdate(l, *argv); err != nil {
+			if err := p.update(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		} else {
 			printi("Installing package")
-			if err := pkgInstall(l, *argv); err != nil {
+			if err := p.install(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		if _, err = os.Stat(path.Join(l, "post-install")); err == nil {
+		if _, err = os.Stat(path.Join(n, "post-install")); err == nil {
 			printi("Running post-install")
-			err = pkgPostInstall(l, *argv)
+			err = p.post(*argv)
 			if err != nil {
 				printe(err.Error())
 				os.Exit(1)

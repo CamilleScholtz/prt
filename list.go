@@ -38,7 +38,7 @@ func list(args []string) {
 	}
 
 	// Get all ports.
-	all, err := portAll()
+	all, err := allPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -47,7 +47,7 @@ func list(args []string) {
 	var instv []string
 	if *argi {
 		// Get installed ports.
-		inst, err := portInst()
+		inst, err := instPorts()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -55,7 +55,7 @@ func list(args []string) {
 
 		// Get installed port versions if needed.
 		if *argv {
-			instv, err = portInstVers()
+			instv, err = instVersPorts()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -88,12 +88,19 @@ func list(args []string) {
 				// Get installed version.
 				v = instv[i]
 			} else {
-				// Get available version from Pkgfile.
-				if err := initPkgfile(portFullLoc(p), []string{"version"}); err != nil {
+				// Read out Pkgfile.
+				f, err := readPkgfile(path.Join(portFullLoc(p), "Pkgfile"))
+				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
-				v = pkgfile.Version
+
+				// Get available version from Pkgfile.
+				v, err = f.variable("version")
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+					continue
+				}
 			}
 
 			// Merge port and version.

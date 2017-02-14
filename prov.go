@@ -93,7 +93,7 @@ func prov(args []string) {
 			db.Close()
 		} else {
 			// Get all ports.
-			all, err := portAll()
+			all, err := allPorts()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				continue

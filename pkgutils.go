@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+type pkg struct {
+	loc string
+}
+
 // trErr translates pkgmk error codes to error strings.
 func trErr(i int, f, p string) error {
 	switch i {
@@ -32,15 +36,15 @@ func trErr(i int, f, p string) error {
 	}
 }
 
-// pkgBuild builds a port.
-func pkgBuild(l string, f, v bool) error {
+// build builds a port.
+func (p pkg) build(f, v bool) error {
 	var cmd *exec.Cmd
 	if f {
 		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo", "-f")
 	} else {
 		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo")
 	}
-	cmd.Dir = l
+	cmd.Dir = p.loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -48,16 +52,16 @@ func pkgBuild(l string, f, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "build", portBaseLoc(l))
+		return trErr(i, "build", portBaseLoc(p.loc))
 	}
 
 	return nil
 }
 
-// pkgDownload downloads a port sources.
-func pkgDownload(l string, v bool) error {
+// download downloads a port sources.
+func (p pkg) download(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-do")
-	cmd.Dir = l
+	cmd.Dir = p.loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -65,16 +69,16 @@ func pkgDownload(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "download", portBaseLoc(l))
+		return trErr(i, "download", portBaseLoc(p.loc))
 	}
 
 	return nil
 }
 
-// pkgInstall installs a package.
-func pkgInstall(l string, v bool) error {
+// install installs a package.
+func (p pkg) install(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-io")
-	cmd.Dir = l
+	cmd.Dir = p.loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -82,59 +86,60 @@ func pkgInstall(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "install", portBaseLoc(l))
+		return trErr(i, "install", portBaseLoc(p.loc))
 	}
 
 	return nil
 }
 
-// pkgPostInstall runs a pre-install scripts.
-func pkgPostInstall(l string, v bool) error {
+// post runs a pre-install scripts.
+func (p pkg) post(v bool) error {
 	cmd := exec.Command("bash", "./post-install")
-	cmd.Dir = l
+	cmd.Dir = p.loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkg post-install %s: Something went wrong", portBaseLoc(l))
+		return fmt.Errorf("pkg post-install %s: Something went wrong", portBaseLoc(p.loc))
 	}
 
 	return nil
 }
 
-// pkgPreInstall runs a pre-install scripts.
-func pkgPreInstall(l string, v bool) error {
+// pre runs a pre-install scripts.
+func (p pkg) pre(v bool) error {
 	cmd := exec.Command("bash", "./pre-install")
-	cmd.Dir = l
+	cmd.Dir = p.loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkg pre-install %s: Something went wrong", portBaseLoc(l))
+		return fmt.Errorf("pkg pre-install %s: Something went wrong", portBaseLoc(p.loc))
 	}
 
 	return nil
 }
 
-// pkgUninstall uninstalls a package.
-func pkgUninstall(p string) error {
-	cmd := exec.Command("pkgrm", p)
+// uninstall uninstalls a package.
+// TODO
+func pkgUninstall(todo string) error {
+	cmd := exec.Command("pkgrm", todo)
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkg uninstall %s: Something went wrong", p)
+		return fmt.Errorf("pkg uninstall %s: Something went wrong", todo)
 	}
 
 	return nil
 }
 
-// pkgUnpack unpacks a port sources.
-func pkgUnpack(l string, v bool) error {
+// unpack unpacks a port sources.
+func (p pkg) unpack(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-eo")
-	cmd.Dir = l
+	cmd.Dir = p.loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -142,16 +147,16 @@ func pkgUnpack(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "unpack", portBaseLoc(l))
+		return trErr(i, "unpack", portBaseLoc(p.loc))
 	}
 
 	return nil
 }
 
-// pkgUpdate updates a package.
-func pkgUpdate(l string, v bool) error {
+// update updates a package.
+func (p pkg) update(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-uo")
-	cmd.Dir = l
+	cmd.Dir = p.loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -159,7 +164,7 @@ func pkgUpdate(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "update", portBaseLoc(l))
+		return trErr(i, "update", portBaseLoc(p.loc))
 	}
 
 	return nil

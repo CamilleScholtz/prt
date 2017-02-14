@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/go2c/optparse"
 )
@@ -50,31 +49,40 @@ func info(args []string) {
 		os.Exit(0)
 	}
 
-	if err := initPkgfile(".", []string{"Description", "URL", "Maintainer", "Depends", "Optional", "Version", "Release"}); err != nil {
+	// Read out Pkgfile.
+	f, err := readPkgfile("./Pkgfile")
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// Print info from Pkgfile.
+	// Print info from Pkgfile..
 	if *argd {
-		fmt.Println("Description: " + pkgfile.Description)
+		s, _ := f.comment("Description")
+		fmt.Println("Description: " + s)
 	}
 	if *argu {
-		fmt.Println("URL: " + pkgfile.URL)
+		s, _ := f.comment("URL")
+		fmt.Println("URL: " + s)
 	}
 	if *argm {
-		fmt.Println("Maintainer: " + pkgfile.Maintainer)
+		s, _ := f.comment("Maintainer")
+		fmt.Println("Maintainer: " + s)
 	}
 	if *arge {
-		fmt.Println("Depends on: " + strings.Join(pkgfile.Depends, ", "))
+		s, _ := f.comment("Depends on")
+		fmt.Println("Depends on: " + s)
 	}
 	if *argo {
-		fmt.Println("Nice to have: " + strings.Join(pkgfile.Optional, ", "))
+		s, _ := f.comment("Nice to have|Optional")
+		fmt.Println("Nice to have: " + s)
 	}
 	if *argv {
-		fmt.Println("Version: " + pkgfile.Version)
+		s, _ := f.variable("version")
+		fmt.Println("Version: " + s)
 	}
 	if *argr {
-		fmt.Println("Release: " + pkgfile.Release)
+		s, _ := f.variable("release")
+		fmt.Println("Release: " + s)
 	}
 }

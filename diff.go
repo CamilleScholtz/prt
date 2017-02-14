@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
@@ -35,21 +36,21 @@ func diff(args []string) {
 	}
 
 	// Get all ports.
-	all, err := portAll()
+	all, err := allPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed ports.
-	inst, err := portInst()
+	inst, err := instPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed port versions.
-	instv, err := portInstVers()
+	instv, err := instVersPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -68,13 +69,27 @@ func diff(args []string) {
 			l = portAlias(l)
 		}
 
-		// Get available version and release from Pkgfile.
-		if err := initPkgfile(portFullLoc(l), []string{"Version", "Release"}); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
+		// Read out Pkgfile.
+		f, err := readPkgfile(path.Join(portFullLoc(l), "Pkgfile"))
+		if err != nil {
+			printe(err.Error())
+			return
 		}
+
+		// Get available version and release from Pkgfile.
+		v, err := f.variable("version")
+		if err != nil {
+			printe(err.Error())
+			return
+		}
+		r, err := f.variable("release")
+		if err != nil {
+			printe(err.Error())
+			return
+		}
+
 		// Combine version and release.
-		availv := pkgfile.Version + "-" + pkgfile.Release
+		availv := v + "-" + r
 
 		// Print if installed and available version don't match.
 		if availv != instv[i] {

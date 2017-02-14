@@ -43,7 +43,7 @@ func loc(args []string) {
 	}
 
 	// Get all ports.
-	all, err := portAll()
+	all, err := allPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

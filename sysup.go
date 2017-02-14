@@ -34,21 +34,21 @@ func sysup(args []string) {
 	}
 
 	// Get all ports.
-	all, err := portAll()
+	all, err := allPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed ports.
-	inst, err := portInst()
+	inst, err := instPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed port versions.
-	instv, err := portInstVers()
+	instv, err := instVersPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -72,12 +72,25 @@ func sysup(args []string) {
 			continue
 		}
 
-		// Get available version.
-		if err := initPkgfile(portFullLoc(l), []string{"Version", "Release"}); err != nil {
+		// Read out Pkgfile.
+		f, err := readPkgfile(path.Join(portFullLoc(l), "Pkgfile"))
+		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		availv := pkgfile.Version + "-" + pkgfile.Release
+
+		// Get available version.
+		v, err := f.variable("version")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
+		r, err := f.variable("release")
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		}
+		availv := v + "-" + r
 
 		// Add to toInst if installed and available version don't match.
 		if availv != instv[i] {
@@ -86,51 +99,52 @@ func sysup(args []string) {
 	}
 
 	t := len(instMe)
-	for i, p := range instMe {
+	for i, n := range instMe {
 		// Set location.
-		l := portFullLoc(p)
+		var p pkg
+		p.loc = portFullLoc(n)
 
 		fmt.Printf("Updating package %d/%d, ", i+1, t)
 		color.Set(config.LightColor)
-		fmt.Printf(p)
+		fmt.Printf(n)
 		color.Unset()
 		fmt.Println(".")
 
-		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
+		if _, err := os.Stat(path.Join(n, "pre-install")); err == nil {
 			printi("Running pre-install")
-			if err = pkgPreInstall(l, *argv); err != nil {
+			if err = p.pre(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
 		printi("Downloading sources")
-		if err := pkgDownload(l, *argv); err != nil {
+		if err := p.download(*argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
 		printi("Unpacking sources")
-		if err := pkgUnpack(l, *argv); err != nil {
+		if err := p.unpack(*argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
 		printi("Building package")
-		if err := pkgBuild(l, false, *argv); err != nil {
+		if err := p.build(false, *argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
 		printi("Updating package")
-		if err := pkgUpdate(l, *argv); err != nil {
+		if err := p.update(*argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
-		if _, err := os.Stat(path.Join(l, "post-install")); err == nil {
+		if _, err := os.Stat(path.Join(n, "post-install")); err == nil {
 			printi("Running post-install")
-			if err := pkgPostInstall(l, *argv); err != nil {
+			if err := p.post(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}

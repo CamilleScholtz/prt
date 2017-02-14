@@ -39,7 +39,7 @@ func depends(args []string) {
 	}
 
 	// Get all ports.
-	all, err := portAll()
+	all, err := allPorts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -48,7 +48,7 @@ func depends(args []string) {
 	// Get installed ports.
 	var inst []string
 	if !*arga {
-		inst, err = portInst()
+		inst, err = instPorts()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -60,13 +60,22 @@ func depends(args []string) {
 	var i int
 	var recursive func(l string)
 	recursive = func(l string) {
-		// Get dependencies from Pkgfile.
-		if err := initPkgfile(l, []string{"Depends"}); err != nil {
+		// Read out Pkgfile.
+		f, err := readPkgfile(path.Join(l, "Pkgfile"))
+		if err != nil {
+			printe(err.Error())
 			return
 		}
 
+		// Get dependencies from Pkgfile.
+		d, err := f.comment("Depends on")
+		if err != nil {
+			return
+		}
+		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
+
 		// Get location and dependencies for each port in dependency list.
-		for _, p := range pkgfile.Depends {
+		for _, p := range dl {
 			// Get port location.
 			ll, err := portLoc(all, p)
 			if err != nil {
