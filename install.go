@@ -1,26 +1,17 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/pkg"
-	"github.com/onodera-punpun/prt/pkgfile"
-	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
-// Install builds and installs packages.
-func Install(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+// install builds and installs packages.
+func install(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argv := o.Bool("verbose", 'v', false)
@@ -44,14 +35,14 @@ func Install(args []string) {
 	}
 
 	// Get all ports.
-	all, err := ports.All()
+	all, err := portAll()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed ports.
-	inst, err := ports.Inst()
+	inst, err := portInst()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -63,44 +54,35 @@ func Install(args []string) {
 	var i int
 	var recursive func(l string)
 	recursive = func(l string) {
-		// Read out Pkgfile.
-		f, err := ioutil.ReadFile(path.Join(l, "Pkgfile"))
-		if err != nil {
-			utils.Printe(err.Error())
-			return
-		}
-
 		// Get dependencies from Pkgfile.
-		d, err := pkgfile.Comment(f, "Depends on")
-		if err != nil {
+		if err := initPkgfile(l, []string{"Depends"}); err != nil {
 			return
 		}
-		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
 
 		// Get location and dependencies for each port in dependency list.
-		for _, p := range dl {
+		for _, p := range pkgfile.Depends {
 			// Get port location.
-			ll, err := ports.Loc(all, p)
+			ll, err := portLoc(all, p)
 			if err != nil {
 				continue
 			}
 			l := ll[0]
 
 			// Alias ports.
-			l = ports.Alias(l)
+			l = portAlias(l)
 
 			// Don't add ports to instMe if in vals.
-			if utils.StringInList(l, vals) {
+			if stringInList(l, vals) {
 				continue
 			}
 
 			// Continue if port is already installed.
-			if utils.StringInList(path.Base(l), inst) {
+			if stringInList(path.Base(l), inst) {
 				continue
 			}
 
 			// Increment tree level.
-			if !utils.StringInList(p, c) {
+			if !stringInList(p, c) {
 				i++
 			}
 
@@ -108,7 +90,7 @@ func Install(args []string) {
 			instMeMap[i] = append([]string{l}, instMeMap[i]...)
 
 			// Continue if the port has already been checked.
-			if utils.StringInList(p, c) {
+			if stringInList(p, c) {
 				// We will also "merge maps" here, here is a quick ASCII illustration
 				// using the `prt depends -t` syntax of what this basically does:
 				//
@@ -131,7 +113,7 @@ func Install(args []string) {
 				// over the "list" from bottom to top.
 				var n int
 				for i := 0; i <= len(instMeMap); i++ {
-					if utils.StringInList(p, instMeMap[i]) {
+					if stringInList(p, instMeMap[i]) {
 						n = i
 					}
 				}
@@ -144,7 +126,7 @@ func Install(args []string) {
 			c = append(c, p)
 
 			// Loop.
-			recursive(ports.FullLoc(l))
+			recursive(portFullLoc(l))
 
 			// If we end up here, decrement tree level.
 			i--
@@ -158,7 +140,7 @@ func Install(args []string) {
 	for i := len(instMeMap); i >= 0; i-- {
 		for _, p := range instMeMap[i] {
 			// Continue if the port has already been checked.
-			if utils.StringInList(p, c) {
+			if stringInList(p, c) {
 				continue
 			}
 
@@ -178,25 +160,17 @@ func Install(args []string) {
 	}
 
 	// Strip of PortDir if needed.
-	if strings.Contains(wd, conf.PortDir) {
-		instMe = append(instMe, ports.BaseLoc(wd))
+	if strings.Contains(wd, config.PortDir) {
+		instMe = append(instMe, portBaseLoc(wd))
 	} else {
-		// Read out Pkgfile.
-		f, err := ioutil.ReadFile("./Pkgfile")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-
 		// Get port name from Pkgfile.
-		d, err := pkgfile.Variable(f, "name")
-		if err != nil {
+		if err := initPkgfile(".", []string{"Name"}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
 		// Add name to ports to install.
-		instMe = append(instMe, d)
+		instMe = append(instMe, pkgfile.Name)
 	}
 
 	// Actually install ports in this loop.
@@ -205,74 +179,74 @@ func Install(args []string) {
 		// Set location.
 		var l string
 		if strings.Contains(p, "/") {
-			l = ports.FullLoc(p)
+			l = portFullLoc(p)
 		} else {
 			l = wd
 		}
 
-		if utils.StringInList(path.Base(p), inst) {
+		if stringInList(path.Base(p), inst) {
 			fmt.Printf("Updating package %d/%d, ", i+1, t)
 		} else {
 			fmt.Printf("Installing package %d/%d, ", i+1, t)
 		}
-		color.Set(conf.LightColor)
+		color.Set(config.LightColor)
 		fmt.Printf(p)
 		color.Unset()
 		fmt.Println(".")
 
 		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
-			utils.Printi("Running pre-install")
-			err = pkg.PreInstall(l, *argv)
+			printi("Running pre-install")
+			err = pkgPreInstall(l, *argv)
 			if err != nil {
-				utils.Printe(err.Error())
+				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		utils.Printi("Downloading sources")
-		if err := pkg.Download(l, *argv); err != nil {
-			utils.Printe(err.Error())
+		printi("Downloading sources")
+		if err := pkgDownload(l, *argv); err != nil {
+			printe(err.Error())
 			os.Exit(1)
 		}
 
-		utils.Printi("Unpacking sources")
-		if err := pkg.Unpack(l, *argv); err != nil {
-			utils.Printe(err.Error())
+		printi("Unpacking sources")
+		if err := pkgUnpack(l, *argv); err != nil {
+			printe(err.Error())
 			os.Exit(1)
 		}
 
-		utils.Printi("Building package")
-		if utils.StringInList(path.Base(p), inst) {
-			if err := pkg.Build(l, true, *argv); err != nil {
-				utils.Printe(err.Error())
+		printi("Building package")
+		if stringInList(path.Base(p), inst) {
+			if err := pkgBuild(l, true, *argv); err != nil {
+				printe(err.Error())
 				os.Exit(1)
 			}
 		} else {
-			if err := pkg.Build(l, false, *argv); err != nil {
-				utils.Printe(err.Error())
+			if err := pkgBuild(l, false, *argv); err != nil {
+				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		if utils.StringInList(path.Base(p), inst) {
-			utils.Printi("Updating package")
-			if err := pkg.Update(l, *argv); err != nil {
-				utils.Printe(err.Error())
+		if stringInList(path.Base(p), inst) {
+			printi("Updating package")
+			if err := pkgUpdate(l, *argv); err != nil {
+				printe(err.Error())
 				os.Exit(1)
 			}
 		} else {
-			utils.Printi("Installing package")
-			if err := pkg.Install(l, *argv); err != nil {
-				utils.Printe(err.Error())
+			printi("Installing package")
+			if err := pkgInstall(l, *argv); err != nil {
+				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
 		if _, err = os.Stat(path.Join(l, "post-install")); err == nil {
-			utils.Printi("Running post-install")
-			err = pkg.PostInstall(l, *argv)
+			printi("Running post-install")
+			err = pkgPostInstall(l, *argv)
 			if err != nil {
-				utils.Printe(err.Error())
+				printe(err.Error())
 				os.Exit(1)
 			}
 		}

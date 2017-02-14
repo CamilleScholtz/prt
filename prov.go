@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"bufio"
@@ -10,15 +10,10 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/ports"
 )
 
-// Prov searches ports for files.
-func Prov(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+// prov searches ports for files.
+func prov(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
@@ -87,8 +82,8 @@ func Prov(args []string) {
 				}
 
 				// Print matched files.
-				color.Set(conf.DarkColor)
-				fmt.Print(conf.IndentChar)
+				color.Set(config.DarkColor)
+				fmt.Print(config.IndentChar)
 				color.Unset()
 				fmt.Println(l[1])
 
@@ -98,7 +93,7 @@ func Prov(args []string) {
 			db.Close()
 		} else {
 			// Get all ports.
-			all, err := ports.All()
+			all, err := portAll()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				continue
@@ -106,7 +101,7 @@ func Prov(args []string) {
 
 			for _, p := range all {
 				// Read out Pkgfile.
-				f, err := os.Open(path.Join(ports.FullLoc(p), ".footprint"))
+				f, err := os.Open(path.Join(portFullLoc(p), ".footprint"))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
@@ -128,8 +123,8 @@ func Prov(args []string) {
 
 				// Print matched files.
 				for _, l := range ll {
-					color.Set(conf.DarkColor)
-					fmt.Print(conf.IndentChar)
+					color.Set(config.DarkColor)
+					fmt.Print(config.IndentChar)
 					color.Unset()
 					fmt.Println(strings.Split(l, "\t")[2])
 				}

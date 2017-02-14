@@ -3,13 +3,17 @@ package main
 import (
 	"fmt"
 	"os"
-
-	"github.com/onodera-punpun/prt/cmd"
 )
 
 func main() {
 	if len(os.Args) == 1 {
 		fmt.Fprintln(os.Stderr, "Missing command, use help for a list of commands!")
+		os.Exit(1)
+	}
+
+	// Initialize the config.
+	if err := initConfig(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
@@ -31,27 +35,27 @@ func main() {
 		fmt.Println("  uninstall               uninstall packages")
 		fmt.Println("  help                    print help and exit")
 	case "depends":
-		cmd.Depends(os.Args[2:])
+		depends(os.Args[2:])
 	case "diff":
-		cmd.Diff(os.Args[2:])
+		diff(os.Args[2:])
 	case "info":
-		cmd.Info(os.Args[2:])
+		info(os.Args[2:])
 	case "install":
-		cmd.Install(os.Args[2:])
+		install(os.Args[2:])
 	case "list":
-		cmd.List(os.Args[2:])
+		list(os.Args[2:])
 	case "loc":
-		cmd.Loc(os.Args[2:])
+		loc(os.Args[2:])
 		//	case "patch":
-		//		cmd.Patch(os.Args[2:])
+		//		patch(os.Args[2:])
 	case "prov":
-		cmd.Prov(os.Args[2:])
+		prov(os.Args[2:])
 	case "pull":
-		cmd.Pull(os.Args[2:])
+		pull(os.Args[2:])
 	case "sysup":
-		cmd.Sysup(os.Args[2:])
+		sysup(os.Args[2:])
 	case "uninstall":
-		cmd.Uninstall(os.Args[2:])
+		uninstall(os.Args[2:])
 	default:
 		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")
 	}

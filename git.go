@@ -1,4 +1,4 @@
-package git
+package main
 
 import (
 	"bytes"
@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// Checkout checks out a repo.
-func Checkout(b, l string) error {
+// gitCheckout checks out a repo.
+func gitCheckout(b, l string) error {
 	cmd := exec.Command("git", "checkout", b)
 	cmd.Dir = l
 
@@ -20,8 +20,8 @@ func Checkout(b, l string) error {
 	return nil
 }
 
-// Clean cleans a repo.
-func Clean(l string) error {
+// gitClean cleans a repo.
+func gitClean(l string) error {
 	cmd := exec.Command("git", "clean", "-f")
 	cmd.Dir = l
 
@@ -32,8 +32,8 @@ func Clean(l string) error {
 	return nil
 }
 
-// Clone clones a repo.
-func Clone(u, b, l string) error {
+// gitClone clones a repo.
+func gitClone(u, b, l string) error {
 	cmd := exec.Command("git", "clone", "--depth", "1", "-b", b, u, l)
 
 	if err := cmd.Run(); err != nil {
@@ -43,8 +43,8 @@ func Clone(u, b, l string) error {
 	return nil
 }
 
-// Diff checks a repo for differences.
-func Diff(b, l string) ([]string, error) {
+// gitDiff checks a repo for differences.
+func gitDiff(b, l string) ([]string, error) {
 	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter", "ACDMR", "origin/"+b)
 	cmd.Dir = l
 	bb := new(bytes.Buffer)
@@ -71,8 +71,8 @@ func Diff(b, l string) ([]string, error) {
 	return dl[1:], nil
 }
 
-// Fetch fetches a repo.
-func Fetch(l string) error {
+// gitFetch fetches a repo.
+func gitFetch(l string) error {
 	cmd := exec.Command("git", "fetch", "--depth", "1")
 	cmd.Dir = l
 
@@ -83,8 +83,8 @@ func Fetch(l string) error {
 	return nil
 }
 
-// Reset resets a repo.
-func Reset(b, l string) error {
+// gitReset resets a repo.
+func gitReset(b, l string) error {
 	cmd := exec.Command("git", "reset", "--hard", "origin/"+b)
 	cmd.Dir = l
 

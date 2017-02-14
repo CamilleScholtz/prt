@@ -1,25 +1,17 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/pkgfile"
-	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
-// Depends lists dependencies recursively.
-func Depends(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+// depends lists dependencies recursively.
+func depends(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	arga := o.Bool("all", 'a', false)
@@ -47,7 +39,7 @@ func Depends(args []string) {
 	}
 
 	// Get all ports.
-	all, err := ports.All()
+	all, err := portAll()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -56,7 +48,7 @@ func Depends(args []string) {
 	// Get installed ports.
 	var inst []string
 	if !*arga {
-		inst, err = ports.Inst()
+		inst, err = portInst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -68,24 +60,15 @@ func Depends(args []string) {
 	var i int
 	var recursive func(l string)
 	recursive = func(l string) {
-		// Read out Pkgfile.
-		f, err := ioutil.ReadFile(path.Join(l, "Pkgfile"))
-		if err != nil {
-			utils.Printe(err.Error())
-			return
-		}
-
 		// Get dependencies from Pkgfile.
-		d, err := pkgfile.Comment(f, "Depends on")
-		if err != nil {
+		if err := initPkgfile(l, []string{"Depends"}); err != nil {
 			return
 		}
-		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
 
 		// Get location and dependencies for each port in dependency list.
-		for _, p := range dl {
+		for _, p := range pkgfile.Depends {
 			// Get port location.
-			ll, err := ports.Loc(all, p)
+			ll, err := portLoc(all, p)
 			if err != nil {
 				continue
 			}
@@ -93,12 +76,12 @@ func Depends(args []string) {
 
 			// Alias ports if needed.
 			if !*argn {
-				l = ports.Alias(l)
+				l = portAlias(l)
 			}
 
 			// Continue if port is already installed.
 			if !*arga {
-				if utils.StringInList(path.Base(l), inst) {
+				if stringInList(path.Base(l), inst) {
 					continue
 				}
 			}
@@ -107,13 +90,13 @@ func Depends(args []string) {
 			if *argt {
 				// Print tree indentation character for each tree level.
 				if i > 0 {
-					color.Set(conf.DarkColor)
-					fmt.Printf(strings.Repeat(conf.IndentChar, i))
+					color.Set(config.DarkColor)
+					fmt.Printf(strings.Repeat(config.IndentChar, i))
 					color.Unset()
 				}
 
 				// Increment tree level.
-				if !utils.StringInList(p, c) {
+				if !stringInList(p, c) {
 					i++
 				}
 			}
@@ -122,9 +105,9 @@ func Depends(args []string) {
 			fmt.Print(l)
 
 			// Print "seen before" star if the port has already been checked.
-			if utils.StringInList(p, c) {
+			if stringInList(p, c) {
 				if *argt {
-					color.Set(conf.DarkColor)
+					color.Set(config.DarkColor)
 					fmt.Print(" *")
 					color.Unset()
 				}
@@ -138,7 +121,7 @@ func Depends(args []string) {
 			c = append(c, p)
 
 			// Loop.
-			recursive(ports.FullLoc(l))
+			recursive(portFullLoc(l))
 
 			// If we end up here, decrement tree level.
 			if *argt {

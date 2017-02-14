@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -8,16 +8,10 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
-// Loc prints port locations
-func Loc(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+// loc prints port locations
+func loc(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argd := o.Bool("duplicate", 'd', false)
@@ -49,7 +43,7 @@ func Loc(args []string) {
 	}
 
 	// Get all ports.
-	all, err := ports.All()
+	all, err := portAll()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -59,14 +53,14 @@ func Loc(args []string) {
 	var i int
 	for _, p := range vals {
 		// Continue if already checked.
-		if utils.StringInList(p, c) {
+		if stringInList(p, c) {
 			continue
 		}
 		// Add to checked ports.
 		c = append(c, p)
 
 		// Get port location.
-		ll, err := ports.Loc(all, p)
+		ll, err := portLoc(all, p)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
@@ -79,7 +73,7 @@ func Loc(args []string) {
 		for _, l := range ll {
 			// Alias if needed.
 			if !*argn {
-				l = ports.Alias(l)
+				l = portAlias(l)
 			}
 
 			// Print duplicate indentation.
@@ -91,8 +85,8 @@ func Loc(args []string) {
 				op = path.Base(l)
 
 				if i > 0 {
-					color.Set(conf.DarkColor)
-					fmt.Printf(strings.Repeat(conf.IndentChar, i))
+					color.Set(config.DarkColor)
+					fmt.Printf(strings.Repeat(config.IndentChar, i))
 					color.Unset()
 				}
 				i++

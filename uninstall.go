@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -6,16 +6,10 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/pkg"
-	"github.com/onodera-punpun/prt/utils"
 )
 
-// Uninstall uninstalls packages.
-func Uninstall(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+// uninstall uninstalls packages.
+func uninstall(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argh := o.Bool("help", 'h', false)
@@ -45,13 +39,13 @@ func Uninstall(args []string) {
 	t := len(vals)
 	for i, p := range vals {
 		fmt.Printf("Uninstalling package %d/%d, ", i+1, t)
-		color.Set(conf.LightColor)
+		color.Set(config.LightColor)
 		fmt.Printf(p)
 		color.Unset()
 		fmt.Println(".")
 
-		if err := pkg.Uninstall(p); err != nil {
-			utils.Printe(err.Error())
+		if err := pkgUninstall(p); err != nil {
+			printe(err.Error())
 			continue
 		}
 	}

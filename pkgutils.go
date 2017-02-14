@@ -1,4 +1,4 @@
-package pkg
+package main
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-
-	"github.com/onodera-punpun/prt/ports"
 )
 
 // trErr translates pkgmk error codes to error strings.
@@ -34,8 +32,8 @@ func trErr(i int, f, p string) error {
 	}
 }
 
-// Build builds a port.
-func Build(l string, f, v bool) error {
+// pkgBuild builds a port.
+func pkgBuild(l string, f, v bool) error {
 	var cmd *exec.Cmd
 	if f {
 		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo", "-f")
@@ -50,14 +48,14 @@ func Build(l string, f, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "build", ports.BaseLoc(l))
+		return trErr(i, "build", portBaseLoc(l))
 	}
 
 	return nil
 }
 
-// Download downloads a port sources.
-func Download(l string, v bool) error {
+// pkgDownload downloads a port sources.
+func pkgDownload(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-do")
 	cmd.Dir = l
 	if v {
@@ -67,14 +65,14 @@ func Download(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "download", ports.BaseLoc(l))
+		return trErr(i, "download", portBaseLoc(l))
 	}
 
 	return nil
 }
 
-// Install installs a package.
-func Install(l string, v bool) error {
+// pkgInstall installs a package.
+func pkgInstall(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-io")
 	cmd.Dir = l
 	if v {
@@ -84,14 +82,14 @@ func Install(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "install", ports.BaseLoc(l))
+		return trErr(i, "install", portBaseLoc(l))
 	}
 
 	return nil
 }
 
-// PostInstall runs a pre-install scripts.
-func PostInstall(l string, v bool) error {
+// pkgPostInstall runs a pre-install scripts.
+func pkgPostInstall(l string, v bool) error {
 	cmd := exec.Command("bash", "./post-install")
 	cmd.Dir = l
 	if v {
@@ -100,14 +98,14 @@ func PostInstall(l string, v bool) error {
 	}
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkg post-install %s: Something went wrong", ports.BaseLoc(l))
+		return fmt.Errorf("pkg post-install %s: Something went wrong", portBaseLoc(l))
 	}
 
 	return nil
 }
 
-// PreInstall runs a pre-install scripts.
-func PreInstall(l string, v bool) error {
+// pkgPreInstall runs a pre-install scripts.
+func pkgPreInstall(l string, v bool) error {
 	cmd := exec.Command("bash", "./pre-install")
 	cmd.Dir = l
 	if v {
@@ -116,14 +114,14 @@ func PreInstall(l string, v bool) error {
 	}
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkg pre-install %s: Something went wrong", ports.BaseLoc(l))
+		return fmt.Errorf("pkg pre-install %s: Something went wrong", portBaseLoc(l))
 	}
 
 	return nil
 }
 
-// Uninstall uninstalls a package.
-func Uninstall(p string) error {
+// pkgUninstall uninstalls a package.
+func pkgUninstall(p string) error {
 	cmd := exec.Command("pkgrm", p)
 
 	if err := cmd.Run(); err != nil {
@@ -133,8 +131,8 @@ func Uninstall(p string) error {
 	return nil
 }
 
-// Unpack unpacks a port sources.
-func Unpack(l string, v bool) error {
+// pkgUnpack unpacks a port sources.
+func pkgUnpack(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-eo")
 	cmd.Dir = l
 	if v {
@@ -144,14 +142,14 @@ func Unpack(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "unpack", ports.BaseLoc(l))
+		return trErr(i, "unpack", portBaseLoc(l))
 	}
 
 	return nil
 }
 
-// Update updates a package.
-func Update(l string, v bool) error {
+// pkgUpdate updates a package.
+func pkgUpdate(l string, v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-uo")
 	cmd.Dir = l
 	if v {
@@ -161,7 +159,7 @@ func Update(l string, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "update", ports.BaseLoc(l))
+		return trErr(i, "update", portBaseLoc(l))
 	}
 
 	return nil

@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -6,17 +6,10 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/git"
-	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
-// Pull pulls in ports.
-func Pull(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+// pull pulls in ports.
+func pull(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argh := o.Bool("help", 'h', false)
@@ -40,67 +33,67 @@ func Pull(args []string) {
 	// Count total repos that need to be pulled.
 	var t int
 	if len(vals) == 0 {
-		t = len(conf.Pull)
+		t = len(config.Pull)
 	} else {
 		t = len(vals)
 	}
 
-	// TODO: Actually learn git and check if all these commands are needed.
+	// TODO: Actually learn gitand check if all these commands are needed.
 	var i int
-	for n, r := range conf.Pull {
+	for n, r := range config.Pull {
 		// Skip repos if needed.
 		if len(vals) != 0 {
-			if !utils.StringInList(n, vals) {
+			if !stringInList(n, vals) {
 				continue
 			}
 		}
 		i++
 
 		fmt.Printf("Pulling in repo %d/%d, ", i, t)
-		color.Set(conf.LightColor)
+		color.Set(config.LightColor)
 		fmt.Printf(n)
 		color.Unset()
 		fmt.Println(".")
 
-		l := ports.FullLoc(n)
+		l := portFullLoc(n)
 
 		// Check if location exists, clone if it doesn't.
 		if _, err := os.Stat(l); err != nil {
-			err := git.Clone(r.URL, r.Branch, l)
+			err := gitClone(r.URL, r.Branch, l)
 			if err != nil {
-				utils.Printe(err.Error())
+				printe(err.Error())
 			}
 			continue
 		}
 
-		if err := git.Checkout(r.Branch, l); err != nil {
-			utils.Printe(err.Error())
+		if err := gitCheckout(r.Branch, l); err != nil {
+			printe(err.Error())
 			continue
 		}
-		if err := git.Fetch(l); err != nil {
-			utils.Printe(err.Error())
+		if err := gitFetch(l); err != nil {
+			printe(err.Error())
 			continue
 		}
 
 		// Print changes.
-		dl, err := git.Diff(r.Branch, l)
+		dl, err := gitDiff(r.Branch, l)
 		if err != nil {
-			utils.Printe(err.Error())
+			printe(err.Error())
 			continue
 		}
 		for _, d := range dl {
-			color.Set(conf.DarkColor)
-			fmt.Print(conf.IndentChar)
+			color.Set(config.DarkColor)
+			fmt.Print(config.IndentChar)
 			color.Unset()
 			fmt.Println(d)
 		}
 
-		if err := git.Clean(l); err != nil {
-			utils.Printe(err.Error())
+		if err := gitClean(l); err != nil {
+			printe(err.Error())
 			continue
 		}
-		if err := git.Reset(r.Branch, l); err != nil {
-			utils.Printe(err.Error())
+		if err := gitReset(r.Branch, l); err != nil {
+			printe(err.Error())
 			continue
 		}
 	}

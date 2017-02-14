@@ -1,19 +1,16 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"sort"
 
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/pkgfile"
-	"github.com/onodera-punpun/prt/ports"
 )
 
-// List lists ports.
-func List(args []string) {
+// list lists ports.
+func list(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
@@ -41,7 +38,7 @@ func List(args []string) {
 	}
 
 	// Get all ports.
-	all, err := ports.All()
+	all, err := portAll()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -50,7 +47,7 @@ func List(args []string) {
 	var instv []string
 	if *argi {
 		// Get installed ports.
-		inst, err := ports.Inst()
+		inst, err := portInst()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -58,7 +55,7 @@ func List(args []string) {
 
 		// Get installed port versions if needed.
 		if *argv {
-			instv, err = ports.InstVers()
+			instv, err = portInstVers()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
@@ -68,7 +65,7 @@ func List(args []string) {
 		// Get port locations if needed.
 		if *argr {
 			for i, p := range inst {
-				ll, err := ports.Loc(all, p)
+				ll, err := portLoc(all, p)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
@@ -91,19 +88,12 @@ func List(args []string) {
 				// Get installed version.
 				v = instv[i]
 			} else {
-				// Read out Pkgfile.
-				f, err := ioutil.ReadFile(path.Join(ports.FullLoc(p), "Pkgfile"))
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-					continue
-				}
-
 				// Get available version from Pkgfile.
-				v, err = pkgfile.Variable(f, "version")
-				if err != nil {
+				if err := initPkgfile(portFullLoc(p), []string{"version"}); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
 				}
+				v = pkgfile.Version
 			}
 
 			// Merge port and version.

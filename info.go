@@ -1,16 +1,15 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/pkgfile"
 )
 
-// Info prints port information.
-func Info(args []string) {
+// info prints port information.
+func info(args []string) {
 	// Enable all arguments if the user hasn't specified any.
 	var b bool
 	if len(args) == 0 {
@@ -51,40 +50,31 @@ func Info(args []string) {
 		os.Exit(0)
 	}
 
-	// Read out Pkgfile.
-	f, err := ioutil.ReadFile("./Pkgfile")
-	if err != nil {
+	if err := initPkgfile(".", []string{"Description", "URL", "Maintainer", "Depends", "Optional", "Version", "Release"}); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// Print info from Pkgfile..
+	// Print info from Pkgfile.
 	if *argd {
-		s, _ := pkgfile.Comment(f, "Description")
-		fmt.Println("Description: " + s)
+		fmt.Println("Description: " + pkgfile.Description)
 	}
 	if *argu {
-		s, _ := pkgfile.Comment(f, "URL")
-		fmt.Println("URL: " + s)
+		fmt.Println("URL: " + pkgfile.URL)
 	}
 	if *argm {
-		s, _ := pkgfile.Comment(f, "Maintainer")
-		fmt.Println("Maintainer: " + s)
+		fmt.Println("Maintainer: " + pkgfile.Maintainer)
 	}
 	if *arge {
-		s, _ := pkgfile.Comment(f, "Depends on")
-		fmt.Println("Depends on: " + s)
+		fmt.Println("Depends on: " + strings.Join(pkgfile.Depends, ", "))
 	}
 	if *argo {
-		s, _ := pkgfile.Comment(f, "Nice to have|Optional")
-		fmt.Println("Nice to have: " + s)
+		fmt.Println("Nice to have: " + strings.Join(pkgfile.Optional, ", "))
 	}
 	if *argv {
-		s, _ := pkgfile.Variable(f, "version")
-		fmt.Println("Version: " + s)
+		fmt.Println("Version: " + pkgfile.Version)
 	}
 	if *argr {
-		s, _ := pkgfile.Variable(f, "release")
-		fmt.Println("Release: " + s)
+		fmt.Println("Release: " + pkgfile.Release)
 	}
 }

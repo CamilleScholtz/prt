@@ -1,15 +1,14 @@
-package config
+package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fatih/color"
 )
 
-// Config is a stuct with all config values.
-type Config struct {
+// config is a stuct with all config values.
+var config struct {
 	PortDir    string
 	Order      []string
 	Alias      [][]string
@@ -30,7 +29,7 @@ type Pull struct {
 // colorFix converts a config color (0..15) to a color compatible color (30..97).
 func colorFix(i color.Attribute) (color.Attribute, error) {
 	if i > 15 {
-		return 0, fmt.Errorf("config colorFix: Could not convert '" + string(i) + "' to color!")
+		return 0, fmt.Errorf("config: Could not convert '" + string(i) + "' to color!")
 	}
 
 	if i <= 7 {
@@ -42,32 +41,26 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 	return i, nil
 }
 
-// Decode decodes the config.
-func Decode() *Config {
-	var c Config
-	_, err := toml.DecodeFile("/etc/prt/config.toml", &c)
-	// TODO: Once ports is fixed, make this return and err.
+// initConfig initializes the config struct.
+func initConfig() error {
+	_, err := toml.DecodeFile("/etc/prt/config.toml", &config)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "config decode /etc/prt/config.toml: "+err.Error())
-		os.Exit(1)
+		return fmt.Errorf("config /etc/prt/config.toml: " + err.Error())
 	}
 
 	// Convert colors to something usable.
-	c.DarkColor, err = colorFix(c.DarkColor)
+	config.DarkColor, err = colorFix(config.DarkColor)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
-	c.ErrorColor, err = colorFix(c.ErrorColor)
+	config.ErrorColor, err = colorFix(config.ErrorColor)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
-	c.LightColor, err = colorFix(c.LightColor)
+	config.LightColor, err = colorFix(config.LightColor)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
-	return &c
+	return nil
 }

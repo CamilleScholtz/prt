@@ -1,23 +1,15 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/pkgfile"
-	"github.com/onodera-punpun/prt/ports"
 )
 
 // Diff lists outdated packages.
-func Diff(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+func diff(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argn := o.Bool("no-alias", 'n', false)
@@ -43,21 +35,21 @@ func Diff(args []string) {
 	}
 
 	// Get all ports.
-	all, err := ports.All()
+	all, err := portAll()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed ports.
-	inst, err := ports.Inst()
+	inst, err := portInst()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed port versions.
-	instv, err := ports.InstVers()
+	instv, err := portInstVers()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -65,7 +57,7 @@ func Diff(args []string) {
 
 	for i, p := range inst {
 		// Get port location.
-		ll, err := ports.Loc(all, p)
+		ll, err := portLoc(all, p)
 		if err != nil {
 			continue
 		}
@@ -73,29 +65,16 @@ func Diff(args []string) {
 
 		// Alias if needed.
 		if *argn {
-			l = ports.Alias(l)
-		}
-
-		// Read out Pkgfile.
-		f, err := ioutil.ReadFile(path.Join(ports.FullLoc(l), "Pkgfile"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
+			l = portAlias(l)
 		}
 
 		// Get available version and release from Pkgfile.
-		v, err := pkgfile.Variable(f, "version")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
-		}
-		r, err := pkgfile.Variable(f, "release")
-		if err != nil {
+		if err := initPkgfile(portFullLoc(l), []string{"Version", "Release"}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
 		// Combine version and release.
-		availv := v + "-" + r
+		availv := pkgfile.Version + "-" + pkgfile.Release
 
 		// Print if installed and available version don't match.
 		if availv != instv[i] {
@@ -105,7 +84,7 @@ func Diff(args []string) {
 			if *argv {
 				fmt.Print(" " + instv[i])
 
-				color.Set(conf.DarkColor)
+				color.Set(config.DarkColor)
 				fmt.Print(" -> ")
 				color.Unset()
 

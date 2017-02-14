@@ -1,4 +1,4 @@
-package ports
+package main
 
 import (
 	"bufio"
@@ -7,18 +7,11 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/utils"
 )
 
-// Decode config.
-// TODO: Remove this?
-var conf = config.Decode()
-
-// Alias aliases ports using the config values.
-func Alias(p string) string {
-	for _, a := range conf.Alias {
+// portAlias aliases ports using the config.g values.
+func portAlias(p string) string {
+	for _, a := range config.Alias {
 		if a[0] == p {
 			p = a[1]
 		}
@@ -27,10 +20,10 @@ func Alias(p string) string {
 	return p
 }
 
-// All lists all ports found in the PortDir.
-func All() ([]string, error) {
+// portAll lists all ports found in the PortDir.
+func portAll() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
-	dl, err := filepath.Glob(path.Join(conf.PortDir, "/*/*/Pkgfile"))
+	dl, err := filepath.Glob(path.Join(config.PortDir, "/*/*/Pkgfile"))
 	if err != nil {
 		return []string{}, err
 	}
@@ -38,24 +31,24 @@ func All() ([]string, error) {
 	// Remove PortDir from output.
 	var p []string
 	for _, d := range dl {
-		p = append(p, BaseLoc(path.Dir(d)))
+		p = append(p, portBaseLoc(path.Dir(d)))
 	}
 
 	return p, nil
 }
 
-// BaseLoc removes the PortDir from a string.
-func BaseLoc(d string) string {
-	return strings.Replace(d, conf.PortDir+"/", "", 1)
+// portBaseLoc removes the PortDir from a string.
+func portBaseLoc(d string) string {
+	return strings.Replace(d, config.PortDir+"/", "", 1)
 }
 
-// FullLoc adds the PortDir to a string.
-func FullLoc(d string) string {
-	return path.Join(conf.PortDir, d)
+// portFullLoc adds the PortDir to a string.
+func portFullLoc(d string) string {
+	return path.Join(config.PortDir, d)
 }
 
-// Inst lists all installed ports.
-func Inst() ([]string, error) {
+// portInst lists all installed ports.
+func portInst() ([]string, error) {
 	// Read out pkg db.
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
@@ -79,8 +72,8 @@ func Inst() ([]string, error) {
 	return p, nil
 }
 
-// InstVers list all installed versions, this should follow the same order as Inst().
-func InstVers() ([]string, error) {
+// portInstVers list all installed versions, this should follow the same order as Inst().
+func portInstVers() ([]string, error) {
 	// Read out pkg db.
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
@@ -106,8 +99,8 @@ func InstVers() ([]string, error) {
 	return v, nil
 }
 
-// Loc tries to get the location of a port.
-func Loc(ports []string, n string) ([]string, error) {
+// portLoc tries to get the location of a port.
+func portLoc(ports []string, n string) ([]string, error) {
 	var l []string
 	for _, p := range ports {
 		if path.Base(p) == n {
@@ -119,12 +112,12 @@ func Loc(ports []string, n string) ([]string, error) {
 		return []string{}, fmt.Errorf("loc %s: Could not find location", n)
 	}
 
-	// If there are multiple matches, sort using the config Order value.
+	// If there are multiple matches, sort using the config.g Order value.
 	if len(l) > 1 {
 		var i int
-		for _, r := range conf.Order {
+		for _, r := range config.Order {
 			nl := path.Join(r, path.Base(l[i]))
-			if utils.StringInList(nl, ports) {
+			if stringInList(nl, ports) {
 				l[i] = nl
 				i++
 			}

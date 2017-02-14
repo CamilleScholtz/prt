@@ -1,25 +1,16 @@
-package cmd
+package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/config"
-	"github.com/onodera-punpun/prt/pkg"
-	"github.com/onodera-punpun/prt/pkgfile"
-	"github.com/onodera-punpun/prt/ports"
-	"github.com/onodera-punpun/prt/utils"
 )
 
-// Sysup updates outdated packages.
-func Sysup(args []string) {
-	// Decode config.
-	conf := config.Decode()
-
+// sysup updates outdated packages.
+func sysup(args []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argv := o.Bool("verbose", 'v', false)
@@ -43,21 +34,21 @@ func Sysup(args []string) {
 	}
 
 	// Get all ports.
-	all, err := ports.All()
+	all, err := portAll()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed ports.
-	inst, err := ports.Inst()
+	inst, err := portInst()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	// Get installed port versions.
-	instv, err := ports.InstVers()
+	instv, err := portInstVers()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -67,39 +58,26 @@ func Sysup(args []string) {
 	var instMe []string
 	for i, p := range inst {
 		// Get port location.
-		ll, err := ports.Loc(all, p)
+		ll, err := portLoc(all, p)
 		if err != nil {
 			continue
 		}
 		l := ll[0]
 
 		// Alias.
-		l = ports.Alias(l)
+		l = portAlias(l)
 
 		// Don't add ports to instMe if in vals.
-		if utils.StringInList(l, vals) {
-			continue
-		}
-
-		// Read out Pkgfile.
-		f, err := ioutil.ReadFile(path.Join(ports.FullLoc(l), "Pkgfile"))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+		if stringInList(l, vals) {
 			continue
 		}
 
 		// Get available version.
-		v, err := pkgfile.Variable(f, "version")
-		if err != nil {
+		if err := initPkgfile(portFullLoc(l), []string{"Version", "Release"}); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
-		r, err := pkgfile.Variable(f, "release")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
-		}
-		availv := v + "-" + r
+		availv := pkgfile.Version + "-" + pkgfile.Release
 
 		// Add to toInst if installed and available version don't match.
 		if availv != instv[i] {
@@ -110,50 +88,50 @@ func Sysup(args []string) {
 	t := len(instMe)
 	for i, p := range instMe {
 		// Set location.
-		l := ports.FullLoc(p)
+		l := portFullLoc(p)
 
 		fmt.Printf("Updating package %d/%d, ", i+1, t)
-		color.Set(conf.LightColor)
+		color.Set(config.LightColor)
 		fmt.Printf(p)
 		color.Unset()
 		fmt.Println(".")
 
 		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
-			utils.Printi("Running pre-install")
-			if err = pkg.PreInstall(l, *argv); err != nil {
-				utils.Printe(err.Error())
+			printi("Running pre-install")
+			if err = pkgPreInstall(l, *argv); err != nil {
+				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		utils.Printi("Downloading sources")
-		if err := pkg.Download(l, *argv); err != nil {
-			utils.Printe(err.Error())
+		printi("Downloading sources")
+		if err := pkgDownload(l, *argv); err != nil {
+			printe(err.Error())
 			continue
 		}
 
-		utils.Printi("Unpacking sources")
-		if err := pkg.Unpack(l, *argv); err != nil {
-			utils.Printe(err.Error())
+		printi("Unpacking sources")
+		if err := pkgUnpack(l, *argv); err != nil {
+			printe(err.Error())
 			continue
 		}
 
-		utils.Printi("Building package")
-		if err := pkg.Build(l, false, *argv); err != nil {
-			utils.Printe(err.Error())
+		printi("Building package")
+		if err := pkgBuild(l, false, *argv); err != nil {
+			printe(err.Error())
 			continue
 		}
 
-		utils.Printi("Updating package")
-		if err := pkg.Update(l, *argv); err != nil {
-			utils.Printe(err.Error())
+		printi("Updating package")
+		if err := pkgUpdate(l, *argv); err != nil {
+			printe(err.Error())
 			continue
 		}
 
 		if _, err := os.Stat(path.Join(l, "post-install")); err == nil {
-			utils.Printi("Running post-install")
-			if err := pkg.PostInstall(l, *argv); err != nil {
-				utils.Printe(err.Error())
+			printi("Running post-install")
+			if err := pkgPostInstall(l, *argv); err != nil {
+				printe(err.Error())
 				os.Exit(1)
 			}
 		}
