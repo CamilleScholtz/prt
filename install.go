@@ -168,8 +168,8 @@ func install(args []string) {
 		os.Exit(1)
 	}
 
-	// Strip of PortDir if needed.
-	if strings.Contains(wd, config.PortDir) {
+	// Strip of PrtDir if needed.
+	if strings.Contains(wd, config.PrtDir) {
 		instMe = append(instMe, portBaseLoc(wd))
 	} else {
 		// Read out Pkgfile.
@@ -196,9 +196,9 @@ func install(args []string) {
 		// Set location.
 		var p pkg
 		if strings.Contains(n, "/") {
-			p.loc = portFullLoc(n)
+			p.Loc = portFullLoc(n)
 		} else {
-			p.loc = wd
+			p.Loc = wd
 		}
 
 		if stringInList(path.Base(n), inst) {
@@ -211,7 +211,7 @@ func install(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		if _, err := os.Stat(path.Join(p.loc, "pre-install")); err == nil {
+		if _, err := os.Stat(path.Join(p.Loc, "pre-install")); err == nil {
 			printi("Running pre-install")
 			err = p.pre(*argv)
 			if err != nil {
@@ -220,7 +220,6 @@ func install(args []string) {
 			}
 		}
 
-		printi("Downloading sources")
 		if err := p.download(*argv); err != nil {
 			printe(err.Error())
 			os.Exit(1)

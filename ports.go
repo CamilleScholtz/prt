@@ -20,15 +20,15 @@ func portAlias(p string) string {
 	return p
 }
 
-// allPorts lists all ports found in the PortDir.
+// allPorts lists all ports found in the PrtDir.
 func allPorts() ([]string, error) {
 	// TODO: Is there something more efficient than Glob?
-	dl, err := filepath.Glob(path.Join(config.PortDir, "/*/*/Pkgfile"))
+	dl, err := filepath.Glob(path.Join(config.PrtDir, "/*/*/Pkgfile"))
 	if err != nil {
 		return []string{}, err
 	}
 
-	// Remove PortDir from output.
+	// Remove PrtDir from output.
 	var p []string
 	for _, d := range dl {
 		p = append(p, portBaseLoc(path.Dir(d)))
@@ -37,14 +37,14 @@ func allPorts() ([]string, error) {
 	return p, nil
 }
 
-// portBaseLoc removes the PortDir from a string.
+// portBaseLoc removes the PrtDir from a string.
 func portBaseLoc(d string) string {
-	return strings.Replace(d, config.PortDir+"/", "", 1)
+	return strings.Replace(d, config.PrtDir+"/", "", 1)
 }
 
-// portFullLoc adds the PortDir to a string.
+// portFullLoc adds the PrtDir to a string.
 func portFullLoc(d string) string {
-	return path.Join(config.PortDir, d)
+	return path.Join(config.PrtDir, d)
 }
 
 // instPorts lists all installed ports.

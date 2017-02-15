@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strconv"
 	"strings"
 )
 
 type pkg struct {
-	loc string
+	Loc string
 }
 
 // trErr translates pkgmk error codes to error strings.
@@ -44,7 +45,7 @@ func (p pkg) build(f, v bool) error {
 	} else {
 		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo")
 	}
-	cmd.Dir = p.loc
+	cmd.Dir = p.Loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -52,7 +53,7 @@ func (p pkg) build(f, v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "build", portBaseLoc(p.loc))
+		return trErr(i, "build", portBaseLoc(p.Loc))
 	}
 
 	return nil
@@ -60,16 +61,34 @@ func (p pkg) build(f, v bool) error {
 
 // download downloads a port sources.
 func (p pkg) download(v bool) error {
-	cmd := exec.Command("/usr/share/prt/pkgmk", "-do")
-	cmd.Dir = p.loc
-	if v {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+	// Read out Pkgfile.
+	f, err := readPkgfile(path.Join(p.Loc, "Pkgfile"))
+	if err != nil {
+		return err
 	}
 
-	if err := cmd.Run(); err != nil {
-		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "download", portBaseLoc(p.loc))
+	// Get sources.
+	s, err := f.variableSource("source")
+	if err != nil {
+		return err
+	}
+	sl := strings.Fields(s)
+	fmt.Println(sl)
+
+	// Download sources.
+	for _, s := range sl {
+		cmd := exec.Command("curl", "-L", "-#", "--fail", "--ftp-pasv", "-O", "-C", "-", s)
+		cmd.Dir = config.SrcDir
+		if v {
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+		}
+
+		printi("Downloading " + s)
+
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("pkg download %s: Something went wrong", portBaseLoc(p.Loc))
+		}
 	}
 
 	return nil
@@ -78,7 +97,7 @@ func (p pkg) download(v bool) error {
 // install installs a package.
 func (p pkg) install(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-io")
-	cmd.Dir = p.loc
+	cmd.Dir = p.Loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -86,7 +105,7 @@ func (p pkg) install(v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "install", portBaseLoc(p.loc))
+		return trErr(i, "install", portBaseLoc(p.Loc))
 	}
 
 	return nil
@@ -95,14 +114,14 @@ func (p pkg) install(v bool) error {
 // post runs a pre-install scripts.
 func (p pkg) post(v bool) error {
 	cmd := exec.Command("bash", "./post-install")
-	cmd.Dir = p.loc
+	cmd.Dir = p.Loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkg post-install %s: Something went wrong", portBaseLoc(p.loc))
+		return fmt.Errorf("pkg post %s: Something went wrong", portBaseLoc(p.Loc))
 	}
 
 	return nil
@@ -111,14 +130,14 @@ func (p pkg) post(v bool) error {
 // pre runs a pre-install scripts.
 func (p pkg) pre(v bool) error {
 	cmd := exec.Command("bash", "./pre-install")
-	cmd.Dir = p.loc
+	cmd.Dir = p.Loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkg pre-install %s: Something went wrong", portBaseLoc(p.loc))
+		return fmt.Errorf("pkg pre %s: Something went wrong", portBaseLoc(p.Loc))
 	}
 
 	return nil
@@ -139,7 +158,7 @@ func pkgUninstall(todo string) error {
 // unpack unpacks a port sources.
 func (p pkg) unpack(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-eo")
-	cmd.Dir = p.loc
+	cmd.Dir = p.Loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -147,7 +166,7 @@ func (p pkg) unpack(v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "unpack", portBaseLoc(p.loc))
+		return trErr(i, "unpack", portBaseLoc(p.Loc))
 	}
 
 	return nil
@@ -156,7 +175,7 @@ func (p pkg) unpack(v bool) error {
 // update updates a package.
 func (p pkg) update(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-uo")
-	cmd.Dir = p.loc
+	cmd.Dir = p.Loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -164,7 +183,7 @@ func (p pkg) update(v bool) error {
 
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "update", portBaseLoc(p.loc))
+		return trErr(i, "update", portBaseLoc(p.Loc))
 	}
 
 	return nil

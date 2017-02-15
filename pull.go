@@ -55,28 +55,28 @@ func pull(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		l := portFullLoc(n)
+		g := git{r.Branch, portFullLoc(n), r.URL}
 
 		// Check if location exists, clone if it doesn't.
-		if _, err := os.Stat(l); err != nil {
-			err := gitClone(r.URL, r.Branch, l)
+		if _, err := os.Stat(portFullLoc(n)); err != nil {
+			err := g.clone()
 			if err != nil {
 				printe(err.Error())
 			}
 			continue
 		}
 
-		if err := gitCheckout(r.Branch, l); err != nil {
+		if err := g.checkout(); err != nil {
 			printe(err.Error())
 			continue
 		}
-		if err := gitFetch(l); err != nil {
+		if err := g.fetch(); err != nil {
 			printe(err.Error())
 			continue
 		}
 
 		// Print changes.
-		dl, err := gitDiff(r.Branch, l)
+		dl, err := g.diff()
 		if err != nil {
 			printe(err.Error())
 			continue
@@ -88,11 +88,11 @@ func pull(args []string) {
 			fmt.Println(d)
 		}
 
-		if err := gitClean(l); err != nil {
+		if err := g.clean(); err != nil {
 			printe(err.Error())
 			continue
 		}
-		if err := gitReset(r.Branch, l); err != nil {
+		if err := g.reset(); err != nil {
 			printe(err.Error())
 			continue
 		}

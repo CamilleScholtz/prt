@@ -9,7 +9,10 @@ import (
 
 // config is a stuct with all config values.
 var config struct {
-	PortDir    string
+	PrtDir     string
+	PkgDir     string
+	SrcDir     string
+	WrkDir     string
 	Order      []string
 	Alias      [][]string
 	IndentChar string

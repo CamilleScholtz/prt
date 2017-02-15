@@ -1,5 +1,8 @@
-# Location of the ports tree.
-portdir = "/usr/ports"
+# Location of the ports tree and pkgutil directories.
+prtdir = "/usr/src/prt"
+pkgdir = "/usr/src/pkg/pkg"
+srcdir = "/usr/src/pkg/src"
+wrkdir = "/usr/src/pkg/wrk"
 
 # Repo order, the port found first is used.
 order = [

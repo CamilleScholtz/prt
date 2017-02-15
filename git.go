@@ -8,50 +8,56 @@ import (
 	"strings"
 )
 
-// gitCheckout checks out a repo.
-func gitCheckout(b, l string) error {
-	cmd := exec.Command("git", "checkout", b)
-	cmd.Dir = l
+type git struct {
+	Branch string
+	Loc    string
+	URL    string
+}
+
+// checkout checks out a repo.
+func (g git) checkout() error {
+	cmd := exec.Command("git", "checkout", g.Branch)
+	cmd.Dir = g.Loc
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git checkout %s: Something went wrong", l)
+		return fmt.Errorf("git checkout %s: Something went wrong", g.Loc)
 	}
 
 	return nil
 }
 
-// gitClean cleans a repo.
-func gitClean(l string) error {
+// clean cleans a repo.
+func (g git) clean() error {
 	cmd := exec.Command("git", "clean", "-f")
-	cmd.Dir = l
+	cmd.Dir = g.Loc
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git clean %s: Something went wrong", l)
+		return fmt.Errorf("git clean %s: Something went wrong", g.Loc)
 	}
 
 	return nil
 }
 
-// gitClone clones a repo.
-func gitClone(u, b, l string) error {
-	cmd := exec.Command("git", "clone", "--depth", "1", "-b", b, u, l)
+// clone clones a repo.
+func (g git) clone() error {
+	cmd := exec.Command("git", "clone", "--depth", "1", "-b", g.Branch, g.URL, g.Loc)
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git clone %s: Something went wrong", u)
+		return fmt.Errorf("git clone %s: Something went wrong", g.URL)
 	}
 
 	return nil
 }
 
-// gitDiff checks a repo for differences.
-func gitDiff(b, l string) ([]string, error) {
-	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter", "ACDMR", "origin/"+b)
-	cmd.Dir = l
+// diff checks a repo for differences.
+func (g git) diff() ([]string, error) {
+	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter", "ACDMR", "origin/"+g.Branch)
+	cmd.Dir = g.Loc
 	bb := new(bytes.Buffer)
 	cmd.Stdout = bb
 
 	if err := cmd.Run(); err != nil {
-		return []string{}, fmt.Errorf("git diff %s: Something went wrong", l)
+		return []string{}, fmt.Errorf("git diff %s: Something went wrong", g.Loc)
 	}
 
 	d := bb.String()
@@ -71,25 +77,25 @@ func gitDiff(b, l string) ([]string, error) {
 	return dl[1:], nil
 }
 
-// gitFetch fetches a repo.
-func gitFetch(l string) error {
+// fetch fetches a repo.
+func (g git) fetch() error {
 	cmd := exec.Command("git", "fetch", "--depth", "1")
-	cmd.Dir = l
+	cmd.Dir = g.Loc
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git fetch %s: Something went wrong", l)
+		return fmt.Errorf("git fetch %s: Something went wrong", g.Loc)
 	}
 
 	return nil
 }
 
-// gitReset resets a repo.
-func gitReset(b, l string) error {
-	cmd := exec.Command("git", "reset", "--hard", "origin/"+b)
-	cmd.Dir = l
+// reset resets a repo.
+func (g git) reset() error {
+	cmd := exec.Command("git", "reset", "--hard", "origin/"+g.Branch)
+	cmd.Dir = g.Loc
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git reset %s: Something went wrong", l)
+		return fmt.Errorf("git reset %s: Something went wrong", g.Loc)
 	}
 
 	return nil

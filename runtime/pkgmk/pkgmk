@@ -1,10 +1,10 @@
 #!/bin/bash
 #
 #  pkgutils
-# 
+#
 #  Copyright (c) 2000-2005 Per Liden
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-# 
+#
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +17,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 #  USA.
 #
 
@@ -119,7 +119,7 @@ download_file() {
 
 	LOCAL_FILENAME=`get_filename $1`
 	LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
-	
+
 	case ${PKGMK_DOWNLOAD_PROG} in
 		curl)
 			RESUME_CMD="-C -"
@@ -164,12 +164,12 @@ download_file() {
 			fi
 		done
 	fi
-	
+
 	if [ $error != 0 -o ! -f "$LOCAL_FILENAME_PARTIAL" ]; then
 		error "Downloading '$1' failed."
 		exit $E_DOWNLOAD
 	fi
-	
+
 	mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
 }
 
@@ -196,7 +196,7 @@ download_source() {
 
 unpack_source() {
 	local FILE LOCAL_FILENAME COMMAND
-	
+
 	for FILE in ${source[@]}; do
 		LOCAL_FILENAME=`get_filename $FILE`
 		case $LOCAL_FILENAME in
@@ -222,12 +222,12 @@ unpack_source() {
 
 make_md5sum() {
 	local FILE LOCAL_FILENAMES
-	
+
 	if [ "$source" ]; then
 		for FILE in ${source[@]}; do
 			LOCAL_FILENAMES="$LOCAL_FILENAMES `get_filename $FILE`"
 		done
-		
+
 		md5sum $LOCAL_FILENAMES | sed -e 's|  .*/|  |' | sort -k 2
 	fi
 }
@@ -276,7 +276,7 @@ check_md5sum() {
 			info "Md5sum not found."
 			exit $E_MD5
 		fi
-		
+
 		warning "Md5sum not found, creating new."
 		make_md5sum > $PKGMK_MD5SUM
 	fi
@@ -418,9 +418,9 @@ refresh_signature() {
 
 strip_files() {
 	local FILE FILTER
-	
+
 	cd $PKG
-	
+
 	if [ -f $PKGMK_ROOT/$PKGMK_NOSTRIP ]; then
 		FILTER="grep -v -f $PKGMK_ROOT/$PKGMK_NOSTRIP"
 	else
@@ -445,13 +445,13 @@ compress_manpages() {
 	local FILE DIR TARGET
 
 	cd $PKG
-	
+
 	find . -type f -path "*/man/man*/*" | while read FILE; do
 		if [ "$FILE" = "${FILE%%.gz}" ]; then
 			gzip -9 "$FILE"
 		fi
 	done
-	
+
 	find . -type l -path "*/man/man*/*" | while read FILE; do
 		TARGET=`readlink -n "$FILE"`
 		TARGET="${TARGET##*/}"
@@ -468,9 +468,9 @@ compress_manpages() {
 
 check_footprint() {
 	local FILE="$PKGMK_WORK_DIR/.tmp"
-	
+
 	cd $PKGMK_ROOT
-	
+
 	if [ -f $TARGET ]; then
 		make_footprint > $FILE.footprint
 		if [ -f $PKGMK_FOOTPRINT ]; then
@@ -505,7 +505,7 @@ make_work_dir() {
 	export PKG="$PKGMK_WORK_DIR/pkg"
 	export SRC="$PKGMK_WORK_DIR/src"
 	umask 022
-	
+
 	cd $PKGMK_ROOT
 	# prt: Don't remove work dir actually
 	#remove_work_dir
@@ -528,31 +528,31 @@ remove_work_dir() {
 build_package() {
 	local BUILD_SUCCESSFUL="no"
 	local COMPRESSION
-	
+
 	check_file "$TARGET"
 	make_work_dir
 
 	if [ "$UID" != "0" ]; then
 		warning "Packages should be built as root."
 	fi
-	
+
 	info "Building '$TARGET'."
 
 	# prt: Disable unpacking of source, since -eo should do that
 	#unpack_source
-	
+
 	cd $SRC
 	# prt: Disabled PS4 prefix
 	export PS4=""
 	(set -e -x ; build)
-	
+
 	if [ $? = 0 ]; then
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
 			strip_files
 		fi
-		
+
 		compress_manpages
-		
+
 		cd $PKG
 		info "Build result:"
 
@@ -573,11 +573,11 @@ build_package() {
 			fi
 		fi
 	fi
-	
+
 	if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 		remove_work_dir
 	fi
-	
+
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
 		info "Building '$TARGET' succeeded."
 	else
@@ -591,19 +591,19 @@ build_package() {
 
 install_package() {
 	local COMMAND
-	
+
 	info "Installing '$TARGET'."
-	
+
 	if [ "$PKGMK_INSTALL" = "install" ]; then
 		COMMAND="pkgadd $TARGET"
 	else
 		COMMAND="pkgadd -u $TARGET"
 	fi
-	
+
 	cd $PKGMK_ROOT
 	echo "$COMMAND"
 	$COMMAND
-	
+
 	if [ $? = 0 ]; then
 		info "Installing '$TARGET' succeeded."
 	else
@@ -614,9 +614,9 @@ install_package() {
 
 recursive() {
 	local ARGS FILE DIR
-	
+
 	ARGS=`echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g"`
-	
+
 	for FILE in `find $PKGMK_ROOT -name $PKGMK_PKGFILE | sort`; do
 		DIR="`dirname $FILE`/"
 		if [ -d $DIR ]; then
@@ -629,12 +629,12 @@ recursive() {
 
 clean() {
 	local FILE LOCAL_FILENAME
-	
+
 	if [ -f $TARGET ]; then
 		info "Removing $TARGET"
 		rm -f $TARGET
 	fi
-	
+
 	for FILE in ${source[@]}; do
 		LOCAL_FILENAME=`get_filename $FILE`
 		if [ -e $LOCAL_FILENAME ] && [ "$LOCAL_FILENAME" != "$FILE" ]; then
@@ -649,17 +649,17 @@ update_footprint() {
 		error "Unable to update footprint. File '$TARGET' not found."
 		exit 1
 	fi
-	
+
 	check_file "$PKGMK_FOOTPRINT"
 	make_footprint > $PKGMK_FOOTPRINT
 	touch $TARGET
-	
+
 	info "Footprint updated."
 }
 
 build_needed() {
 	local FILE RESULT
-	
+
 	RESULT="yes"
 	if [ -f $TARGET ]; then
 		RESULT="no"
@@ -671,18 +671,18 @@ build_needed() {
 			fi
 		done
 	fi
-	
+
 	echo $RESULT
 }
 
 interrupted() {
 	echo ""
 	error "Interrupted."
-	
+
 	if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 		rm -rf $PKGMK_WORK_DIR
 	fi
-	
+
 	exit 1
 }
 
@@ -814,14 +814,14 @@ main() {
 	fi
 
 	local FILE TARGET
-	
+
 	parse_options "$@"
-	
+
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
 		exit 0
 	fi
-	
+
 	for FILE in $PKGMK_PKGFILE $PKGMK_CONFFILE; do
 		if [ ! -f $FILE ]; then
 			error "File '$FILE' not found."
@@ -829,11 +829,11 @@ main() {
 		fi
 		. $FILE
 	done
-	
+
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "`dirname $PKGMK_WORK_DIR`"
-	
+
 	check_pkgfile
 
 	case $PKGMK_COMPRESSION_MODE in
@@ -850,12 +850,12 @@ main() {
 		clean
 		exit 0
 	fi
-	
+
 	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
 		update_footprint
 		exit 0
 	fi
-	
+
 	if [ "$PKGMK_UPDATE_MD5SUM" = "yes" ]; then
 		download_source
 		check_file "$PKGMK_MD5SUM"
@@ -863,7 +863,7 @@ main() {
 		info "Md5sum updated."
 		exit 0
 	fi
-	
+
 	if [ "$PKGMK_UPDATE_SIGNATURE" = "yes" ]; then
 		download_source
 		check_file "$PKGMK_SIGNATURE"
@@ -883,7 +883,7 @@ main() {
 		download_source
 		exit 0
 	fi
-	
+
 	if [ "$PKGMK_EXTRACT_ONLY" = "yes" ]; then
 		# prt: ONLY extract source
 		#download_source
@@ -914,7 +914,7 @@ main() {
 		install_package
 		exit 0
 	fi
-	
+
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
 		if [ "`build_needed`" = "yes" ]; then
 			info "Package '$TARGET' is not up to date."
@@ -923,18 +923,18 @@ main() {
 		fi
 		exit 0
 	fi
-	
+
 	if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ] && [ "$PKGMK_CHECK_SIGNATURE" = "no" ]; then
 		info "Package '$TARGET' is up to date."
 	else
 		download_source
 		build_package
 	fi
-	
+
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
-	
+
 	exit 0
 }
 

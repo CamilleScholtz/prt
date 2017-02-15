@@ -102,7 +102,7 @@ func sysup(args []string) {
 	for i, n := range instMe {
 		// Set location.
 		var p pkg
-		p.loc = portFullLoc(n)
+		p.Loc = portFullLoc(n)
 
 		fmt.Printf("Updating package %d/%d, ", i+1, t)
 		color.Set(config.LightColor)
@@ -118,7 +118,6 @@ func sysup(args []string) {
 			}
 		}
 
-		printi("Downloading sources")
 		if err := p.download(*argv); err != nil {
 			printe(err.Error())
 			continue
