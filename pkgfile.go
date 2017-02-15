@@ -49,11 +49,11 @@ func (p pkgfile) variable(v string) (string, error) {
 }
 
 // variableSource reads a variable from a Pkgfile, it's like the variable
-// function, but actually uses bash source. This is a lot slower but also
-// more precise, because it completes variables. This is especially (only?)
-// useful for the source variable in Pkgfiles.
+// function, but actually uses bash source. This is a lot slower but also more
+// precise because it completes variables. This is especially (only?) seful for
+// the source variable in Pkgfiles.
 func (p pkgfile) variableSource(v string) (string, error) {
-	cmd := exec.Command("bash", "-c", "source ./Pkgfile && echo $"+v)
+	cmd := exec.Command("bash", "-c", "source ./Pkgfile && echo ${"+v+"[@]}")
 	cmd.Dir = p.Loc
 	var b bytes.Buffer
 	cmd.Stdout = &b

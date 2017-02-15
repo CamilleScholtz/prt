@@ -82,16 +82,18 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [ ] Implement `patch` command.
 - [x] Implement `prov` command.
 - [x] Implement `pull` command.
-- [x] Implement `sysup` command.
+- [x] Implement `sysup` command. *(needs some improvements when it comes to installation order)*
 - [x] Implement `uninstall` command.
 
-- [ ] Convert `pkgmk` `get_filename` function to Go.
-- [ ] Convert `pkgmk` `get_basename` function to Go.
+---
+
+- [x] Convert `pkgmk` `get_filename` function to Go.
+- [x] Convert `pkgmk` `get_basename` function to Go.
 - [ ] Convert `pkgmk` `check_pkgfile` function to Go.
 - [ ] Convert `pkgmk` `check_directory` function to Go.
 - [ ] Convert `pkgmk` `check_file` function to Go.
 - [x] Convert `pkgmk` `download_file` function to Go.
-- [ ] Convert `pkgmk` `download_source` function to Go.
+- [x] Convert `pkgmk` `download_source` function to Go.
 - [ ] Convert `pkgmk` `make_md5sum` function to Go.
 - [ ] Convert `pkgmk` `make_footprint` function to Go.
 - [ ] Convert `pkgmk` `make_footprint` function to Go.
@@ -104,12 +106,18 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [ ] Convert `pkgmk` `remove_work_dir` function to Go.
 - [ ] Convert `pkgmk` `install_package` function to Go.
 - [ ] Convert `pkgmk` `clean` function to Go.
-- [ ] Convert `pkgmk` `clean` function to Go.
+
+---
 
 - [x] Write fish `cdp` function.
-- [x] Write bash `cdp` function.
+- [x] Write bash `cdp` function. *(need to actually test this)*
 - [x] Write fish completions.
 - [ ] Write bash completions.
+
+---
+
+- [ ] Write tests.
+- [x] Write README and man pages. *(needs some updates with changes)*
 
 
 ## AUTHORS

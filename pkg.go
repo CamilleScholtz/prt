@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -73,22 +74,35 @@ func (p pkg) download(v bool) error {
 		return err
 	}
 	sl := strings.Fields(s)
-	fmt.Println(sl)
 
 	// Download sources.
 	for _, s := range sl {
-		cmd := exec.Command("curl", "-L", "-#", "--fail", "--ftp-pasv", "-O", "-C", "-", s)
-		cmd.Dir = config.SrcDir
+		f := path.Join(config.SrcDir, path.Base(s))
+
+		// Continue if file has already been downloaded.
+		if _, err := os.Stat(f); err == nil {
+			continue
+		}
+
+		// Continue if file is not an URL.
+		r := regexp.MustCompile("^(http|https|ftp|file)://")
+		if !r.MatchString(s) {
+			continue
+		}
+
+		cmd := exec.Command("curl", "-L", "-#", "--fail", "--ftp-pasv", "-C", "-", "-o", f+".partial", s)
 		if v {
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 		}
 
 		printi("Downloading " + s)
-
 		if err := cmd.Run(); err != nil {
 			return fmt.Errorf("pkg download %s: Something went wrong", portBaseLoc(p.Loc))
 		}
+
+		// Remove .partial on completion.
+		os.Rename(f+".partial", f)
 	}
 
 	return nil

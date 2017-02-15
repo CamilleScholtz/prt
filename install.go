@@ -90,7 +90,7 @@ func install(args []string) {
 				continue
 			}
 
-			// Increment tree level.
+			// Increment tree level if we already checked this port before.
 			if !stringInList(p, c) {
 				i++
 			}
@@ -100,8 +100,9 @@ func install(args []string) {
 
 			// Continue if the port has already been checked.
 			if stringInList(p, c) {
-				// We will also "merge maps" here, here is a quick ASCII illustration
-				// using the `prt depends -t` syntax of what this basically does:
+				// We will also "merge maps" here, here is a quick ASCII
+				// illustration using the `prt depends -t` syntax of what this
+				// basically does:
 				//
 				// BEFORE:
 				// port1
@@ -118,8 +119,8 @@ func install(args []string) {
 				// - - port3
 				//
 				// We do this because without this "merge" port2 would be
-				// complaining about how port3 isn't installed, since we iterrate
-				// over the "list" from bottom to top.
+				// complaining about how port3 isn't installed, since we
+				// iterrate over the "list" from bottom to top.
 				var n int
 				for i := 0; i <= len(instMeMap); i++ {
 					if stringInList(p, instMeMap[i]) {

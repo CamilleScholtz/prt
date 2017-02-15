@@ -104,7 +104,7 @@ func depends(args []string) {
 					color.Unset()
 				}
 
-				// Increment tree level.
+				// Increment tree level if we already checked this port before.
 				if !stringInList(p, c) {
 					i++
 				}
@@ -113,14 +113,17 @@ func depends(args []string) {
 			// Finally print the port.
 			fmt.Print(l)
 
-			// Print "seen before" star if the port has already been checked.
 			if stringInList(p, c) {
+				// Print "seen before" star if the port has already been
+				// checked.
 				if *argt {
 					color.Set(config.DarkColor)
 					fmt.Print(" *")
 					color.Unset()
 				}
 
+				// Also continue, since we don't want to print each "seen
+				// before" port a 100 times.
 				fmt.Println()
 				continue
 			}

@@ -72,7 +72,8 @@ func instPorts() ([]string, error) {
 	return p, nil
 }
 
-// instVersPorts list all installed versions, this should follow the same order as Inst().
+// instVersPorts list all installed versions, this should follow the same order
+// as Inst().
 func instVersPorts() ([]string, error) {
 	// Read out pkg db.
 	db, err := os.Open("/var/lib/pkg/db")
@@ -112,7 +113,7 @@ func portLoc(ports []string, n string) ([]string, error) {
 		return []string{}, fmt.Errorf("loc %s: Could not find location", n)
 	}
 
-	// If there are multiple matches, sort using the config.g Order value.
+	// If there are multiple matches, sort using the config Order value.
 	if len(l) > 1 {
 		var i int
 		for _, r := range config.Order {

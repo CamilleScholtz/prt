@@ -7,7 +7,7 @@ import (
 	"github.com/fatih/color"
 )
 
-// config is a stuct with all config values.
+// config is a stuct with all config values. See `runtime/config/config.toml` for// more information about these values.
 var config struct {
 	PrtDir     string
 	PkgDir     string
@@ -51,7 +51,6 @@ func initConfig() error {
 		return fmt.Errorf("config /etc/prt/config.toml: " + err.Error())
 	}
 
-	// Convert colors to something usable.
 	config.DarkColor, err = colorFix(config.DarkColor)
 	if err != nil {
 		return err

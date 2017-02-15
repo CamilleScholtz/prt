@@ -87,8 +87,6 @@ func diff(args []string) {
 			printe(err.Error())
 			return
 		}
-
-		// Combine version and release.
 		availv := v + "-" + r
 
 		// Print if installed and available version don't match.

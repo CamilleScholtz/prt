@@ -56,7 +56,7 @@ func info(args []string) {
 		os.Exit(1)
 	}
 
-	// Print info from Pkgfile..
+	// Print info from Pkgfile.
 	if *argd {
 		s, _ := f.comment("Description")
 		fmt.Println("Description: " + s)
