@@ -10,10 +10,6 @@ import (
 	"strings"
 )
 
-type pkg struct {
-	Loc string
-}
-
 // trErr translates pkgmk error codes to error strings.
 func trErr(i int, f, p string) error {
 	switch i {
@@ -39,7 +35,7 @@ func trErr(i int, f, p string) error {
 }
 
 // build builds a port.
-func (p pkg) build(f, v bool) error {
+func (p pkgfile) build(f, v bool) error {
 	var cmd *exec.Cmd
 	if f {
 		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo", "-f")
@@ -61,15 +57,9 @@ func (p pkg) build(f, v bool) error {
 }
 
 // download downloads a port sources.
-func (p pkg) download(v bool) error {
-	// Read out Pkgfile.
-	f, err := readPkgfile(path.Join(p.Loc, "Pkgfile"))
-	if err != nil {
-		return err
-	}
-
+func (p pkgfile) download(v bool) error {
 	// Get sources.
-	s, err := f.variableSource("source")
+	s, err := p.variableSource("source")
 	if err != nil {
 		return err
 	}
@@ -96,9 +86,9 @@ func (p pkg) download(v bool) error {
 			cmd.Stderr = os.Stderr
 		}
 
-		printi("Downloading " + s)
+		printi("Downloading " + path.Base(s))
 		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("pkg download %s: Something went wrong", portBaseLoc(p.Loc))
+			return fmt.Errorf("pkg download %s: Something went wrong", path.Base(s))
 		}
 
 		// Remove .partial on completion.
@@ -109,7 +99,7 @@ func (p pkg) download(v bool) error {
 }
 
 // install installs a package.
-func (p pkg) install(v bool) error {
+func (p pkgfile) install(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-io")
 	cmd.Dir = p.Loc
 	if v {
@@ -126,7 +116,7 @@ func (p pkg) install(v bool) error {
 }
 
 // post runs a pre-install scripts.
-func (p pkg) post(v bool) error {
+func (p pkgfile) post(v bool) error {
 	cmd := exec.Command("bash", "./post-install")
 	cmd.Dir = p.Loc
 	if v {
@@ -142,7 +132,7 @@ func (p pkg) post(v bool) error {
 }
 
 // pre runs a pre-install scripts.
-func (p pkg) pre(v bool) error {
+func (p pkgfile) pre(v bool) error {
 	cmd := exec.Command("bash", "./pre-install")
 	cmd.Dir = p.Loc
 	if v {
@@ -170,24 +160,48 @@ func pkgUninstall(todo string) error {
 }
 
 // unpack unpacks a port sources.
-func (p pkg) unpack(v bool) error {
-	cmd := exec.Command("/usr/share/prt/pkgmk", "-eo")
-	cmd.Dir = p.Loc
-	if v {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+func (p pkgfile) unpack(v bool) error {
+	// Get sources.
+	s, err := p.variableSource("source")
+	if err != nil {
+		return err
 	}
+	sl := strings.Fields(s)
 
-	if err := cmd.Run(); err != nil {
-		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "unpack", portBaseLoc(p.Loc))
+	// Unpack sources.
+	for _, s := range sl {
+		n, err := p.variable("name")
+		if err != nil {
+			return err
+		}
+		wd := path.Join(config.WrkDir, n)
+		os.Mkdir(wd, 0777)
+
+		// Continue if file is not an URL.
+		var cmd *exec.Cmd
+		r := regexp.MustCompile(".(tar|tar.gz|tar.Z|tgz|tar.bz2|tbz2|tar.xz|txz|tar.lzma|tar.lz|zip|rpm)$")
+		if r.MatchString(s) {
+			cmd = exec.Command("bsdtar", "-p", "-o", "-C", wd, "-xf", path.Join(config.SrcDir, path.Base(s)))
+		} else {
+			cmd = exec.Command("cp", path.Join(p.Loc, path.Base(s)), wd)
+		}
+		if v {
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+		}
+
+		printi("Unpacking " + path.Base(s))
+		if err := cmd.Run(); err != nil {
+			os.Remove(wd)
+			return fmt.Errorf("pkg unpack %s: Something went wrong", path.Base(s))
+		}
 	}
 
 	return nil
 }
 
 // update updates a package.
-func (p pkg) update(v bool) error {
+func (p pkgfile) update(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-uo")
 	cmd.Dir = p.Loc
 	if v {

@@ -193,75 +193,80 @@ func install(args []string) {
 
 	// Actually install ports in this loop.
 	t := len(instMe)
-	for i, n := range instMe {
-		// Set location.
-		var p pkg
-		if strings.Contains(n, "/") {
-			p.Loc = portFullLoc(n)
+	for i, l := range instMe {
+		var ls string
+		if strings.Contains(l, "/") {
+			ls = portFullLoc(l)
 		} else {
-			p.Loc = wd
+			ls = wd
 		}
 
-		if stringInList(path.Base(n), inst) {
+		// Read out Pkgfile.
+		f, err := readPkgfile(path.Join(ls, "Pkgfile"))
+		if err != nil {
+			printe(err.Error())
+			return
+		}
+
+		if stringInList(path.Base(l), inst) {
 			fmt.Printf("Updating package %d/%d, ", i+1, t)
 		} else {
 			fmt.Printf("Installing package %d/%d, ", i+1, t)
 		}
 		color.Set(config.LightColor)
-		fmt.Printf(n)
+		fmt.Printf(l)
 		color.Unset()
 		fmt.Println(".")
 
-		if _, err := os.Stat(path.Join(p.Loc, "pre-install")); err == nil {
+		if _, err := os.Stat(path.Join(f.Loc, "pre-install")); err == nil {
 			printi("Running pre-install")
-			err = p.pre(*argv)
+			err = f.pre(*argv)
 			if err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		if err := p.download(*argv); err != nil {
+		if err := f.download(*argv); err != nil {
 			printe(err.Error())
 			os.Exit(1)
 		}
 
-		printi("Unpacking sources")
-		if err := p.unpack(*argv); err != nil {
+		if err := f.unpack(*argv); err != nil {
 			printe(err.Error())
 			os.Exit(1)
 		}
 
 		printi("Building package")
-		if stringInList(path.Base(n), inst) {
-			if err := p.build(true, *argv); err != nil {
+		if stringInList(path.Base(l), inst) {
+			if err := f.build(true, *argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		} else {
-			if err := p.build(false, *argv); err != nil {
+			if err := f.build(false, *argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		if stringInList(path.Base(n), inst) {
+		if stringInList(path.Base(l), inst) {
 			printi("Updating package")
-			if err := p.update(*argv); err != nil {
+			if err := f.update(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		} else {
 			printi("Installing package")
-			if err := p.install(*argv); err != nil {
+			if err := f.install(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		if _, err = os.Stat(path.Join(n, "post-install")); err == nil {
+		if _, err = os.Stat(path.Join(l, "post-install")); err == nil {
 			printi("Running post-install")
-			err = p.post(*argv)
+			err = f.post(*argv)
 			if err != nil {
 				printe(err.Error())
 				os.Exit(1)

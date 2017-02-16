@@ -1,5 +1,9 @@
 prt
+
 Pkgfile
 .md5sum
 .footprint
 .signature
+
+testfile
+testdir

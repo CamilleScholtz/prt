@@ -94,6 +94,7 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [ ] Convert `pkgmk` `check_file` function to Go.
 - [x] Convert `pkgmk` `download_file` function to Go.
 - [x] Convert `pkgmk` `download_source` function to Go.
+- [x] Convert `pkgmk` `unpack_source` function to Go.
 - [ ] Convert `pkgmk` `make_md5sum` function to Go.
 - [ ] Convert `pkgmk` `make_footprint` function to Go.
 - [ ] Convert `pkgmk` `make_footprint` function to Go.
