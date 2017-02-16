@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
@@ -70,7 +69,7 @@ func diff(args []string) {
 		}
 
 		// Read out Pkgfile.
-		f, err := readPkgfile(path.Join(portFullLoc(l), "Pkgfile"))
+		f, err := readPkgfile(portFullLoc(l))
 		if err != nil {
 			printe(err.Error())
 			return

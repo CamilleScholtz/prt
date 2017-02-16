@@ -87,7 +87,7 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 
 ---
 
-- [x] Convert `pkgmk` `get_filename` function to Go.
+- [x] Convert `pkgmk` `get_filename` function to Go. *(So uhh, pkgmk does something with "absolute paths", do I need this as well?)*
 - [x] Convert `pkgmk` `get_basename` function to Go.
 - [ ] Convert `pkgmk` `check_pkgfile` function to Go.
 - [ ] Convert `pkgmk` `check_directory` function to Go.
@@ -95,15 +95,15 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [x] Convert `pkgmk` `download_file` function to Go.
 - [x] Convert `pkgmk` `download_source` function to Go.
 - [x] Convert `pkgmk` `unpack_source` function to Go.
-- [ ] Convert `pkgmk` `make_md5sum` function to Go.
+- [x] Convert `pkgmk` `make_md5sum` function to Go.
 - [ ] Convert `pkgmk` `make_footprint` function to Go.
-- [ ] Convert `pkgmk` `make_footprint` function to Go.
+- [x] Convert `pkgmk` `check_md5sum` function to Go.
 - [ ] Convert `pkgmk` `check_signature` function to Go.
 - [ ] Convert `pkgmk` `make_signature` function to Go.
 - [ ] Convert `pkgmk` `strip_files` function to Go.
 - [ ] Convert `pkgmk` `compress_manpages` function to Go.
 - [ ] Convert `pkgmk` `check_footprint` function to Go.
-- [ ] Convert `pkgmk` `make_work_dir` function to Go.
+- [x] Convert `pkgmk` `make_work_dir` function to Go.
 - [ ] Convert `pkgmk` `remove_work_dir` function to Go.
 - [ ] Convert `pkgmk` `install_package` function to Go.
 - [ ] Convert `pkgmk` `clean` function to Go.

@@ -61,7 +61,7 @@ func depends(args []string) {
 	var recursive func(l string)
 	recursive = func(l string) {
 		// Read out Pkgfile.
-		f, err := readPkgfile(path.Join(l, "Pkgfile"))
+		f, err := readPkgfile(l)
 		if err != nil {
 			printe(err.Error())
 			return

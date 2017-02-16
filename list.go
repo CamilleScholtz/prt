@@ -81,6 +81,7 @@ func list(args []string) {
 		all = inst
 	}
 
+	// TODO: Use l instead of p here?
 	for i, p := range all {
 		if *argv {
 			var v string
@@ -89,7 +90,7 @@ func list(args []string) {
 				v = instv[i]
 			} else {
 				// Read out Pkgfile.
-				f, err := readPkgfile(path.Join(portFullLoc(p), "Pkgfile"))
+				f, err := readPkgfile(portFullLoc(p))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue

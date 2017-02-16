@@ -50,7 +50,7 @@ func info(args []string) {
 	}
 
 	// Read out Pkgfile.
-	f, err := readPkgfile("./Pkgfile")
+	f, err := readPkgfile(".")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

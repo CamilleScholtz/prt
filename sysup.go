@@ -72,8 +72,8 @@ func sysup(args []string) {
 			continue
 		}
 
-		// Read out Pkgfile.
-		f, err := readPkgfile(path.Join(portFullLoc(l), "Pkgfile"))
+		// Read out the port files.
+		f, err := readPkgfile(l)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
@@ -101,7 +101,7 @@ func sysup(args []string) {
 	t := len(instMe)
 	for i, l := range instMe {
 		// Read out Pkgfile.
-		f, err := readPkgfile(path.Join(portFullLoc(l), "Pkgfile"))
+		p, err := readPort(l)
 		if err != nil {
 			printe(err.Error())
 			return
@@ -114,38 +114,36 @@ func sysup(args []string) {
 		fmt.Println(".")
 
 		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
-			printi("Running pre-install")
-			if err = f.pre(*argv); err != nil {
+			if err = p.pre(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}
 		}
 
-		if err := f.download(*argv); err != nil {
+		if err := p.download(*argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
-		if err := f.unpack(*argv); err != nil {
+		if err := p.unpack(*argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
 		printi("Building package")
-		if err := f.build(false, *argv); err != nil {
+		if err := p.build(false, *argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
 		printi("Updating package")
-		if err := f.update(*argv); err != nil {
+		if err := p.update(*argv); err != nil {
 			printe(err.Error())
 			continue
 		}
 
 		if _, err := os.Stat(path.Join(l, "post-install")); err == nil {
-			printi("Running post-install")
-			if err := f.post(*argv); err != nil {
+			if err := p.post(*argv); err != nil {
 				printe(err.Error())
 				os.Exit(1)
 			}

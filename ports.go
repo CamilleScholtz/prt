@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// portsAlias aliases ports using the config.g values.
+// portsAlias aliases ports using the config.Alias values.
 func portAlias(p string) string {
 	for _, a := range config.Alias {
 		if a[0] == p {
@@ -38,11 +38,13 @@ func allPorts() ([]string, error) {
 }
 
 // portBaseLoc removes the PrtDir from a string.
+// TODO: Should I move this to port.go?
 func portBaseLoc(d string) string {
 	return strings.Replace(d, config.PrtDir+"/", "", 1)
 }
 
 // portFullLoc adds the PrtDir to a string.
+// TODO: Should I move this to port.go?
 func portFullLoc(d string) string {
 	return path.Join(config.PrtDir, d)
 }
