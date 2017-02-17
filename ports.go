@@ -87,10 +87,10 @@ func instVersPorts() ([]string, error) {
 	s := bufio.NewScanner(db)
 
 	// Check for versions.
-	var b, n bool
+	var b, f, n bool
 	var v []string
 	for s.Scan() {
-		if b {
+		if b || !f {
 			b, n = false, true
 		} else if n {
 			v = append(v, s.Text())
@@ -98,6 +98,7 @@ func instVersPorts() ([]string, error) {
 		} else if s.Text() == "" {
 			b = true
 		}
+		f = true
 	}
 
 	return v, nil

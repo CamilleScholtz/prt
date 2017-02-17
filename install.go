@@ -218,55 +218,9 @@ func install(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		if _, err := os.Stat(path.Join(p.Loc, "pre-install")); err == nil {
-			err = p.pre(*argv)
-			if err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
-		}
-		if err := p.download(*argv); err != nil {
+		if err := p.pkgmk(inst, *argv); err != nil {
 			printe(err.Error())
 			os.Exit(1)
-		}
-		if err := p.unpack(*argv); err != nil {
-			printe(err.Error())
-			os.Exit(1)
-		}
-		if err := p.md5sum(*argv); err != nil {
-			os.Exit(1)
-		}
-		printi("Building package")
-		if stringInList(path.Base(l), inst) {
-			if err := p.build(true, *argv); err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
-		} else {
-			if err := p.build(false, *argv); err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
-		}
-		if stringInList(path.Base(l), inst) {
-			printi("Updating package")
-			if err := p.update(*argv); err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
-		} else {
-			printi("Installing package")
-			if err := p.install(*argv); err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
-		}
-		if _, err = os.Stat(path.Join(l, "post-install")); err == nil {
-			err = p.post(*argv)
-			if err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
 		}
 	}
 }

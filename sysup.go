@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
@@ -46,7 +45,6 @@ func sysup(args []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-
 	// Get installed port versions.
 	instv, err := instVersPorts()
 	if err != nil {
@@ -73,7 +71,7 @@ func sysup(args []string) {
 		}
 
 		// Read out the port files.
-		f, err := readPkgfile(l)
+		f, err := readPkgfile(portFullLoc(l))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
@@ -101,7 +99,7 @@ func sysup(args []string) {
 	t := len(instMe)
 	for i, l := range instMe {
 		// Read out Pkgfile.
-		p, err := readPort(l)
+		p, err := readPort(portFullLoc(l))
 		if err != nil {
 			printe(err.Error())
 			return
@@ -113,38 +111,9 @@ func sysup(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		if _, err := os.Stat(path.Join(l, "pre-install")); err == nil {
-			if err = p.pre(*argv); err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
-		}
-		if err := p.download(*argv); err != nil {
+		if err := p.pkgmk(inst, *argv); err != nil {
 			printe(err.Error())
 			continue
-		}
-		if err := p.unpack(*argv); err != nil {
-			printe(err.Error())
-			continue
-		}
-		if err := p.md5sum(*argv); err != nil {
-			os.Exit(1)
-		}
-		printi("Building package")
-		if err := p.build(false, *argv); err != nil {
-			printe(err.Error())
-			continue
-		}
-		printi("Updating package")
-		if err := p.update(*argv); err != nil {
-			printe(err.Error())
-			continue
-		}
-		if _, err := os.Stat(path.Join(l, "post-install")); err == nil {
-			if err := p.post(*argv); err != nil {
-				printe(err.Error())
-				os.Exit(1)
-			}
 		}
 	}
 }

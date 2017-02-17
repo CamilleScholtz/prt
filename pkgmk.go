@@ -108,8 +108,22 @@ func (p port) checkMd5sum() error {
 	}
 
 	if e {
-		return fmt.Errorf("")
+		return fmt.Errorf("pkgmk md5sum %s: Mismatch", portBaseLoc(p.Loc))
 	}
+	return nil
+}
+
+// cleanWrkDir removes the necessary WrkDir directories.
+func (p port) cleanWrkDir() error {
+	// Get port name and create the workdir.
+	n, err := p.variable("name")
+	if err != nil {
+		return err
+	}
+
+	wd := path.Join(config.WrkDir, n)
+	os.Remove(wd)
+
 	return nil
 }
 
@@ -253,6 +267,57 @@ func (p port) md5sum(v bool) error {
 	return nil
 }
 
+// pkgmk is a wrapper for all the functions in pkgmk.go.
+func (p port) pkgmk(inst []string, v bool) error {
+	// TODO: DO this check in pre()?
+	if _, err := os.Stat(path.Join(p.Loc, "pre-install")); err == nil {
+		err = p.pre(v)
+		if err != nil {
+			return err
+		}
+	}
+	if err := p.download(v); err != nil {
+		return err
+	}
+	if err := p.md5sum(v); err != nil {
+		return err
+	}
+	defer p.cleanWrkDir()
+	if err := p.unpack(v); err != nil {
+		return err
+	}
+	printi("Building package")
+	if stringInList(path.Base(p.Loc), inst) {
+		if err := p.build(true, v); err != nil {
+			return err
+		}
+	} else {
+		if err := p.build(false, v); err != nil {
+			return err
+		}
+	}
+	if stringInList(path.Base(p.Loc), inst) {
+		printi("Updating package")
+		if err := p.update(v); err != nil {
+			return err
+		}
+	} else {
+		printi("Installing package")
+		if err := p.install(v); err != nil {
+			return err
+		}
+	}
+	// TODO: DO this check in post()?
+	if _, err := os.Stat(path.Join(p.Loc, "post-install")); err == nil {
+		err = p.post(v)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // post runs a pre-install scripts.
 func (p port) post(v bool) error {
 	cmd := exec.Command("bash", "./post-install")
@@ -327,8 +392,6 @@ func (p port) unpack(v bool) error {
 			}
 
 			if err := cmd.Run(); err != nil {
-				// TODO: Use clean here
-				os.Remove(wsd)
 				return fmt.Errorf("pkgmk unpack %s: Something went wrong", path.Base(s))
 			}
 		} else {
