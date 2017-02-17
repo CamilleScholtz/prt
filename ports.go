@@ -60,15 +60,16 @@ func instPorts() ([]string, error) {
 	s := bufio.NewScanner(db)
 
 	// Check for versions.
-	var b bool
+	var b, f bool
 	var p []string
 	for s.Scan() {
-		if b {
+		if b || !f {
 			p = append(p, s.Text())
 			b = false
 		} else if s.Text() == "" {
 			b = true
 		}
+		f = true
 	}
 
 	return p, nil
