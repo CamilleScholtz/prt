@@ -115,13 +115,7 @@ func (p port) checkMd5sum() error {
 
 // cleanWrkDir removes the necessary WrkDir directories.
 func (p port) cleanWrkDir() error {
-	// Get port name and create the workdir.
-	n, err := p.variable("name")
-	if err != nil {
-		return err
-	}
-
-	wd := path.Join(config.WrkDir, n)
+	wd := path.Join(config.WrkDir, path.Base(p.Loc))
 	os.Remove(wd)
 
 	return nil
@@ -174,15 +168,9 @@ func (p port) createMd5sum(l string) error {
 
 // createWrkDir creates the necessary WrkDir directories.
 func (p port) createWrkDir() (string, string, string, error) {
-	// Get port name and create the workdir.
-	n, err := p.variable("name")
-	if err != nil {
-		return "", "", "", err
-	}
-
-	wd := path.Join(config.WrkDir, n)
-	wpd := path.Join(config.WrkDir, n, "pkg")
-	wsd := path.Join(config.WrkDir, n, "src")
+	wd := path.Join(config.WrkDir, path.Base(p.Loc))
+	wpd := path.Join(config.WrkDir, path.Base(p.Loc), "pkg")
+	wsd := path.Join(config.WrkDir, path.Base(p.Loc), "src")
 	os.Mkdir(wd, 0777)
 	os.Mkdir(wpd, 0777)
 	os.Mkdir(wsd, 0777)

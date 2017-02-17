@@ -104,9 +104,9 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [ ] Convert `pkgmk` `compress_manpages` function to Go.
 - [ ] Convert `pkgmk` `check_footprint` function to Go.
 - [x] Convert `pkgmk` `make_work_dir` function to Go.
-- [ ] Convert `pkgmk` `remove_work_dir` function to Go.
+- [x] Convert `pkgmk` `remove_work_dir` function to Go.
 - [ ] Convert `pkgmk` `install_package` function to Go.
-- [ ] Convert `pkgmk` `clean` function to Go.
+- [x] Convert `pkgmk` `clean` function to Go. *(not going to implement, there is `rm`)*
 
 ---
 
