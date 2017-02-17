@@ -77,20 +77,24 @@ func (p port) checkMd5sum() error {
 	}
 	defer n.Close()
 
+	var e bool
 	so := bufio.NewScanner(o)
 	var io int
 	for so.Scan() {
 		sn := bufio.NewScanner(n)
 		var in int
-		for sn.Scan() {
+		for i := 0; i <= io; i++ {
+			sn.Scan()
 			if io == in {
-				ol := strings.Split(so.Text(), " ")
-				nl := strings.Split(sn.Text(), " ")
+				lo := strings.Split(so.Text(), " ")
+				ln := strings.Split(sn.Text(), " ")
 
-				if ol[2] != nl[2] {
-					printe("Missing md5sum " + ol[0] + " for " + ol[2])
-				} else if ol[0] != nl[0] {
-					printe("New md5sum " + ol[0] + " for " + ol[2])
+				if len(sn.Text()) == 0 {
+					e = true
+					printe("Missing md5sum " + lo[0] + " for " + lo[2])
+				} else if lo[0] != ln[0] {
+					e = true
+					printe("New md5sum " + ln[0] + " for " + ln[2])
 				}
 			}
 
@@ -103,6 +107,9 @@ func (p port) checkMd5sum() error {
 		io++
 	}
 
+	if e {
+		return fmt.Errorf("")
+	}
 	return nil
 }
 
@@ -309,24 +316,35 @@ func (p port) unpack(v bool) error {
 
 	// Unpack sources.
 	for _, s := range sl {
-		var cmd *exec.Cmd
 		r := regexp.MustCompile(".(tar|tar.gz|tar.Z|tgz|tar.bz2|tbz2|tar.xz|txz|tar.lzma|tar.lz|zip|rpm)$")
 		if r.MatchString(s) {
 			printi("Unpacking " + path.Base(s))
-			cmd = exec.Command("bsdtar", "-p", "-o", "-C", wsd, "-xf", path.Join(config.SrcDir, path.Base(s)))
+
+			cmd := exec.Command("bsdtar", "-p", "-o", "-C", wsd, "-xf", path.Join(config.SrcDir, path.Base(s)))
+			if v {
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+			}
+
+			if err := cmd.Run(); err != nil {
+				// TODO: Use clean here
+				os.Remove(wsd)
+				return fmt.Errorf("pkgmk unpack %s: Something went wrong", path.Base(s))
+			}
 		} else {
 			printi("Moving " + path.Base(s))
-			cmd = exec.Command("cp", path.Join(p.Loc, path.Base(s)), wsd)
-		}
-		if v {
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-		}
 
-		if err := cmd.Run(); err != nil {
-			// TODO: Use clean here
-			os.Remove(wsd)
-			return fmt.Errorf("pkgmk unpack %s: Something went wrong", path.Base(s))
+			// TODO: MAke this missing
+			f, _ := os.Open(path.Join(p.Loc, path.Base(s)))
+			defer f.Close()
+
+			d, err := os.Create(path.Join(wsd, path.Base(s)))
+			if err != nil {
+				return err
+			}
+
+			io.Copy(d, f)
+			d.Close()
 		}
 	}
 

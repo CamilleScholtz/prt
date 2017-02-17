@@ -237,12 +237,8 @@ func install(args []string) {
 		}
 
 		if err := p.md5sum(*argv); err != nil {
-			printe(err.Error())
 			os.Exit(1)
 		}
-
-		// TODO
-		os.Exit(0)
 
 		printi("Building package")
 		if stringInList(path.Base(l), inst) {

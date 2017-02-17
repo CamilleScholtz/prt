@@ -130,6 +130,10 @@ func sysup(args []string) {
 			continue
 		}
 
+		if err := p.md5sum(*argv); err != nil {
+			os.Exit(1)
+		}
+
 		printi("Building package")
 		if err := p.build(false, *argv); err != nil {
 			printe(err.Error())
