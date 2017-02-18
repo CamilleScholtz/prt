@@ -127,7 +127,7 @@ func (p port) createMd5sum(l string) error {
 		return err
 	}
 	sl := strings.Fields(s)
-	sort.Strings(sl)
+	sort.Sort(byBase(sl))
 
 	m, err := os.OpenFile(path.Join(l, ".md5sum"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
@@ -188,7 +188,7 @@ func (p port) download(v bool) error {
 		return err
 	}
 	sl := strings.Fields(s)
-	sort.Strings(sl)
+	sort.Sort(byBase(sl))
 
 	// Download sources.
 	for _, s := range sl {
@@ -205,6 +205,7 @@ func (p port) download(v bool) error {
 			continue
 		}
 
+		// TODO: Can I use some go package for this?
 		cmd := exec.Command("curl", "-L", "-#", "--fail", "--ftp-pasv", "-C", "-", "-o", f+".partial", s)
 		if v {
 			cmd.Stdout = os.Stdout
@@ -362,7 +363,7 @@ func (p port) unpack(v bool) error {
 		return err
 	}
 	sl := strings.Fields(s)
-	sort.Strings(sl)
+	sort.Sort(byBase(sl))
 
 	_, _, wsd, err := p.createWrkDir()
 	if err != nil {
@@ -381,7 +382,7 @@ func (p port) unpack(v bool) error {
 			if err := ff.Open(path.Join(config.SrcDir, path.Base(s)), wsd); err != nil {
 				return err
 			}
-			return nil
+			continue
 		}
 
 		// TODO: Make this missing.

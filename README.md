@@ -25,9 +25,9 @@ prt is like `prt-get(8)` a port/package management utility which provides additi
 * update outdated packages
 * uninstall installed packages
 
-like `prt-get(8)`, prt is basically a wrapper around `pkgmk(8)`/`pkgadd(8)` and provides some nice functionality such as listing and installing dependencies, getting the location of a port, aliasing ports (for example `core/openssl` to `6c37-dropin/libressl`), and ordering ports with the same name depending on how "important" the repo is the port resides in.
+Unlike `prt-get(8)`, prt reimplements `pkgmk(8)`/`pkgadd(8)` fully in Go. This is mostly for more control (and for fun). Like `prt-get` it does provide some nice exyta functionality such as listing and installing dependencies, getting the location of a port, aliasing ports (for example `core/openssl` to `6c37-dropin/libressl`), and ordering ports with the same name depending on how "important" the repo is the port resides in.
 
-There are a few differences though, for example, unlike `prt-get(8)` you need to  be in the port's directory for most commands to work, like how `pkgmk(8)` works. This has a few advantages, for example you can quickly download a port
+There are a few differences, for example, unlike `prt-get(8)` you need to  be in the port's directory for most commands to work, like how `pkgmk(8)` works. This has a few advantages, for example you can quickly download a port
 anywhere on the filesystem, and install it and its dependencies using `prt install`. Because `prt-get depinst` needs a port name, you can *only* install ports that are located in a predefined `prtdir`.
 
 Another difference with `prt-get(8)` is that prt does not use a cache file, while still being nearly as fast or faster in some cases.
@@ -87,12 +87,12 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 
 ---
 
-- [x] Convert `pkgmk` `get_filename` function to Go. *(So uhh, pkgmk does something with "absolute paths", do I need this as well?)*
+- [x] Convert `pkgmk` `get_filename` function to Go. *(so uhh, `pkgmk` does something with "absolute paths", do I need this as well?)*
 - [x] Convert `pkgmk` `get_basename` function to Go.
-- [ ] Convert `pkgmk` `check_pkgfile` function to Go.
-- [ ] Convert `pkgmk` `check_directory` function to Go.
-- [ ] Convert `pkgmk` `check_file` function to Go.
-- [x] Convert `pkgmk` `download_file` function to Go.
+- [x] Convert `pkgmk` `check_pkgfile` function to Go.
+- [x] Convert `pkgmk` `check_directory` function to Go.
+- [x] Convert `pkgmk` `check_file` function to Go.
+- [x] Convert `pkgmk` `download_file` function to Go. *(`curl` is still used to download the sources, is there some pure Go implementation)*
 - [x] Convert `pkgmk` `download_source` function to Go.
 - [x] Convert `pkgmk` `unpack_source` function to Go.
 - [x] Convert `pkgmk` `make_md5sum` function to Go.
@@ -119,6 +119,7 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 
 - [ ] Write tests.
 - [ ] Make errors pretty and consistent.
+- [ ] Test environment variables.
 - [x] Write README and man pages. *(needs some updates with changes)*
 
 
