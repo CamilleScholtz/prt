@@ -13,6 +13,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/mholt/archiver"
 )
 
 // trErr translates pkgmk error codes to error strings.
@@ -371,30 +373,28 @@ func (p port) unpack(v bool) error {
 	for _, s := range sl {
 		printi("Unpacking " + path.Base(s))
 
-		r := regexp.MustCompile(".(tar|tar.gz|tar.Z|tgz|tar.bz2|tbz2|tar.xz|txz|tar.lzma|tar.lz|zip|rpm)$")
-		if r.MatchString(s) {
-			cmd := exec.Command("bsdtar", "-p", "-o", "-C", wsd, "-xf", path.Join(config.SrcDir, path.Base(s)))
-			if v {
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = os.Stderr
+		for _, ff := range archiver.SupportedFormats {
+			if !ff.Match(path.Base(s)) {
+				continue
 			}
 
-			if err := cmd.Run(); err != nil {
-				return fmt.Errorf("pkgmk unpack %s: Could not unpack source", path.Base(s))
-			}
-		} else {
-			// TODO: Make this missing.
-			f, _ := os.Open(path.Join(p.Loc, path.Base(s)))
-			defer f.Close()
-
-			d, err := os.Create(path.Join(wsd, path.Base(s)))
-			if err != nil {
+			if err := ff.Open(path.Join(config.SrcDir, path.Base(s)), wsd); err != nil {
 				return err
 			}
-
-			io.Copy(d, f)
-			d.Close()
+			return nil
 		}
+
+		// TODO: Make this missing.
+		f, _ := os.Open(path.Join(p.Loc, path.Base(s)))
+		defer f.Close()
+
+		d, err := os.Create(path.Join(wsd, path.Base(s)))
+		if err != nil {
+			return err
+		}
+
+		io.Copy(d, f)
+		d.Close()
 	}
 
 	return nil
