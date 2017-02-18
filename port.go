@@ -31,12 +31,13 @@ func (p port) comment(v string) (string, error) {
 
 // readFootprint reads a .footprint.
 func readFootprint(l string) (port, error) {
-	var f []byte
-	if _, err := os.Stat(path.Join(l, ".footprint")); err == nil {
-		f, err = ioutil.ReadFile(path.Join(l, ".footprint"))
-		if err != nil {
-			return port{}, err
-		}
+	if _, err := os.Stat(path.Join(l, ".footprint")); err != nil {
+		return port{}, nil
+	}
+
+	f, err := ioutil.ReadFile(path.Join(l, ".footprint"))
+	if err != nil {
+		return port{}, err
 	}
 
 	return port{f, nil, nil, l}, nil
@@ -44,12 +45,13 @@ func readFootprint(l string) (port, error) {
 
 // readMd5sum reads a .md5sum.
 func readMd5sum(l string) (port, error) {
-	var m []byte
-	if _, err := os.Stat(path.Join(l, ".md5sum")); err == nil {
-		m, err = ioutil.ReadFile(path.Join(l, ".md5sum"))
-		if err != nil {
-			return port{}, err
-		}
+	if _, err := os.Stat(path.Join(l, ".md5sum")); err != nil {
+		return port{}, nil
+	}
+
+	m, err := ioutil.ReadFile(path.Join(l, ".md5sum"))
+	if err != nil {
+		return port{}, err
 	}
 
 	return port{nil, m, nil, l}, nil

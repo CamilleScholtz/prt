@@ -16,6 +16,7 @@ import (
 )
 
 // trErr translates pkgmk error codes to error strings.
+// TODO: Eventually remove this after everything is ported.
 func trErr(i int, f, p string) error {
 	switch i {
 	default:
@@ -24,12 +25,6 @@ func trErr(i int, f, p string) error {
 		return fmt.Errorf("pkgmk %s %s: Invalid Pkgfile", f, p)
 	case 3:
 		return fmt.Errorf("pkgmk %s %s: Directory missing or missing read/write permission", f, p)
-	case 4:
-		return fmt.Errorf("pkgmk %s %s: Could not download source", f, p)
-	case 5:
-		return fmt.Errorf("pkgmk %s %s: Could not unpack source", f, p)
-	case 6:
-		return fmt.Errorf("pkgmk %s %s: Md5sum verification failed", f, p)
 	case 7:
 		return fmt.Errorf("pkgmk %s %s: Footprint check failed", f, p)
 	case 8:
@@ -107,8 +102,9 @@ func (p port) checkMd5sum() error {
 		io++
 	}
 
+	// TODO: Actually I don't want this printed, can I return an empty err?
 	if e {
-		return fmt.Errorf("pkgmk md5sum %s: Mismatch", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgmk md5sum %s: Verification failed", portBaseLoc(p.Loc))
 	}
 	return nil
 }
@@ -131,6 +127,16 @@ func (p port) createMd5sum(l string) error {
 	sl := strings.Fields(s)
 	sort.Strings(sl)
 
+	m, err := os.OpenFile(path.Join(l, ".md5sum"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		return err
+	}
+	defer m.Close()
+
+	if len(sl) == 0 {
+		return nil
+	}
+
 	// Create .md5sum file.
 	for _, s := range sl {
 		var f string
@@ -151,12 +157,6 @@ func (p port) createMd5sum(l string) error {
 		if _, err := io.Copy(h, hf); err != nil {
 			return err
 		}
-
-		m, err := os.OpenFile(path.Join(l, ".md5sum"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
-		if err != nil {
-			return err
-		}
-		defer m.Close()
 
 		if _, err := m.WriteString(hex.EncodeToString(h.Sum(nil)) + "  " + path.Base(s) + "\n"); err != nil {
 			return err
@@ -211,7 +211,7 @@ func (p port) download(v bool) error {
 
 		printi("Downloading " + path.Base(s))
 		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("pkgmk download %s: Something went wrong", path.Base(s))
+			return fmt.Errorf("pkgmk download %s: Could not download source", path.Base(s))
 		}
 
 		// Remove .partial on completion.
@@ -257,12 +257,8 @@ func (p port) md5sum(v bool) error {
 
 // pkgmk is a wrapper for all the functions in pkgmk.go.
 func (p port) pkgmk(inst []string, v bool) error {
-	// TODO: DO this check in pre()?
-	if _, err := os.Stat(path.Join(p.Loc, "pre-install")); err == nil {
-		err = p.pre(v)
-		if err != nil {
-			return err
-		}
+	if err := p.pre(v); err != nil {
+		return err
 	}
 	if err := p.download(v); err != nil {
 		return err
@@ -295,12 +291,8 @@ func (p port) pkgmk(inst []string, v bool) error {
 			return err
 		}
 	}
-	// TODO: DO this check in post()?
-	if _, err := os.Stat(path.Join(p.Loc, "post-install")); err == nil {
-		err = p.post(v)
-		if err != nil {
-			return err
-		}
+	if err := p.post(v); err != nil {
+		return err
 	}
 
 	return nil
@@ -308,6 +300,10 @@ func (p port) pkgmk(inst []string, v bool) error {
 
 // post runs a pre-install scripts.
 func (p port) post(v bool) error {
+	if _, err := os.Stat(path.Join(p.Loc, "post-install")); err != nil {
+		return nil
+	}
+
 	cmd := exec.Command("bash", "./post-install")
 	cmd.Dir = p.Loc
 	if v {
@@ -325,6 +321,10 @@ func (p port) post(v bool) error {
 
 // pre runs a pre-install scripts.
 func (p port) pre(v bool) error {
+	if _, err := os.Stat(path.Join(p.Loc, "pre-install")); err != nil {
+		return nil
+	}
+
 	cmd := exec.Command("bash", "./pre-install")
 	cmd.Dir = p.Loc
 	if v {
@@ -369,10 +369,10 @@ func (p port) unpack(v bool) error {
 
 	// Unpack sources.
 	for _, s := range sl {
+		printi("Unpacking " + path.Base(s))
+
 		r := regexp.MustCompile(".(tar|tar.gz|tar.Z|tgz|tar.bz2|tbz2|tar.xz|txz|tar.lzma|tar.lz|zip|rpm)$")
 		if r.MatchString(s) {
-			printi("Unpacking " + path.Base(s))
-
 			cmd := exec.Command("bsdtar", "-p", "-o", "-C", wsd, "-xf", path.Join(config.SrcDir, path.Base(s)))
 			if v {
 				cmd.Stdout = os.Stdout
@@ -380,12 +380,10 @@ func (p port) unpack(v bool) error {
 			}
 
 			if err := cmd.Run(); err != nil {
-				return fmt.Errorf("pkgmk unpack %s: Something went wrong", path.Base(s))
+				return fmt.Errorf("pkgmk unpack %s: Could not unpack source", path.Base(s))
 			}
 		} else {
-			printi("Moving " + path.Base(s))
-
-			// TODO: MAke this missing
+			// TODO: Make this missing.
 			f, _ := os.Open(path.Join(p.Loc, path.Base(s)))
 			defer f.Close()
 

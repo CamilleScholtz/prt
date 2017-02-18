@@ -118,6 +118,7 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 ---
 
 - [ ] Write tests.
+- [ ] Make errors pretty and consistent.
 - [x] Write README and man pages. *(needs some updates with changes)*
 
 
