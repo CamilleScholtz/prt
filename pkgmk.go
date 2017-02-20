@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -31,8 +32,6 @@ func trErr(i int, f, p string) error {
 		return fmt.Errorf("pkgmk %s %s: Footprint check failed", f, p)
 	case 8:
 		return fmt.Errorf("pkgmk %s %s: Error while running build()", f, p)
-	case 10:
-		return fmt.Errorf("pkgmk %s %s: Signature verification failed", f, p)
 	}
 }
 
@@ -58,17 +57,17 @@ func (p port) build(f, v bool) error {
 	return nil
 }
 
-// checkMd5sum creates the .md5sum file.
+// checkMd5sum checks the .md5sum file.
 func (p port) checkMd5sum() error {
-	p.createMd5sum("/tmp")
-	defer os.Remove("/tmp/.md5sum")
+	p.createMd5sum("/tmp/prt")
 
+	// TODO: Use p.Md5sum here.
 	o, err := os.Open(path.Join(p.Loc, ".md5sum"))
 	if err != nil {
 		return err
 	}
 	defer o.Close()
-	n, err := os.Open("/tmp/.md5sum")
+	n, err := os.Open("/tmp/prt/.md5sum")
 	if err != nil {
 		return err
 	}
@@ -88,10 +87,10 @@ func (p port) checkMd5sum() error {
 
 				if len(sn.Text()) == 0 {
 					e = true
-					printe("Missing md5sum " + lo[0] + " for " + lo[2])
+					printe("Mismatch " + lo[0])
 				} else if lo[0] != ln[0] {
 					e = true
-					printe("New md5sum " + ln[0] + " for " + ln[2])
+					printe("Mismatch " + ln[0])
 				}
 			}
 
@@ -104,17 +103,69 @@ func (p port) checkMd5sum() error {
 		io++
 	}
 
-	// TODO: Actually I don't want this printed, can I return an empty err?
 	if e {
-		return fmt.Errorf("pkgmk md5sum %s: Verification failed", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgmk md5sum %s: verification failed", portBaseLoc(p.Loc))
 	}
 	return nil
 }
 
-// cleanWrkDir removes the necessary WrkDir directories.
-func (p port) cleanWrkDir() error {
-	wd := path.Join(config.WrkDir, path.Base(p.Loc))
-	os.Remove(wd)
+// checkSignature checks the .signature file.
+func (p port) checkSignature() error {
+	// Get sources.
+	s, err := p.variableSource("source")
+	if err != nil {
+		return err
+	}
+	sl := strings.Fields(s)
+	sort.Sort(byBase(sl))
+
+	// Prepend Pkgfile and .footprint to sources.
+	sl = append([]string{"Pkgfile", ".footprint"}, sl...)
+
+	for _, s := range sl {
+		r := regexp.MustCompile("^(http|https|ftp|file)://")
+		if r.MatchString(s) {
+			s = path.Join(config.SrcDir, path.Base(s))
+		} else {
+			s = path.Join(p.Loc, path.Base(s))
+		}
+
+		if err := os.Symlink(s, path.Join("/tmp/prt/"+path.Base(s))); err != nil {
+			return err
+		}
+	}
+
+	// TODO: Do this in Go.
+	cmd := exec.Command("signify", "-q", "-C", "-x", path.Join(p.Loc, ".signature"))
+	cmd.Dir = "/tmp/prt"
+	var b bytes.Buffer
+	cmd.Stderr = &b
+
+	if err := cmd.Run(); err != nil {
+		for _, l := range strings.Split(b.String(), "\n") {
+			if len(l) == 0 {
+				continue
+			}
+
+			printe("Mismatch " + strings.Trim(l, ": FAIL"))
+
+		}
+		return fmt.Errorf("pkgmk signature %s: verification failed", portBaseLoc(p.Loc))
+	}
+
+	return nil
+}
+
+// cleanWrk removes the necessary WrkDir directories.
+func (p port) cleanWrk() error {
+	if err := os.RemoveAll(path.Join(config.WrkDir, path.Base(p.Loc))); err != nil {
+		return err
+	}
+
+	// Temp directory used by some functions.
+	if err := os.RemoveAll("/tmp/prt"); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -129,27 +180,26 @@ func (p port) createMd5sum(l string) error {
 	sl := strings.Fields(s)
 	sort.Sort(byBase(sl))
 
-	m, err := os.OpenFile(path.Join(l, ".md5sum"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	f, err := os.OpenFile(path.Join(l, ".md5sum"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
 		return err
 	}
-	defer m.Close()
+	defer f.Close()
 
+	// Just leave the file empty if there are no sources.
 	if len(sl) == 0 {
 		return nil
 	}
 
-	// Create .md5sum file.
 	for _, s := range sl {
-		var f string
 		r := regexp.MustCompile("^(http|https|ftp|file)://")
 		if r.MatchString(s) {
-			f = path.Join(config.SrcDir, path.Base(s))
+			s = path.Join(config.SrcDir, path.Base(s))
 		} else {
-			f = path.Join(p.Loc, path.Base(s))
+			s = path.Join(p.Loc, path.Base(s))
 		}
 
-		hf, err := os.Open(f)
+		hf, err := os.Open(s)
 		if err != nil {
 			return err
 		}
@@ -160,7 +210,7 @@ func (p port) createMd5sum(l string) error {
 			return err
 		}
 
-		if _, err := m.WriteString(hex.EncodeToString(h.Sum(nil)) + "  " + path.Base(s) + "\n"); err != nil {
+		if _, err := f.WriteString(hex.EncodeToString(h.Sum(nil)) + "  " + path.Base(s) + "\n"); err != nil {
 			return err
 		}
 	}
@@ -168,16 +218,24 @@ func (p port) createMd5sum(l string) error {
 	return nil
 }
 
-// createWrkDir creates the necessary WrkDir directories.
-func (p port) createWrkDir() (string, string, string, error) {
-	wd := path.Join(config.WrkDir, path.Base(p.Loc))
-	wpd := path.Join(config.WrkDir, path.Base(p.Loc), "pkg")
-	wsd := path.Join(config.WrkDir, path.Base(p.Loc), "src")
-	os.Mkdir(wd, 0777)
-	os.Mkdir(wpd, 0777)
-	os.Mkdir(wsd, 0777)
+// createWrk creates the necessary WrkDir directories.
+func (p port) createWrk() error {
+	if err := os.Mkdir(path.Join(config.WrkDir, path.Base(p.Loc)), 0777); err != nil {
+		return err
+	}
+	if err := os.Mkdir(path.Join(config.WrkDir, path.Base(p.Loc), "pkg"), 0777); err != nil {
+		return err
+	}
+	if err := os.Mkdir(path.Join(config.WrkDir, path.Base(p.Loc), "src"), 0777); err != nil {
+		return err
+	}
 
-	return wd, wpd, wsd, nil
+	// Temp directory used by some functions.
+	if err := os.Mkdir("/tmp/prt", 0777); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // download downloads a port sources.
@@ -205,7 +263,7 @@ func (p port) download(v bool) error {
 			continue
 		}
 
-		// TODO: Can I use some go package for this?
+		// TODO: Can I use some Go package for this?
 		cmd := exec.Command("curl", "-L", "-#", "--fail", "--ftp-pasv", "-C", "-", "-o", f+".partial", s)
 		if v {
 			cmd.Stdout = os.Stdout
@@ -241,9 +299,15 @@ func (p port) install(v bool) error {
 	return nil
 }
 
-// md5sum checks and optionally creates the .md5sum file.
-func (p port) md5sum(v bool) error {
-	if _, err := os.Stat(path.Join(p.Loc, ".md5sum")); err == nil {
+// md5sum checks the .md5sum file.
+func (p port) md5sum() error {
+	// Only check md5sum if there is no signature.
+	if p.Signature != nil {
+		return nil
+	}
+
+	// Check .md5sum if it exists, else create it.
+	if p.Md5sum != nil {
 		printi("Checking md5sum")
 		if err := p.checkMd5sum(); err != nil {
 			return err
@@ -260,17 +324,23 @@ func (p port) md5sum(v bool) error {
 
 // pkgmk is a wrapper for all the functions in pkgmk.go.
 func (p port) pkgmk(inst []string, v bool) error {
+	if err := p.createWrk(); err != nil {
+		return err
+	}
+	defer p.cleanWrk()
 	if err := p.pre(v); err != nil {
 		return err
 	}
 	if err := p.download(v); err != nil {
 		return err
 	}
-	if err := p.md5sum(v); err != nil {
+	if err := p.md5sum(); err != nil {
 		return err
 	}
-	defer p.cleanWrkDir()
-	if err := p.unpack(v); err != nil {
+	if err := p.signature(); err != nil {
+		return err
+	}
+	if err := p.unpack(); err != nil {
 		return err
 	}
 	printi("Building package")
@@ -355,8 +425,25 @@ func pkgUninstall(todo string) error {
 	return nil
 }
 
+// signature checks and optionally creates the .signature file.
+func (p port) signature() error {
+	if p.Signature != nil {
+		printi("Checking signature")
+		if err := p.checkSignature(); err != nil {
+			return err
+		}
+	} else {
+		printi("Creating signature")
+		//if err := p.createSignature(p.Loc); err != nil {
+		//	return err
+		//}
+	}
+
+	return nil
+}
+
 // unpack unpacks a port sources.
-func (p port) unpack(v bool) error {
+func (p port) unpack() error {
 	// Get sources.
 	s, err := p.variableSource("source")
 	if err != nil {
@@ -364,11 +451,6 @@ func (p port) unpack(v bool) error {
 	}
 	sl := strings.Fields(s)
 	sort.Sort(byBase(sl))
-
-	_, _, wsd, err := p.createWrkDir()
-	if err != nil {
-		return err
-	}
 
 	// Unpack sources.
 	for _, s := range sl {
@@ -379,7 +461,7 @@ func (p port) unpack(v bool) error {
 				continue
 			}
 
-			if err := ff.Open(path.Join(config.SrcDir, path.Base(s)), wsd); err != nil {
+			if err := ff.Open(path.Join(config.SrcDir, path.Base(s)), path.Join(config.WrkDir, path.Base(p.Loc), "src")); err != nil {
 				return err
 			}
 			continue
@@ -389,7 +471,7 @@ func (p port) unpack(v bool) error {
 		f, _ := os.Open(path.Join(p.Loc, path.Base(s)))
 		defer f.Close()
 
-		d, err := os.Create(path.Join(wsd, path.Base(s)))
+		d, err := os.Create(path.Join(path.Join(config.WrkDir, path.Base(p.Loc), "src"), path.Base(s)))
 		if err != nil {
 			return err
 		}

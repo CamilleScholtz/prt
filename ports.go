@@ -39,6 +39,7 @@ func allPorts() ([]string, error) {
 
 // portBaseLoc removes the PrtDir from a string.
 // TODO: Should I move this to port.go?
+// TODO: Make it path.Base if config.PrtDir is not found.
 func portBaseLoc(d string) string {
 	return strings.Replace(d, config.PrtDir+"/", "", 1)
 }

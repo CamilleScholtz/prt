@@ -14,7 +14,9 @@ type port struct {
 	Footprint []byte
 	Md5sum    []byte
 	Pkgfile   []byte
-	Loc       string
+	Signature []byte
+
+	Loc string
 }
 
 // comment reads a comment from a Pkgfile.
@@ -40,7 +42,7 @@ func readFootprint(l string) (port, error) {
 		return port{}, err
 	}
 
-	return port{f, nil, nil, l}, nil
+	return port{f, nil, nil, nil, l}, nil
 }
 
 // readMd5sum reads a .md5sum.
@@ -54,7 +56,7 @@ func readMd5sum(l string) (port, error) {
 		return port{}, err
 	}
 
-	return port{nil, m, nil, l}, nil
+	return port{nil, m, nil, nil, l}, nil
 }
 
 // readFootprint reads a Pkgfile.
@@ -64,7 +66,21 @@ func readPkgfile(l string) (port, error) {
 		return port{}, err
 	}
 
-	return port{nil, nil, p, l}, nil
+	return port{nil, nil, p, nil, l}, nil
+}
+
+// readFootprint reads a .signatrure.
+func readSignature(l string) (port, error) {
+	if _, err := os.Stat(path.Join(l, ".signature")); err != nil {
+		return port{}, nil
+	}
+
+	s, err := ioutil.ReadFile(path.Join(l, ".signature"))
+	if err != nil {
+		return port{}, err
+	}
+
+	return port{nil, nil, nil, s, l}, nil
 }
 
 // readPort reads a Pkfile, .footprint and .md5sum.
@@ -83,8 +99,12 @@ func readPort(l string) (port, error) {
 	if err != nil {
 		return port{}, err
 	}
+	s, err := readSignature(l)
+	if err != nil {
+		return port{}, err
+	}
 
-	return port{f.Footprint, m.Md5sum, p.Pkgfile, l}, nil
+	return port{f.Footprint, m.Md5sum, p.Pkgfile, s.Signature, l}, nil
 }
 
 // variable reads a variable from a Pkgfile.

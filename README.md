@@ -92,13 +92,13 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [x] Convert `pkgmk` `check_pkgfile` function to Go.
 - [x] Convert `pkgmk` `check_directory` function to Go.
 - [x] Convert `pkgmk` `check_file` function to Go.
-- [x] Convert `pkgmk` `download_file` function to Go. *(`curl` is still used to download the sources, is there some pure Go implementation)*
+- [x] Convert `pkgmk` `download_file` function to Go. *(`curl` is still used, is there some pure Go implementation?)*
 - [x] Convert `pkgmk` `download_source` function to Go.
 - [x] Convert `pkgmk` `unpack_source` function to Go.
 - [x] Convert `pkgmk` `make_md5sum` function to Go.
 - [ ] Convert `pkgmk` `make_footprint` function to Go.
 - [x] Convert `pkgmk` `check_md5sum` function to Go.
-- [ ] Convert `pkgmk` `check_signature` function to Go.
+- [x] Convert `pkgmk` `check_signature` function to Go. *(`signify` is still used, is there some pure Go implementation?)*
 - [ ] Convert `pkgmk` `make_signature` function to Go.
 - [ ] Convert `pkgmk` `strip_files` function to Go.
 - [ ] Convert `pkgmk` `compress_manpages` function to Go.
