@@ -31,6 +31,24 @@ func (p port) comment(v string) (string, error) {
 	return string(m[1]), nil
 }
 
+// function checks if for a function in a Pkgfile.
+func (p port) function(f string) error {
+	cmd := exec.Command("bash", "-c", "source ./Pkgfile && type -t "+f)
+	cmd.Dir = p.Loc
+	var b bytes.Buffer
+	cmd.Stdout = &b
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("pkgfile %s: Could not source", f)
+	}
+
+	if b.String() != "function\n" {
+		return fmt.Errorf("pkgfile %s: No such function", f)
+	}
+
+	return nil
+}
+
 // readFootprint reads a .footprint.
 func readFootprint(l string) (port, error) {
 	if _, err := os.Stat(path.Join(l, ".footprint")); err != nil {

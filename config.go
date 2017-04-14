@@ -7,7 +7,8 @@ import (
 	"github.com/fatih/color"
 )
 
-// config is a stuct with all config values. See `runtime/config/config.toml` for// more information about these values.
+// config is a stuct with all config values. See `runtime/config/config.toml` for
+// more information about these values.
 var config struct {
 	PrtDir     string
 	PkgDir     string

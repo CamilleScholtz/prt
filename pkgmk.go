@@ -57,6 +57,21 @@ func (p port) build(f, v bool) error {
 	return nil
 }
 
+// check check if all needed directories present.
+func (p port) checkDir() error {
+	if _, err := os.Stat(config.SrcDir); os.IsNotExist(err) {
+		return err
+	}
+	if _, err := os.Stat(config.PkgDir); os.IsNotExist(err) {
+		return err
+	}
+	if _, err := os.Stat(config.WrkDir); os.IsNotExist(err) {
+		return err
+	}
+
+	return nil
+}
+
 // checkMd5sum checks the .md5sum file.
 func (p port) checkMd5sum() error {
 	p.createMd5sum("/tmp/prt")
@@ -106,6 +121,24 @@ func (p port) checkMd5sum() error {
 	if e {
 		return fmt.Errorf("pkgmk md5sum %s: verification failed", portBaseLoc(p.Loc))
 	}
+	return nil
+}
+
+// check check if all needed variables are present.
+func (p port) checkPkgfile() error {
+	if _, err := p.variable("name"); err != nil {
+		return err
+	}
+	if _, err := p.variable("version"); err != nil {
+		return err
+	}
+	if _, err := p.variable("release"); err != nil {
+		return err
+	}
+	if err := p.function("build"); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -231,6 +264,8 @@ func (p port) createWrk() error {
 	}
 
 	// Temp directory used by some functions.
+	// TODO: Is this needed?
+	// TODO: Use os.TempDir()?
 	if err := os.Mkdir("/tmp/prt", 0777); err != nil {
 		return err
 	}
@@ -324,6 +359,12 @@ func (p port) md5sum() error {
 
 // pkgmk is a wrapper for all the functions in pkgmk.go.
 func (p port) pkgmk(inst []string, v bool) error {
+	if err := p.checkDir(); err != nil {
+		return err
+	}
+	if err := p.checkPkgfile(); err != nil {
+		return err
+	}
 	if err := p.createWrk(); err != nil {
 		return err
 	}
@@ -443,6 +484,7 @@ func (p port) signature() error {
 }
 
 // unpack unpacks a port sources.
+// TODO: Don't run this if the Pkgfile has its own unpack function.
 func (p port) unpack() error {
 	// Get sources.
 	s, err := p.variableSource("source")
