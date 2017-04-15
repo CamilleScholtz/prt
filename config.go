@@ -9,22 +9,27 @@ import (
 
 // config is a stuct with all config values. See `runtime/config/config.toml` for
 // more information about these values.
+// TODO: Make this a type.
 var config struct {
-	PrtDir     string
-	PkgDir     string
-	SrcDir     string
-	WrkDir     string
-	Order      []string
-	Alias      [][]string
+	PrtDir string
+	PkgDir string
+	SrcDir string
+	WrkDir string
+
+	Order []string
+	Alias [][]string
+
 	IndentChar string
 	ErrorChar  string
 	DarkColor  color.Attribute
 	ErrorColor color.Attribute
 	LightColor color.Attribute
-	Pull       map[string]Pull
+
+	Pull map[string]Pull
 }
 
 // Pull is a struct with values related to repos.
+// TODO: Why does this need to be a global?
 type Pull struct {
 	URL    string
 	Branch string
@@ -45,8 +50,8 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 	return i, nil
 }
 
-// initConfig initializes the config struct.
-func initConfig() error {
+// decodeConfig decodes a toml config..
+func decodeConfig() error {
 	_, err := toml.DecodeFile("/etc/prt/config.toml", &config)
 	if err != nil {
 		return fmt.Errorf("config /etc/prt/config.toml: " + err.Error())

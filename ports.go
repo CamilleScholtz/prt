@@ -52,7 +52,6 @@ func portFullLoc(d string) string {
 
 // instPorts lists all installed ports.
 func instPorts() ([]string, error) {
-	// Read out pkg db.
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return []string{}, err
@@ -79,7 +78,6 @@ func instPorts() ([]string, error) {
 // instVersPorts list all installed versions, this should follow the same order
 // as Inst().
 func instVersPorts() ([]string, error) {
-	// Read out pkg db.
 	db, err := os.Open("/var/lib/pkg/db")
 	if err != nil {
 		return []string{}, err

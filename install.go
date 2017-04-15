@@ -54,22 +54,14 @@ func install(args []string) {
 	var i int
 	var recursive func(l string)
 	recursive = func(l string) {
-		// Read out Pkgfile.
-		f, err := readPkgfile(l)
+		p, err := decodePort(".", "Pkgfile")
 		if err != nil {
 			printe(err.Error())
 			return
 		}
 
-		// Get dependencies from Pkgfile.
-		d, err := f.comment("Depends on")
-		if err != nil {
-			return
-		}
-		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
-
 		// Get location and dependencies for each port in dependency list.
-		for _, p := range dl {
+		for _, p := range p.Pkgfile.Depends {
 			// Get port location.
 			ll, err := portLoc(all, p)
 			if err != nil {
@@ -173,22 +165,14 @@ func install(args []string) {
 	if strings.Contains(wd, config.PrtDir) {
 		instMe = append(instMe, portBaseLoc(wd))
 	} else {
-		// Read out Pkgfile.
-		f, err := readPkgfile(".")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-
-		// Get port name from Pkgfile.
-		d, err := f.variable("name")
+		p, err := decodePort(".", "Pkgfile")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
 		// Add name to ports to install.
-		instMe = append(instMe, d)
+		instMe = append(instMe, p.Pkgfile.Name)
 	}
 
 	// Actually install ports in this loop.
@@ -202,7 +186,7 @@ func install(args []string) {
 		}
 
 		// Read out the port files.
-		p, err := readPort(ls)
+		p, err := decodePortStrict(ls, "Footprint", "Md5sum", "Pkgfile")
 		if err != nil {
 			printe(err.Error())
 			return

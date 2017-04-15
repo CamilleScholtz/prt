@@ -60,22 +60,14 @@ func depends(args []string) {
 	var i int
 	var recursive func(l string)
 	recursive = func(l string) {
-		// Read out Pkgfile.
-		f, err := readPkgfile(l)
+		p, err := decodePort(l, "Pkgfile")
 		if err != nil {
 			printe(err.Error())
 			return
 		}
 
-		// Get dependencies from Pkgfile.
-		d, err := f.comment("Depends on")
-		if err != nil {
-			return
-		}
-		dl := strings.Split(strings.Replace(d, ",", "", -1), " ")
-
 		// Get location and dependencies for each port in dependency list.
-		for _, p := range dl {
+		for _, p := range p.Pkgfile.Depends {
 			// Get port location.
 			ll, err := portLoc(all, p)
 			if err != nil {

@@ -89,19 +89,14 @@ func list(args []string) {
 				// Get installed version.
 				v = instv[i]
 			} else {
-				// Read out Pkgfile.
-				f, err := readPkgfile(portFullLoc(p))
+				p, err := decodePort(portFullLoc(p), "Pkgfile")
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
-					continue
+					os.Exit(1)
 				}
 
 				// Get available version from Pkgfile.
-				v, err = f.variable("version")
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-					continue
-				}
+				v = p.Pkgfile.Version
 			}
 
 			// Merge port and version.

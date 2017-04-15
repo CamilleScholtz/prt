@@ -68,25 +68,14 @@ func diff(args []string) {
 			l = portAlias(l)
 		}
 
-		// Read out Pkgfile.
-		f, err := readPkgfile(portFullLoc(l))
+		p, err := decodePort(portFullLoc(l), "Pkgfile")
 		if err != nil {
 			printe(err.Error())
 			return
 		}
 
 		// Get available version and release from Pkgfile.
-		v, err := f.variable("version")
-		if err != nil {
-			printe(err.Error())
-			return
-		}
-		r, err := f.variable("release")
-		if err != nil {
-			printe(err.Error())
-			return
-		}
-		availv := v + "-" + r
+		availv := p.Pkgfile.Version + "-" + p.Pkgfile.Release
 
 		// Print if installed and available version don't match.
 		if availv != instv[i] {

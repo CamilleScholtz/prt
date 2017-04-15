@@ -11,8 +11,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Initialize the config.
-	if err := initConfig(); err != nil {
+	if err := decodeConfig(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

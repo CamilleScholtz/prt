@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
@@ -75,46 +74,28 @@ func (p port) checkDir() error {
 func (p port) checkMd5sum() error {
 	p.createMd5sum("/tmp/prt")
 
-	// TODO: Use p.Md5sum here.
-	o, err := os.Open(path.Join(p.Loc, ".md5sum"))
+	t, err := decodeMd5sum("/tmp/prt")
 	if err != nil {
 		return err
 	}
-	defer o.Close()
-	n, err := os.Open("/tmp/prt/.md5sum")
-	if err != nil {
-		return err
-	}
-	defer n.Close()
 
 	var e bool
-	so := bufio.NewScanner(o)
-	var io int
-	for so.Scan() {
-		sn := bufio.NewScanner(n)
-		var in int
-		for i := 0; i <= io; i++ {
-			sn.Scan()
-			if io == in {
-				lo := strings.Split(so.Text(), " ")
-				ln := strings.Split(sn.Text(), " ")
-
-				if len(sn.Text()) == 0 {
+	for pi, pl := range p.Md5sum.Hash {
+		for ti, tl := range t.Hash {
+			if pl == tl {
+				if len(tl) == 0 {
 					e = true
-					printe("Mismatch " + lo[0])
-				} else if lo[0] != ln[0] {
+					printe("1 Mismatch " + pl)
+				} else if pl != tl {
 					e = true
-					printe("Mismatch " + ln[0])
+					printe("2 Mismatch " + tl)
 				}
 			}
 
-			in++
+			if ti <= pi {
+				break
+			}
 		}
-
-		if _, err := n.Seek(0, os.SEEK_SET); err != nil {
-			return err
-		}
-		io++
 	}
 
 	if e {
@@ -125,30 +106,27 @@ func (p port) checkMd5sum() error {
 
 // check check if all needed variables are present.
 func (p port) checkPkgfile() error {
-	if _, err := p.variable("name"); err != nil {
-		return err
+	if p.Pkgfile.Name == "" {
+		return fmt.Errorf("pkgfile checkPkgfile %s: Name variable is empty", portBaseLoc(p.Loc))
 	}
-	if _, err := p.variable("version"); err != nil {
-		return err
+	if p.Pkgfile.Version == "" {
+		return fmt.Errorf("pkgfile checkPkgfile %s: Version variable is empty", portBaseLoc(p.Loc))
 	}
-	if _, err := p.variable("release"); err != nil {
-		return err
+	if p.Pkgfile.Release == "" {
+		return fmt.Errorf("pkgfile checkPkgfile %s: Release variable is empty", portBaseLoc(p.Loc))
 	}
-	if err := p.function("build"); err != nil {
-		return err
-	}
+	// TODO: Add a function function in port.go.
+	//if err := p.function("build"); err != nil {
+	//	return fmt.Errorf("pkgfile checkPkgfile %s: Build function is empty", portBaseLoc(p.Loc))
+	//}
 
 	return nil
 }
 
 // checkSignature checks the .signature file.
+// TODO: Rewrite this.
 func (p port) checkSignature() error {
-	// Get sources.
-	s, err := p.variableSource("source")
-	if err != nil {
-		return err
-	}
-	sl := strings.Fields(s)
+	sl := p.Pkgfile.Source
 	sort.Sort(byBase(sl))
 
 	// Prepend Pkgfile and .footprint to sources.
@@ -190,12 +168,7 @@ func (p port) checkSignature() error {
 
 // cleanWrk removes the necessary WrkDir directories.
 func (p port) cleanWrk() error {
-	n, err := p.variable("name")
-	if err != nil {
-		return err
-	}
-
-	if err := os.RemoveAll(path.Join(config.WrkDir, n)); err != nil {
+	if err := os.RemoveAll(path.Join(config.WrkDir, p.Pkgfile.Name)); err != nil {
 		return err
 	}
 
@@ -207,14 +180,9 @@ func (p port) cleanWrk() error {
 	return nil
 }
 
-// createMd5sum creates the .md5sum file.
+// createMd5sum creates a .md5sum file.
 func (p port) createMd5sum(l string) error {
-	// Get sources.
-	s, err := p.variableSource("source")
-	if err != nil {
-		return err
-	}
-	sl := strings.Fields(s)
+	sl := p.Pkgfile.Source
 	sort.Sort(byBase(sl))
 
 	f, err := os.OpenFile(path.Join(l, ".md5sum"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
@@ -257,18 +225,13 @@ func (p port) createMd5sum(l string) error {
 
 // createWrk creates the necessary WrkDir directories.
 func (p port) createWrk() error {
-	n, err := p.variable("name")
-	if err != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name), 0777); err != nil {
 		return err
 	}
-
-	if err := os.Mkdir(path.Join(config.WrkDir, n), 0777); err != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "pkg"), 0777); err != nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(config.WrkDir, n, "pkg"), 0777); err != nil {
-		return err
-	}
-	if err := os.Mkdir(path.Join(config.WrkDir, n, "src"), 0777); err != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "src"), 0777); err != nil {
 		return err
 	}
 
@@ -283,12 +246,7 @@ func (p port) createWrk() error {
 
 // download downloads a port sources.
 func (p port) download(v bool) error {
-	// Get sources.
-	s, err := p.variableSource("source")
-	if err != nil {
-		return err
-	}
-	sl := strings.Fields(s)
+	sl := p.Pkgfile.Source
 	sort.Sort(byBase(sl))
 
 	// Download sources.
@@ -345,12 +303,13 @@ func (p port) install(v bool) error {
 // md5sum checks the .md5sum file.
 func (p port) md5sum() error {
 	// Only check md5sum if there is no signature.
-	if p.Signature != nil {
-		return nil
-	}
+	// TODO
+	//if p.Signature != nil {
+	//	return nil
+	//}
 
 	// Check .md5sum if it exists, else create it.
-	if p.Md5sum != nil {
+	if _, err := os.Stat(path.Join(p.Loc, ".md5sum")); err == nil {
 		printi("Checking md5sum")
 		if err := p.checkMd5sum(); err != nil {
 			return err
@@ -419,34 +378,12 @@ func pkgUninstall(todo string) error {
 	return nil
 }
 
-// signature checks and optionally creates the .signature file.
-func (p port) signature() error {
-	if p.Signature != nil {
-		printi("Checking signature")
-		if err := p.checkSignature(); err != nil {
-			return err
-		}
-	} else {
-		printi("Creating signature")
-		//if err := p.createSignature(p.Loc); err != nil {
-		//	return err
-		//}
-	}
-
-	return nil
-}
-
 // unpack unpacks a port sources.
 // TODO: Don't run this if the Pkgfile has its own unpack function.
 // TODO: Or should I, it's a lot of added complexity for basically just
 // the Go port, I could try to rewrite that port.
 func (p port) unpack() error {
-	// Get sources.
-	s, err := p.variableSource("source")
-	if err != nil {
-		return err
-	}
-	sl := strings.Fields(s)
+	sl := p.Pkgfile.Source
 	sort.Sort(byBase(sl))
 
 	// Unpack sources.
@@ -516,9 +453,6 @@ func (p port) pkgmk(inst []string, v bool) error {
 		return err
 	}
 	if err := p.md5sum(); err != nil {
-		return err
-	}
-	if err := p.signature(); err != nil {
 		return err
 	}
 	if err := p.unpack(); err != nil {

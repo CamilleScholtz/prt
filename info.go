@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/go2c/optparse"
 )
+
+// TODO: Check this for all command files, should I use os.Exit or return an err?
 
 // info prints port information.
 func info(args []string) {
@@ -49,8 +52,7 @@ func info(args []string) {
 		os.Exit(0)
 	}
 
-	// Read out Pkgfile.
-	f, err := readPkgfile(".")
+	p, err := decodePort(".", "Pkgfile")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -58,31 +60,24 @@ func info(args []string) {
 
 	// Print info from Pkgfile.
 	if *argd {
-		s, _ := f.comment("Description")
-		fmt.Println("Description: " + s)
+		fmt.Println("Description: " + p.Pkgfile.Description)
 	}
 	if *argu {
-		s, _ := f.comment("URL")
-		fmt.Println("URL: " + s)
+		fmt.Println("URL: " + p.Pkgfile.URL)
 	}
 	if *argm {
-		s, _ := f.comment("Maintainer")
-		fmt.Println("Maintainer: " + s)
+		fmt.Println("Maintainer: " + p.Pkgfile.Maintainer)
 	}
 	if *arge {
-		s, _ := f.comment("Depends on")
-		fmt.Println("Depends on: " + s)
+		fmt.Println("Depends on: " + strings.Join(p.Pkgfile.Depends, ", "))
 	}
 	if *argo {
-		s, _ := f.comment("Nice to have|Optional")
-		fmt.Println("Nice to have: " + s)
+		fmt.Println("Nice to have: " + strings.Join(p.Pkgfile.Optional, ", "))
 	}
 	if *argv {
-		s, _ := f.variable("version")
-		fmt.Println("Version: " + s)
+		fmt.Println("Version: " + p.Pkgfile.Version)
 	}
 	if *argr {
-		s, _ := f.variable("release")
-		fmt.Println("Release: " + s)
+		fmt.Println("Release: " + p.Pkgfile.Release)
 	}
 }

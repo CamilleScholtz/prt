@@ -70,25 +70,13 @@ func sysup(args []string) {
 			continue
 		}
 
-		// Read out the port files.
-		f, err := readPkgfile(portFullLoc(l))
+		p, err := decodePort(portFullLoc(l), "Pkgfile")
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
 		}
 
-		// Get available version.
-		v, err := f.variable("version")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
-		}
-		r, err := f.variable("release")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
-		}
-		availv := v + "-" + r
+		availv := p.Pkgfile.Version + "-" + p.Pkgfile.Release
 
 		// Add to toInst if installed and available version don't match.
 		if availv != instv[i] {
@@ -96,10 +84,10 @@ func sysup(args []string) {
 		}
 	}
 
+	// Actually update ports in this loop.
 	t := len(instMe)
 	for i, l := range instMe {
-		// Read out Pkgfile.
-		p, err := readPort(portFullLoc(l))
+		p, err := decodePortStrict(portFullLoc(l), "Footprint", "Md5sum", "Pkgfile")
 		if err != nil {
 			printe(err.Error())
 			return
