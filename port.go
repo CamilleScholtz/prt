@@ -4,21 +4,25 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 )
 
-// TODO: Make footprint its own type.
 // TODO: Add signature.
 type port struct {
 	Loc string
 
-	Footprint io.Reader
+	Footprint footprint
 	Md5sum    md5sum
 	Pkgfile   pkgfile
+}
+
+type footprint struct {
+	Permission []string
+	Owner      []string
+	File       []string
 }
 
 type md5sum struct {
@@ -42,15 +46,25 @@ type pkgfile struct {
 }
 
 // decodeFootprint decodes a .footprint.
-func decodeFootprint(l string) (io.Reader, error) {
-	s, err := os.Open(path.Join(l, ".footprint"))
-	if err != nil {
-		return nil, err
-	}
-	// TODO: I should probably close this somewhere, right?
-	// defer o.Close()
+func decodeFootprint(l string) (footprint, error) {
+	var f footprint
 
-	return s, nil
+	mf, err := os.Open(path.Join(l, ".md5sum"))
+	if err != nil {
+		return f, err
+	}
+	defer mf.Close()
+	s := bufio.NewScanner(mf)
+
+	for s.Scan() {
+		l := strings.Fields(s.Text())
+
+		f.Permission = append(f.Permission, l[0])
+		f.Owner = append(f.Owner, l[1])
+		f.File = append(f.File, l[2])
+	}
+
+	return f, nil
 }
 
 // decodeMd5sum decodes a .md5sum.
@@ -131,7 +145,7 @@ func decodePkgfile(l string, strict bool) (pkgfile, error) {
 
 // decodePort decodes a port.
 func decodePort(l string, tl ...string) (port, error) {
-	p := port{l, nil, md5sum{}, pkgfile{}}
+	p := port{l, footprint{}, md5sum{}, pkgfile{}}
 
 	var err error
 	for _, t := range tl {
@@ -155,7 +169,7 @@ func decodePort(l string, tl ...string) (port, error) {
 
 // decodePortStrict decodes a port using source, which is slower.
 func decodePortStrict(l string, tl ...string) (port, error) {
-	p := port{l, nil, md5sum{}, pkgfile{}}
+	p := port{l, footprint{}, md5sum{}, pkgfile{}}
 
 	var err error
 	for _, t := range tl {
