@@ -36,19 +36,18 @@ func trErr(i int, f, p string) error {
 }
 
 // build builds a port.
-func (p port) build(f, v bool) error {
+func (p port) build(v bool) error {
 	var cmd *exec.Cmd
-	if f {
-		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo", "-f")
-	} else {
-		cmd = exec.Command("/usr/share/prt/pkgmk", "-bo")
-	}
+	cmd = exec.Command("/usr/share/prt/pkgmk")
 	cmd.Dir = p.Loc
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
+	// TODO: Make this behave like check/createmd5sum in regards
+	// to updating or not.
+	printi("Building package")
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
 		return trErr(i, "build", portBaseLoc(p.Loc))
@@ -191,7 +190,12 @@ func (p port) checkSignature() error {
 
 // cleanWrk removes the necessary WrkDir directories.
 func (p port) cleanWrk() error {
-	if err := os.RemoveAll(path.Join(config.WrkDir, path.Base(p.Loc))); err != nil {
+	n, err := p.variable("name")
+	if err != nil {
+		return err
+	}
+
+	if err := os.RemoveAll(path.Join(config.WrkDir, n)); err != nil {
 		return err
 	}
 
@@ -253,19 +257,23 @@ func (p port) createMd5sum(l string) error {
 
 // createWrk creates the necessary WrkDir directories.
 func (p port) createWrk() error {
-	if err := os.Mkdir(path.Join(config.WrkDir, path.Base(p.Loc)), 0777); err != nil {
+	n, err := p.variable("name")
+	if err != nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(config.WrkDir, path.Base(p.Loc), "pkg"), 0777); err != nil {
+
+	if err := os.Mkdir(path.Join(config.WrkDir, n), 0777); err != nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(config.WrkDir, path.Base(p.Loc), "src"), 0777); err != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, n, "pkg"), 0777); err != nil {
+		return err
+	}
+	if err := os.Mkdir(path.Join(config.WrkDir, n, "src"), 0777); err != nil {
 		return err
 	}
 
 	// Temp directory used by some functions.
 	// TODO: Is this needed?
-	// TODO: Use os.TempDir()?
 	if err := os.Mkdir("/tmp/prt", 0777); err != nil {
 		return err
 	}
@@ -357,61 +365,6 @@ func (p port) md5sum() error {
 	return nil
 }
 
-// pkgmk is a wrapper for all the functions in pkgmk.go.
-func (p port) pkgmk(inst []string, v bool) error {
-	if err := p.checkDir(); err != nil {
-		return err
-	}
-	if err := p.checkPkgfile(); err != nil {
-		return err
-	}
-	if err := p.createWrk(); err != nil {
-		return err
-	}
-	defer p.cleanWrk()
-	if err := p.pre(v); err != nil {
-		return err
-	}
-	if err := p.download(v); err != nil {
-		return err
-	}
-	if err := p.md5sum(); err != nil {
-		return err
-	}
-	if err := p.signature(); err != nil {
-		return err
-	}
-	if err := p.unpack(); err != nil {
-		return err
-	}
-	printi("Building package")
-	if stringInList(path.Base(p.Loc), inst) {
-		if err := p.build(true, v); err != nil {
-			return err
-		}
-	} else {
-		if err := p.build(false, v); err != nil {
-			return err
-		}
-	}
-	if stringInList(path.Base(p.Loc), inst) {
-		printi("Updating package")
-		if err := p.update(v); err != nil {
-			return err
-		}
-	} else {
-		printi("Installing package")
-		if err := p.install(v); err != nil {
-			return err
-		}
-	}
-	if err := p.post(v); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // post runs a pre-install scripts.
 func (p port) post(v bool) error {
 	if _, err := os.Stat(path.Join(p.Loc, "post-install")); err != nil {
@@ -485,6 +438,8 @@ func (p port) signature() error {
 
 // unpack unpacks a port sources.
 // TODO: Don't run this if the Pkgfile has its own unpack function.
+// TODO: Or should I, it's a lot of added complexity for basically just
+// the Go port, I could try to rewrite that port.
 func (p port) unpack() error {
 	// Get sources.
 	s, err := p.variableSource("source")
@@ -537,6 +492,56 @@ func (p port) update(v bool) error {
 	if err := cmd.Run(); err != nil {
 		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
 		return trErr(i, "update", portBaseLoc(p.Loc))
+	}
+
+	return nil
+}
+
+// pkgmk is a wrapper for all the functions in pkgmk.go.
+func (p port) pkgmk(inst []string, v bool) error {
+	if err := p.checkDir(); err != nil {
+		return err
+	}
+	if err := p.checkPkgfile(); err != nil {
+		return err
+	}
+	if err := p.createWrk(); err != nil {
+		return err
+	}
+	defer p.cleanWrk()
+	if err := p.pre(v); err != nil {
+		return err
+	}
+	if err := p.download(v); err != nil {
+		return err
+	}
+	if err := p.md5sum(); err != nil {
+		return err
+	}
+	if err := p.signature(); err != nil {
+		return err
+	}
+	if err := p.unpack(); err != nil {
+		return err
+	}
+	if !stringInList(path.Base(p.Loc), inst) {
+		if err := p.build(v); err != nil {
+			return err
+		}
+	}
+	if stringInList(path.Base(p.Loc), inst) {
+		printi("Updating package")
+		if err := p.update(v); err != nil {
+			return err
+		}
+	} else {
+		printi("Installing package")
+		if err := p.install(v); err != nil {
+			return err
+		}
+	}
+	if err := p.post(v); err != nil {
+		return err
 	}
 
 	return nil
