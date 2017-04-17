@@ -71,8 +71,10 @@ func (p *port) alias() {
 	}
 }
 
-// parseFootprint parses a .footprint file, it returns a
-// footprint type and an error.
+// parseFootprint parses a .footprint file. It will read the
+// .footprint file into a footprint type, which is a struct
+// containing permissions and ownership information and their
+// matching files.
 func (p *port) parseFootprint() error {
 	f, err := os.Open(path.Join(p.Location, ".footprint"))
 	if err != nil {
@@ -92,8 +94,9 @@ func (p *port) parseFootprint() error {
 	return nil
 }
 
-// parseMd5sum parses a .md5sum file, it returns a
-// md5sum type and an error.
+// parseMd5sum parses a .md5sum file. It will read the
+// .md5sum file into a md5sum type, which is a struct
+// containing hashes and their matching files.
 func (p *port) parseMd5sum() error {
 	f, err := os.Open(path.Join(p.Location, ".md5sum"))
 	if err != nil {
@@ -112,8 +115,9 @@ func (p *port) parseMd5sum() error {
 	return nil
 }
 
-// parsePkgfile parses a Pkgfile file, it returns a
-// pkgfile type and an error.
+// parsePkgfile parses a Pkgfile file. It will read the
+// Pkgfile file into a pkgfile type, which is a struct
+// containing the various info a Pkgfile contains.
 func (p *port) parsePkgfile() error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
 	if err != nil {
@@ -160,10 +164,12 @@ func (p *port) parsePkgfile() error {
 	return nil
 }
 
-// parsePkgfileStrict parses a Pkgfile file, it returns a
-// pkgfile type and an error. parsePkgfileStrict differs
-// from parsePkgfile in that parse is used to parse the source
-// field. Since this forks to bash this is relatively slow.
+// parsePkgfileStrict parses a Pkgfile file. It will read the
+// Pkgfile file into a pkgfile type, which is a struct
+// containing the various info a Pkgfile contains.
+// parsePkgfileStrict differs from parsePkgfile in that
+// parse is used to parse the source field. Since this
+// forks to bash this is relatively slow.
 func (p *port) parsePkgfileStrict() error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
 	if err != nil {
@@ -214,6 +220,12 @@ func (p *port) parsePkgfileStrict() error {
 	return nil
 }
 
+// parsePort is a wrapper for the various parse* functions.
+// parsePort will return a port type. tl stands for
+// type list, and is a list with the various port files
+// you want to parse. If you want to parse the Pkgfile
+// and .md5sum of a port you would use:
+// `parsePort(l, "Pkgfile", ".md5sum")`.
 func parsePort(l string, tl ...string) (port, error) {
 	var p port
 	var err error
@@ -237,6 +249,15 @@ func parsePort(l string, tl ...string) (port, error) {
 	return p, nil
 }
 
+// parsePortStrict is a wrapper for the various parse* functions.
+// parsePort will return a port type. tl stands for
+// type list, and is a list with the various port files
+// you want to parse. If you want to parse the Pkgfile
+// and .md5sum of a port you would use:
+// `parsePortStrict(l, "Pkgfile", ".md5sum")`.
+// parsePkgfileStrict differs from parsePort in that
+// it uses parsePkgfileStrict instead of parsePkgfile
+// to parse a Pkgfile.
 func parsePortStrict(l string, tl ...string) (port, error) {
 	var p port
 	var err error
