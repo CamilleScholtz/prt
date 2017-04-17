@@ -11,7 +11,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := decodeConfig(); err != nil {
+	if err := parseConfig(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -45,8 +45,8 @@ func main() {
 		list(os.Args[2:])
 	case "loc":
 		loc(os.Args[2:])
-		//	case "patch":
-		//		patch(os.Args[2:])
+	//	case "patch":
+	//		patch(os.Args[2:])
 	case "prov":
 		prov(os.Args[2:])
 	case "pull":

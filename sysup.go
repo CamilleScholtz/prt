@@ -9,14 +9,14 @@ import (
 )
 
 // sysup updates outdated packages.
-func sysup(args []string) {
+func sysup(input []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argv := o.Bool("verbose", 'v', false)
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	vals, err := o.Parse(args)
+	vals, err := o.Parse(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -33,7 +33,7 @@ func sysup(args []string) {
 	}
 
 	// Get all ports.
-	all, err := allPorts()
+	all, err := ports()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -54,25 +54,24 @@ func sysup(args []string) {
 
 	// Get out of date ports.
 	var instMe []string
-	for i, p := range inst {
+	for i, n := range inst {
 		// Get port location.
-		ll, err := portLoc(all, p)
+		ll, err := location(n, all)
 		if err != nil {
 			continue
 		}
-		l := ll[0]
+
+		p, err := parsePort(fullLocation(ll[0]), "Pkgfile")
+		if err != nil {
+			printe(err.Error())
+			continue
+		}
 
 		// Alias.
-		l = portAlias(l)
+		p.alias()
 
 		// Don't add ports to instMe if in vals.
-		if stringInList(l, vals) {
-			continue
-		}
-
-		p, err := decodePort(portFullLoc(l), "Pkgfile")
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+		if stringInList(baseLocation(p.Location), vals) {
 			continue
 		}
 
@@ -80,14 +79,14 @@ func sysup(args []string) {
 
 		// Add to toInst if installed and available version don't match.
 		if availv != instv[i] {
-			instMe = append(instMe, l)
+			instMe = append(instMe, p.Location)
 		}
 	}
 
 	// Actually update ports in this loop.
 	t := len(instMe)
 	for i, l := range instMe {
-		p, err := decodePortStrict(portFullLoc(l), "Footprint", "Md5sum", "Pkgfile")
+		p, err := parsePortStrict(fullLocation(l), "Footprint", "Md5sum", "Pkgfile")
 		if err != nil {
 			printe(err.Error())
 			return

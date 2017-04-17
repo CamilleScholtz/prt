@@ -11,10 +11,10 @@ import (
 // TODO: Check this for all command files, should I use os.Exit or return an err?
 
 // info prints port information.
-func info(args []string) {
+func info(input []string) {
 	// Enable all arguments if the user hasn't specified any.
 	var b bool
-	if len(args) == 0 {
+	if len(input) == 0 {
 		b = true
 	}
 
@@ -27,10 +27,11 @@ func info(args []string) {
 	argo := o.Bool("optional", 'o', b)
 	argv := o.Bool("version", 'v', b)
 	argr := o.Bool("release", 'r', b)
+	args := o.Bool("source", 's', b)
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	_, err := o.Parse(args)
+	_, err := o.Parse(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -48,11 +49,12 @@ func info(args []string) {
 		fmt.Println("  -o,   --optional        print optional dependencies")
 		fmt.Println("  -v,   --version         print version")
 		fmt.Println("  -r,   --release         print release")
+		fmt.Println("  -s,   --source          print sources")
 		fmt.Println("  -h,   --help            print help and exit")
 		os.Exit(0)
 	}
 
-	p, err := decodePort(".", "Pkgfile")
+	p, err := parsePortStrict(".", "Pkgfile")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -79,5 +81,8 @@ func info(args []string) {
 	}
 	if *argr {
 		fmt.Println("Release: " + p.Pkgfile.Release)
+	}
+	if *args {
+		fmt.Println("Source: " + strings.Join(p.Pkgfile.Source, ", "))
 	}
 }

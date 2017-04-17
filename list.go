@@ -10,7 +10,7 @@ import (
 )
 
 // list lists ports.
-func list(args []string) {
+func list(input []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
@@ -19,7 +19,7 @@ func list(args []string) {
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	_, err := o.Parse(args)
+	_, err := o.Parse(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -38,7 +38,7 @@ func list(args []string) {
 	}
 
 	// Get all ports.
-	all, err := allPorts()
+	all, err := ports()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -64,8 +64,8 @@ func list(args []string) {
 
 		// Get port locations if needed.
 		if *argr {
-			for i, p := range inst {
-				ll, err := portLoc(all, p)
+			for i, n := range inst {
+				ll, err := location(n, all)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					continue
@@ -81,18 +81,17 @@ func list(args []string) {
 		all = inst
 	}
 
-	// TODO: Use l instead of p here?
-	for i, p := range all {
+	for i, n := range all {
 		if *argv {
 			var v string
 			if *argi {
 				// Get installed version.
 				v = instv[i]
 			} else {
-				p, err := decodePort(portFullLoc(p), "Pkgfile")
+				p, err := parsePort(fullLocation(n))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
-					os.Exit(1)
+					continue
 				}
 
 				// Get available version from Pkgfile.
@@ -100,14 +99,14 @@ func list(args []string) {
 			}
 
 			// Merge port and version.
-			p += " " + v
+			n += " " + v
 		}
 
 		// Remove repo if needed.
 		if !*argr && !*argi {
-			p = path.Base(p)
+			n = path.Base(n)
 		}
 
-		fmt.Println(p)
+		fmt.Println(n)
 	}
 }

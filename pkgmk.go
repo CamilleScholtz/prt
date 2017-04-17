@@ -11,34 +11,17 @@ import (
 	"path"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/mholt/archiver"
 )
 
-// trErr translates pkgmk error codes to error strings.
-// TODO: Eventually remove this after everything is ported.
-func trErr(i int, f, p string) error {
-	switch i {
-	default:
-		return fmt.Errorf("pkgmk %s %s: Something went wrong", f, p)
-	case 2:
-		return fmt.Errorf("pkgmk %s %s: Invalid Pkgfile", f, p)
-	case 3:
-		return fmt.Errorf("pkgmk %s %s: Directory missing or missing read/write permission", f, p)
-	case 7:
-		return fmt.Errorf("pkgmk %s %s: Footprint check failed", f, p)
-	case 8:
-		return fmt.Errorf("pkgmk %s %s: Error while running build()", f, p)
-	}
-}
-
-// build builds a port.
+// build builds a port. It does this by running a custom fork
+// of pkgmk.
 func (p port) build(v bool) error {
 	var cmd *exec.Cmd
 	cmd = exec.Command("/usr/share/prt/pkgmk")
-	cmd.Dir = p.Loc
+	cmd.Dir = p.Location
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -48,15 +31,14 @@ func (p port) build(v bool) error {
 	// to updating or not.
 	printi("Building package")
 	if err := cmd.Run(); err != nil {
-		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "build", portBaseLoc(p.Loc))
+		return fmt.Errorf("build %s: Something went wrong", baseLocation(p.Location))
 	}
 
 	return nil
 }
 
-// check check if all needed directories present.
-func (p port) checkDir() error {
+// check checks if all directories need to build a port are present.
+func checkDir() error {
 	if _, err := os.Stat(config.SrcDir); os.IsNotExist(err) {
 		return err
 	}
@@ -70,18 +52,19 @@ func (p port) checkDir() error {
 	return nil
 }
 
-// checkMd5sum checks the .md5sum file.
+// checkMd5sum validates the .md5sum file.
 func (p port) checkMd5sum() error {
 	p.createMd5sum("/tmp/prt")
 
-	t, err := decodeMd5sum("/tmp/prt")
-	if err != nil {
+	var t port
+	t.Location = path.Join("/tmp/prt", p.Pkgfile.Name)
+	if err := t.parseMd5sum(); err != nil {
 		return err
 	}
 
 	var e bool
 	for pi, pl := range p.Md5sum.Hash {
-		for ti, tl := range t.Hash {
+		for ti, tl := range t.Md5sum.Hash {
 			if pl == tl {
 				if len(tl) == 0 {
 					e = true
@@ -99,7 +82,7 @@ func (p port) checkMd5sum() error {
 	}
 
 	if e {
-		return fmt.Errorf("pkgmk md5sum %s: verification failed", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgmk md5sum %s: verification failed", baseLocation(p.Location))
 	}
 	return nil
 }
@@ -107,17 +90,17 @@ func (p port) checkMd5sum() error {
 // check check if all needed variables are present.
 func (p port) checkPkgfile() error {
 	if p.Pkgfile.Name == "" {
-		return fmt.Errorf("pkgfile checkPkgfile %s: Name variable is empty", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgfile checkPkgfile %s: Name variable is empty", baseLocation(p.Location))
 	}
 	if p.Pkgfile.Version == "" {
-		return fmt.Errorf("pkgfile checkPkgfile %s: Version variable is empty", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgfile checkPkgfile %s: Version variable is empty", baseLocation(p.Location))
 	}
 	if p.Pkgfile.Release == "" {
-		return fmt.Errorf("pkgfile checkPkgfile %s: Release variable is empty", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgfile checkPkgfile %s: Release variable is empty", baseLocation(p.Location))
 	}
 	// TODO: Add a function function in port.go.
 	//if err := p.function("build"); err != nil {
-	//	return fmt.Errorf("pkgfile checkPkgfile %s: Build function is empty", portBaseLoc(p.Loc))
+	//	return fmt.Errorf("pkgfile checkPkgfile %s: Build function is empty", portBaseLoc(p.Location))
 	//}
 
 	return nil
@@ -137,7 +120,7 @@ func (p port) checkSignature() error {
 		if r.MatchString(s) {
 			s = path.Join(config.SrcDir, path.Base(s))
 		} else {
-			s = path.Join(p.Loc, path.Base(s))
+			s = path.Join(p.Location, path.Base(s))
 		}
 
 		if err := os.Symlink(s, path.Join("/tmp/prt/"+path.Base(s))); err != nil {
@@ -146,7 +129,7 @@ func (p port) checkSignature() error {
 	}
 
 	// TODO: Do this in Go.
-	cmd := exec.Command("signify", "-q", "-C", "-x", path.Join(p.Loc, ".signature"))
+	cmd := exec.Command("signify", "-q", "-C", "-x", path.Join(p.Location, ".signature"))
 	cmd.Dir = "/tmp/prt"
 	var b bytes.Buffer
 	cmd.Stderr = &b
@@ -160,7 +143,7 @@ func (p port) checkSignature() error {
 			printe("Mismatch " + strings.Trim(l, ": FAIL"))
 
 		}
-		return fmt.Errorf("pkgmk signature %s: verification failed", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgmk signature %s: verification failed", baseLocation(p.Location))
 	}
 
 	return nil
@@ -201,7 +184,7 @@ func (p port) createMd5sum(l string) error {
 		if r.MatchString(s) {
 			s = path.Join(config.SrcDir, path.Base(s))
 		} else {
-			s = path.Join(p.Loc, path.Base(s))
+			s = path.Join(p.Location, path.Base(s))
 		}
 
 		hf, err := os.Open(s)
@@ -286,15 +269,14 @@ func (p port) download(v bool) error {
 // install installs a package.
 func (p port) install(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-io")
-	cmd.Dir = p.Loc
+	cmd.Dir = p.Location
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
 	if err := cmd.Run(); err != nil {
-		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "install", portBaseLoc(p.Loc))
+		return fmt.Errorf("install %s: Something went wrong", baseLocation(p.Location))
 	}
 
 	return nil
@@ -309,14 +291,14 @@ func (p port) md5sum() error {
 	//}
 
 	// Check .md5sum if it exists, else create it.
-	if _, err := os.Stat(path.Join(p.Loc, ".md5sum")); err == nil {
+	if _, err := os.Stat(path.Join(p.Location, ".md5sum")); err == nil {
 		printi("Checking md5sum")
 		if err := p.checkMd5sum(); err != nil {
 			return err
 		}
 	} else {
 		printi("Creating md5sum")
-		if err := p.createMd5sum(p.Loc); err != nil {
+		if err := p.createMd5sum(p.Location); err != nil {
 			return err
 		}
 	}
@@ -326,12 +308,12 @@ func (p port) md5sum() error {
 
 // post runs a pre-install scripts.
 func (p port) post(v bool) error {
-	if _, err := os.Stat(path.Join(p.Loc, "post-install")); err != nil {
+	if _, err := os.Stat(path.Join(p.Location, "post-install")); err != nil {
 		return nil
 	}
 
 	cmd := exec.Command("bash", "./post-install")
-	cmd.Dir = p.Loc
+	cmd.Dir = p.Location
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -339,7 +321,7 @@ func (p port) post(v bool) error {
 
 	printi("Running post-install")
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkgmk post %s: Something went wrong", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgmk post %s: Something went wrong", baseLocation(p.Location))
 	}
 
 	return nil
@@ -347,12 +329,12 @@ func (p port) post(v bool) error {
 
 // pre runs a pre-install scripts.
 func (p port) pre(v bool) error {
-	if _, err := os.Stat(path.Join(p.Loc, "pre-install")); err != nil {
+	if _, err := os.Stat(path.Join(p.Location, "pre-install")); err != nil {
 		return nil
 	}
 
 	cmd := exec.Command("bash", "./pre-install")
-	cmd.Dir = p.Loc
+	cmd.Dir = p.Location
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -360,14 +342,14 @@ func (p port) pre(v bool) error {
 
 	printi("Running pre-install")
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pkgmk pre %s: Something went wrong", portBaseLoc(p.Loc))
+		return fmt.Errorf("pkgmk pre %s: Something went wrong", baseLocation(p.Location))
 	}
 
 	return nil
 }
 
 // uninstall uninstalls a package.
-// TODO
+// TODO: Rewrite this.
 func pkgUninstall(todo string) error {
 	cmd := exec.Command("pkgrm", todo)
 
@@ -395,17 +377,17 @@ func (p port) unpack() error {
 				continue
 			}
 
-			if err := ff.Open(path.Join(config.SrcDir, path.Base(s)), path.Join(config.WrkDir, path.Base(p.Loc), "src")); err != nil {
+			if err := ff.Open(path.Join(config.SrcDir, path.Base(s)), path.Join(config.WrkDir, path.Base(p.Location), "src")); err != nil {
 				return err
 			}
 			continue
 		}
 
 		// TODO: Make this missing.
-		f, _ := os.Open(path.Join(p.Loc, path.Base(s)))
+		f, _ := os.Open(path.Join(p.Location, path.Base(s)))
 		defer f.Close()
 
-		d, err := os.Create(path.Join(path.Join(config.WrkDir, path.Base(p.Loc), "src"), path.Base(s)))
+		d, err := os.Create(path.Join(path.Join(config.WrkDir, path.Base(p.Location), "src"), path.Base(s)))
 		if err != nil {
 			return err
 		}
@@ -420,15 +402,14 @@ func (p port) unpack() error {
 // update updates a package.
 func (p port) update(v bool) error {
 	cmd := exec.Command("/usr/share/prt/pkgmk", "-uo")
-	cmd.Dir = p.Loc
+	cmd.Dir = p.Location
 	if v {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	}
 
 	if err := cmd.Run(); err != nil {
-		i, _ := strconv.Atoi(strings.Split(err.Error(), " ")[2])
-		return trErr(i, "update", portBaseLoc(p.Loc))
+		return fmt.Errorf("update %s: Something went wrong", baseLocation(p.Location))
 	}
 
 	return nil
@@ -436,7 +417,7 @@ func (p port) update(v bool) error {
 
 // pkgmk is a wrapper for all the functions in pkgmk.go.
 func (p port) pkgmk(inst []string, v bool) error {
-	if err := p.checkDir(); err != nil {
+	if err := checkDir(); err != nil {
 		return err
 	}
 	if err := p.checkPkgfile(); err != nil {
@@ -458,12 +439,12 @@ func (p port) pkgmk(inst []string, v bool) error {
 	if err := p.unpack(); err != nil {
 		return err
 	}
-	if !stringInList(path.Base(p.Loc), inst) {
+	if !stringInList(path.Base(p.Location), inst) {
 		if err := p.build(v); err != nil {
 			return err
 		}
 	}
-	if stringInList(path.Base(p.Loc), inst) {
+	if stringInList(path.Base(p.Location), inst) {
 		printi("Updating package")
 		if err := p.update(v); err != nil {
 			return err

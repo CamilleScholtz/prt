@@ -10,154 +10,224 @@ import (
 	"strings"
 )
 
-// TODO: Add signature.
+// port is a struct type with all the files a port should (and could)
+// have. The location of the port is often used as the "key" here.
+// TODO: Add signature, .nostrip, et cetera.
 type port struct {
-	Loc string
+	Location string
 
 	Footprint footprint
 	Md5sum    md5sum
 	Pkgfile   pkgfile
 }
 
+// footprint is a struct type describing a .footprint file.
 type footprint struct {
 	Permission []string
 	Owner      []string
 	File       []string
 }
 
+// md5sum is a struct type describing a .md5sum file.
 type md5sum struct {
 	Hash []string
 	File []string
 }
 
+// pkgfile is a struct type describing a parsed Pkgfile file.
 type pkgfile struct {
+	// Comments with various information that isn't strictly
+	// needed in order to build a package.
 	Description string
 	URL         string
 	Maintainer  string
 
+	// Comments with information about dependencies.
+	// These need some more parsing because there isn't
+	// an official styling guideline, so some Pkgfiles use
+	// commas to separate dependencies, and some don't.
 	Depends  []string
 	Optional []string
 
+	// Variables with various information that is needed
+	// in order to build a package.
 	Name    string
 	Version string
 	Release string
 
+	// A variable array with the needed sources of a port.
+	// We probably need to parse this by actually using bash
+	// because people often use variables (such as $name or
+	// $version) and bashism in the source variable.
 	Source []string
 }
 
-// decodeFootprint decodes a .footprint.
-func decodeFootprint(l string) (footprint, error) {
-	var f footprint
-
-	mf, err := os.Open(path.Join(l, ".md5sum"))
-	if err != nil {
-		return f, err
+// portsAlias aliases ports using the config.Alias values.
+func (p *port) alias() {
+	for _, a := range config.Alias {
+		if a[0] == p.Location {
+			p.Location = a[1]
+		}
 	}
-	defer mf.Close()
-	s := bufio.NewScanner(mf)
-
-	for s.Scan() {
-		l := strings.Fields(s.Text())
-
-		f.Permission = append(f.Permission, l[0])
-		f.Owner = append(f.Owner, l[1])
-		f.File = append(f.File, l[2])
-	}
-
-	return f, nil
 }
 
-// decodeMd5sum decodes a .md5sum.
-func decodeMd5sum(l string) (md5sum, error) {
-	var m md5sum
-
-	mf, err := os.Open(path.Join(l, ".md5sum"))
+// parseFootprint parses a .footprint file, it returns a
+// footprint type and an error.
+func (p *port) parseFootprint() error {
+	f, err := os.Open(path.Join(p.Location, ".footprint"))
 	if err != nil {
-		return m, err
+		return err
 	}
-	defer mf.Close()
-	s := bufio.NewScanner(mf)
+	defer f.Close()
+	s := bufio.NewScanner(f)
 
 	for s.Scan() {
-		l := strings.Fields(s.Text())
+		l := strings.Split(s.Text(), "\t")
 
-		m.Hash = append(m.Hash, l[0])
-		m.File = append(m.File, l[1])
+		p.Footprint.Permission = append(p.Footprint.Permission, l[0])
+		p.Footprint.Owner = append(p.Footprint.Owner, l[1])
+		p.Footprint.File = append(p.Footprint.File, l[2])
 	}
 
-	return m, nil
+	return nil
 }
 
-// decodePkgfile decodes a Pkgfile.
-func decodePkgfile(l string, strict bool) (pkgfile, error) {
-	var f pkgfile
-
-	pf, err := os.Open(path.Join(l, "Pkgfile"))
+// parseMd5sum parses a .md5sum file, it returns a
+// md5sum type and an error.
+func (p *port) parseMd5sum() error {
+	f, err := os.Open(path.Join(p.Location, ".md5sum"))
 	if err != nil {
-		return f, err
+		return err
 	}
-	defer pf.Close()
-	s := bufio.NewScanner(pf)
+	defer f.Close()
+	s := bufio.NewScanner(f)
+
+	for s.Scan() {
+		l := strings.Split(s.Text(), "  ")
+
+		p.Md5sum.Hash = append(p.Md5sum.Hash, l[0])
+		p.Md5sum.File = append(p.Md5sum.File, l[1])
+	}
+
+	return nil
+}
+
+// parsePkgfile parses a Pkgfile file, it returns a
+// pkgfile type and an error.
+func (p *port) parsePkgfile() error {
+	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	s := bufio.NewScanner(f)
 
 	for s.Scan() {
 		i := s.Text()
 
-		// TODO: Use FieldsFunc maybe.
-		switch {
-		case strings.HasPrefix(i, "# Description:"):
-			f.Description = strings.TrimSpace(strings.TrimPrefix(i, "# Description:"))
-		case strings.HasPrefix(i, "# URL:"):
-			f.URL = strings.TrimSpace(strings.TrimPrefix(i, "# URL:"))
-		case strings.HasPrefix(i, "# Maintainer:"):
-			f.Maintainer = strings.TrimSpace(strings.TrimPrefix(i, "# Maintainer:"))
+		if strings.HasPrefix(i, "#") {
+			switch {
+			case p.Pkgfile.Description == "" && strings.HasPrefix(i, "# Description:"):
+				p.Pkgfile.Description = strings.TrimSpace(strings.TrimPrefix(i, "# Description:"))
+			case p.Pkgfile.URL == "" && strings.HasPrefix(i, "# URL:"):
+				p.Pkgfile.URL = strings.TrimSpace(strings.TrimPrefix(i, "# URL:"))
+			case p.Pkgfile.Maintainer == "" && strings.HasPrefix(i, "# Maintainer:"):
+				p.Pkgfile.Maintainer = strings.TrimSpace(strings.TrimPrefix(i, "# Maintainer:"))
 
-		case strings.HasPrefix(i, "# Depends on:"):
-			f.Depends = strings.Fields(strings.Replace(strings.TrimSpace(strings.TrimPrefix(i, "# Depends on:")), ",", "", -1))
-		case strings.HasPrefix(i, "# Optional:"), strings.Contains(i, "# Nice to have:"):
-			f.Optional = strings.Fields(strings.TrimSpace(strings.TrimPrefix(i, "# Optional:")))
-			if len(f.Optional) == 0 {
-				f.Optional = strings.Fields(strings.TrimSpace(strings.TrimPrefix(i, "# Nice to have:")))
+			case len(p.Pkgfile.Depends) == 0 && strings.HasPrefix(i, "# Depends on:"):
+				p.Pkgfile.Depends = strings.Fields(strings.Replace(strings.TrimSpace(strings.TrimPrefix(i, "# Depends on:")), ",", "", -1))
+			case len(p.Pkgfile.Optional) == 0 && strings.HasPrefix(i, "# Optional:"):
+				p.Pkgfile.Optional = strings.Fields(strings.Replace(strings.TrimSpace(strings.TrimPrefix(i, "# Optional:")), ",", "", -1))
+			case len(p.Pkgfile.Optional) == 0 && strings.Contains(i, "# Nice to have:"):
+				p.Pkgfile.Optional = strings.Fields(strings.Replace(strings.TrimSpace(strings.TrimPrefix(i, "# Nice to have:")), ",", "", -1))
 			}
+		} else {
+			switch {
+			case p.Pkgfile.Name == "" && strings.HasPrefix(i, "name="):
+				p.Pkgfile.Name = strings.TrimSpace(strings.TrimPrefix(i, "name="))
+			case p.Pkgfile.Version == "" && strings.HasPrefix(i, "version="):
+				p.Pkgfile.Version = strings.TrimSpace(strings.TrimPrefix(i, "version="))
+			case p.Pkgfile.Release == "" && strings.HasPrefix(i, "release="):
+				p.Pkgfile.Release = strings.TrimSpace(strings.TrimPrefix(i, "release="))
 
-		case strings.HasPrefix(i, "name="):
-			f.Name = strings.TrimSpace(strings.TrimPrefix(i, "name="))
-		case strings.HasPrefix(i, "version="):
-			f.Version = strings.TrimSpace(strings.TrimPrefix(i, "version="))
-		case strings.HasPrefix(i, "release="):
-			f.Release = strings.TrimSpace(strings.TrimPrefix(i, "release="))
+			case len(p.Pkgfile.Source) == 0 && strings.HasPrefix(i, "source="):
+				p.Pkgfile.Source = strings.Fields(strings.TrimSpace(strings.TrimPrefix(i, "source=")))
+				break
+			}
+		}
+	}
 
-		case strings.HasPrefix(i, "source="):
-			if strict {
-				t, err := source(l, "source")
+	return nil
+}
+
+// parsePkgfileStrict parses a Pkgfile file, it returns a
+// pkgfile type and an error. parsePkgfileStrict differs
+// from parsePkgfile in that parse is used to parse the source
+// field. Since this forks to bash this is relatively slow.
+func (p *port) parsePkgfileStrict() error {
+	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	s := bufio.NewScanner(f)
+
+	for s.Scan() {
+		i := s.Text()
+
+		if strings.HasPrefix(i, "#") {
+			switch {
+			case p.Pkgfile.Description == "" && strings.HasPrefix(i, "# Description:"):
+				p.Pkgfile.Description = strings.TrimSpace(strings.TrimPrefix(i, "# Description:"))
+			case p.Pkgfile.URL == "" && strings.HasPrefix(i, "# URL:"):
+				p.Pkgfile.URL = strings.TrimSpace(strings.TrimPrefix(i, "# URL:"))
+			case p.Pkgfile.Maintainer == "" && strings.HasPrefix(i, "# Maintainer:"):
+				p.Pkgfile.Maintainer = strings.TrimSpace(strings.TrimPrefix(i, "# Maintainer:"))
+
+			case len(p.Pkgfile.Depends) == 0 && strings.HasPrefix(i, "# Depends on:"):
+				p.Pkgfile.Depends = strings.Fields(strings.Replace(strings.TrimSpace(strings.TrimPrefix(i, "# Depends on:")), ",", "", -1))
+			case len(p.Pkgfile.Optional) == 0 && strings.HasPrefix(i, "# Optional:"):
+				p.Pkgfile.Optional = strings.Fields(strings.Replace(strings.TrimSpace(strings.TrimPrefix(i, "# Optional:")), ",", "", -1))
+			case len(p.Pkgfile.Optional) == 0 && strings.Contains(i, "# Nice to have:"):
+				p.Pkgfile.Optional = strings.Fields(strings.Replace(strings.TrimSpace(strings.TrimPrefix(i, "# Nice to have:")), ",", "", -1))
+			}
+		} else {
+			switch {
+			case p.Pkgfile.Name == "" && strings.HasPrefix(i, "name="):
+				p.Pkgfile.Name = strings.TrimSpace(strings.TrimPrefix(i, "name="))
+			case p.Pkgfile.Version == "" && strings.HasPrefix(i, "version="):
+				p.Pkgfile.Version = strings.TrimSpace(strings.TrimPrefix(i, "version="))
+			case p.Pkgfile.Release == "" && strings.HasPrefix(i, "release="):
+				p.Pkgfile.Release = strings.TrimSpace(strings.TrimPrefix(i, "release="))
+
+			case len(p.Pkgfile.Source) == 0 && strings.HasPrefix(i, "source="):
+				t, err := p.source("source")
 				if err != nil {
-					return f, err
+					return err
 				}
-				f.Source = strings.Fields(t)
-			} else {
-				f.Source = strings.Fields(strings.TrimSpace(strings.TrimPrefix(i, "source=")))
+				p.Pkgfile.Source = strings.Fields(t)
+				break
 			}
-			break
 		}
 	}
 
-	return f, nil
+	return nil
 }
 
-// decodePort decodes a port.
-func decodePort(l string, tl ...string) (port, error) {
-	p := port{l, footprint{}, md5sum{}, pkgfile{}}
-
+func parsePort(l string, tl ...string) (port, error) {
+	var p port
 	var err error
+	p.Location = l
 	for _, t := range tl {
 		switch t {
 		case "Footprint":
-			p.Footprint, err = decodeFootprint(p.Loc)
+			err = p.parseFootprint()
 		case "Md5sum":
-			p.Md5sum, err = decodeMd5sum(p.Loc)
+			err = p.parseMd5sum()
 		case "Pkgfile":
-			p.Pkgfile, err = decodePkgfile(p.Loc, false)
+			err = p.parsePkgfile()
 		default:
-			return port{}, fmt.Errorf("port decodePort %s: No type '%s'", portBaseLoc(l), t)
+			return port{}, fmt.Errorf("port parsePort %s: No type '%s'", baseLocation(l), t)
 		}
 		if err != nil {
 			return port{}, err
@@ -167,21 +237,20 @@ func decodePort(l string, tl ...string) (port, error) {
 	return p, nil
 }
 
-// decodePortStrict decodes a port using source, which is slower.
-func decodePortStrict(l string, tl ...string) (port, error) {
-	p := port{l, footprint{}, md5sum{}, pkgfile{}}
-
+func parsePortStrict(l string, tl ...string) (port, error) {
+	var p port
 	var err error
+	p.Location = l
 	for _, t := range tl {
 		switch t {
 		case "Footprint":
-			p.Footprint, err = decodeFootprint(p.Loc)
+			err = p.parseFootprint()
 		case "Md5sum":
-			p.Md5sum, err = decodeMd5sum(p.Loc)
+			err = p.parseMd5sum()
 		case "Pkgfile":
-			p.Pkgfile, err = decodePkgfile(p.Loc, true)
+			err = p.parsePkgfileStrict()
 		default:
-			return port{}, fmt.Errorf("port decodePort %s: No type '%s'", portBaseLoc(l), t)
+			return port{}, fmt.Errorf("port parsePortStrict %s: No type '%s'", baseLocation(l), t)
 		}
 		if err != nil {
 			return port{}, err
@@ -189,14 +258,49 @@ func decodePortStrict(l string, tl ...string) (port, error) {
 	}
 
 	return p, nil
+}
+
+// location tries to get the location of a port.
+// It returns a list with possible ports, ordered using
+// the config Order value.
+func location(n string, all []string) ([]string, error) {
+	var l []string
+	for _, p := range all {
+		if path.Base(p) == n {
+			l = append(l, p)
+		}
+	}
+
+	if len(l) == 0 {
+		return []string{}, fmt.Errorf("port location %s: Not in the ports tree", n)
+	}
+
+	// If there are multiple matches, sort using the config Order value.
+	if len(l) > 1 {
+		var i int
+		for _, r := range config.Order {
+			nl := path.Join(r, path.Base(l[i]))
+			if stringInList(nl, all) {
+				l[i] = nl
+				i++
+			}
+
+			// Break if everything has been ordered.
+			if i == len(l) {
+				break
+			}
+		}
+	}
+
+	return l, nil
 }
 
 // source reads a variable from a Pkgfile, this actually uses bash source
 // This is relatively slow but also more precise because it completes variables.
-// This is especially (only?) seful for the source variable in Pkgfiles.
-func source(l, k string) (string, error) {
+// This is especially (only?) useful for the source variable in Pkgfiles.
+func (p port) source(k string) (string, error) {
 	cmd := exec.Command("bash", "-c", "source ./Pkgfile && echo ${"+k+"[@]}")
-	cmd.Dir = l
+	cmd.Dir = p.Location
 	var b bytes.Buffer
 	cmd.Stdout = &b
 

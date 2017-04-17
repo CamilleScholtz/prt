@@ -9,7 +9,6 @@ import (
 
 // config is a stuct with all config values. See `runtime/config/config.toml` for
 // more information about these values.
-// TODO: Make this a type.
 var config struct {
 	PrtDir string
 	PkgDir string
@@ -50,8 +49,8 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 	return i, nil
 }
 
-// decodeConfig decodes a toml config..
-func decodeConfig() error {
+// decodeConfig parses a toml config.
+func parseConfig() error {
 	_, err := toml.DecodeFile("/etc/prt/config.toml", &config)
 	if err != nil {
 		return fmt.Errorf("config /etc/prt/config.toml: " + err.Error())

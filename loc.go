@@ -11,7 +11,7 @@ import (
 )
 
 // loc prints port locations
-func loc(args []string) {
+func loc(input []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argd := o.Bool("duplicate", 'd', false)
@@ -19,7 +19,7 @@ func loc(args []string) {
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	vals, err := o.Parse(args)
+	vals, err := o.Parse(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -43,7 +43,7 @@ func loc(args []string) {
 	}
 
 	// Get all ports.
-	all, err := allPorts()
+	all, err := ports()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -51,16 +51,17 @@ func loc(args []string) {
 
 	var c []string
 	var i int
-	for _, p := range vals {
+	for _, n := range vals {
 		// Continue if already checked.
-		if stringInList(p, c) {
+		if stringInList(n, c) {
 			continue
 		}
+
 		// Add to checked ports.
-		c = append(c, p)
+		c = append(c, n)
 
 		// Get port location.
-		ll, err := portLoc(all, p)
+		ll, err := location(n, all)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			continue
@@ -71,18 +72,24 @@ func loc(args []string) {
 
 		var op string
 		for _, l := range ll {
+			p, err := parsePort(l)
+			if err != nil {
+				printe(err.Error())
+				continue
+			}
+
 			// Alias if needed.
 			if !*argn {
-				l = portAlias(l)
+				p.alias()
 			}
 
 			// Print duplicate indentation.
 			if *argd {
 				// Reset indentation on new port
-				if path.Base(l) != op {
+				if path.Base(p.Location) != op {
 					i = 0
 				}
-				op = path.Base(l)
+				op = path.Base(p.Location)
 
 				if i > 0 {
 					color.Set(config.DarkColor)
@@ -93,7 +100,7 @@ func loc(args []string) {
 			}
 
 			// Finally print the port.
-			fmt.Println(l)
+			fmt.Println(p.Location)
 		}
 	}
 }

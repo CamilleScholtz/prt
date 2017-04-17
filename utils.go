@@ -11,12 +11,8 @@ import (
 type byBase []string
 
 // Custom "by basename" sort.
-func (s byBase) Len() int {
-	return len(s)
-}
-func (s byBase) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
+func (s byBase) Len() int      { return len(s) }
+func (s byBase) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (s byBase) Less(i, j int) bool {
 	if path.Base(s[i]) < path.Base(s[j]) {
 		return true

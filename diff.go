@@ -9,7 +9,7 @@ import (
 )
 
 // Diff lists outdated packages.
-func diff(args []string) {
+func diff(input []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argn := o.Bool("no-alias", 'n', false)
@@ -17,7 +17,7 @@ func diff(args []string) {
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	_, err := o.Parse(args)
+	_, err := o.Parse(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -35,7 +35,7 @@ func diff(args []string) {
 	}
 
 	// Get all ports.
-	all, err := allPorts()
+	all, err := ports()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -55,23 +55,22 @@ func diff(args []string) {
 		os.Exit(1)
 	}
 
-	for i, p := range inst {
+	for i, n := range inst {
 		// Get port location.
-		ll, err := portLoc(all, p)
+		ll, err := location(n, all)
 		if err != nil {
 			continue
 		}
-		l := ll[0]
 
-		// Alias if needed.
-		if *argn {
-			l = portAlias(l)
-		}
-
-		p, err := decodePort(portFullLoc(l), "Pkgfile")
+		p, err := parsePort(fullLocation(ll[0]), "Pkgfile")
 		if err != nil {
 			printe(err.Error())
-			return
+			continue
+		}
+
+		// Alias if needed.
+		if !*argn {
+			p.alias()
 		}
 
 		// Get available version and release from Pkgfile.
@@ -79,7 +78,7 @@ func diff(args []string) {
 
 		// Print if installed and available version don't match.
 		if availv != instv[i] {
-			fmt.Print(p)
+			fmt.Print(p.Pkgfile.Name)
 
 			// Print version information if needed.
 			if *argv {

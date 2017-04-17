@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path"
-	"regexp"
 	"strings"
 
 	"github.com/fatih/color"
@@ -13,14 +11,14 @@ import (
 )
 
 // prov searches ports for files.
-func prov(args []string) {
+func prov(input []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	vals, err := o.Parse(args)
+	vals, err := o.Parse(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -43,13 +41,7 @@ func prov(args []string) {
 	}
 
 	for _, v := range vals {
-		r, err := regexp.Compile(v)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			continue
-		}
-
-		// TODO: Use Alias and Loc here to always display repo info?
+		// TODO: Use Alias and Location here to always display repo info?
 		if *argi {
 			// Read out pkg db.
 			db, err := os.Open("/var/lib/pkg/db")
@@ -62,74 +54,70 @@ func prov(args []string) {
 			// Search for files.
 			var b bool
 			var n string
-			var ll [][]string
+			var fl [][]string
 			for s.Scan() {
 				if b {
 					n = s.Text()
 					b = false
 				} else if s.Text() == "" {
 					b = true
-				} else if r.MatchString(s.Text()) {
-					ll = append(ll, []string{n, s.Text()})
+				} else if strings.Contains(s.Text(), v) {
+					fl = append(fl, []string{n, s.Text()})
 				}
 			}
 
 			var on string
-			for _, l := range ll {
+			for _, f := range fl {
 				// Print port name.
-				if on != l[0] {
-					fmt.Println(l[0])
+				if on != f[0] {
+					fmt.Println(f[0])
 				}
 
 				// Print matched files.
 				color.Set(config.DarkColor)
 				fmt.Print(config.IndentChar)
 				color.Unset()
-				fmt.Println(l[1])
+				fmt.Println(f[1])
 
-				on = l[0]
+				on = f[0]
 			}
 
 			db.Close()
 		} else {
 			// Get all ports.
-			all, err := allPorts()
+			all, err := ports()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				continue
 			}
 
-			for _, p := range all {
-				// Read out Pkgfile.
-				f, err := os.Open(path.Join(portFullLoc(p), ".footprint"))
+			for _, n := range all {
+				p, err := parsePort(fullLocation(n), "Footprint")
 				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
+					printe(err.Error())
 					continue
 				}
-				s := bufio.NewScanner(f)
 
 				// Search for files.
-				var ll []string
-				for s.Scan() {
-					if r.MatchString(s.Text()) {
-						ll = append(ll, s.Text())
+				var fl []string
+				for _, f := range p.Footprint.File {
+					if strings.Contains(f, v) {
+						fl = append(fl, f)
 					}
 				}
 
 				// Print port name.
-				if len(ll) > 0 {
-					fmt.Println(p)
+				if len(fl) > 0 {
+					fmt.Println(n)
 				}
 
 				// Print matched files.
-				for _, l := range ll {
+				for _, f := range fl {
 					color.Set(config.DarkColor)
 					fmt.Print(config.IndentChar)
 					color.Unset()
-					fmt.Println(strings.Split(l, "\t")[2])
+					fmt.Println(f)
 				}
-
-				f.Close()
 			}
 		}
 	}

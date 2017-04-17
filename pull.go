@@ -9,13 +9,13 @@ import (
 )
 
 // pull pulls in ports.
-func pull(args []string) {
+func pull(input []string) {
 	// Define valid arguments.
 	o := optparse.New()
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
-	vals, err := o.Parse(args)
+	vals, err := o.Parse(input)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
@@ -55,10 +55,11 @@ func pull(args []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		g := git{r.Branch, portFullLoc(n), r.URL}
+		l := fullLocation(n)
+		g := git{r.Branch, l, r.URL}
 
 		// Check if location exists, clone if it doesn't.
-		if _, err := os.Stat(portFullLoc(n)); err != nil {
+		if _, err := os.Stat(l); err != nil {
 			err := g.clone()
 			if err != nil {
 				printe(err.Error())
