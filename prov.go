@@ -20,7 +20,8 @@ func prov(input []string) {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
+		fmt.Fprintln(os.Stderr,
+			"Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
@@ -41,7 +42,9 @@ func prov(input []string) {
 	}
 
 	for _, v := range vals {
-		// TODO: Use Alias and Location here to always display repo info?
+		// TODO: Use Alias and Location here to always display repo
+		// info?
+		// TODO: Can I somehow use db.go for this? I should right?
 		if *argi {
 			// Read out pkg db.
 			db, err := os.Open("/var/lib/pkg/db")
@@ -68,7 +71,7 @@ func prov(input []string) {
 
 			var on string
 			for _, f := range fl {
-				// Print port name.
+				// Print port location.
 				if on != f[0] {
 					fmt.Println(f[0])
 				}
@@ -91,9 +94,8 @@ func prov(input []string) {
 				continue
 			}
 
-			for _, n := range all {
-				p, err := parsePort(fullLocation(n), "Footprint")
-				if err != nil {
+			for _, p := range all {
+				if err := p.parseFootprint(); err != nil {
 					printe(err.Error())
 					continue
 				}
@@ -106,9 +108,9 @@ func prov(input []string) {
 					}
 				}
 
-				// Print port name.
+				// Print port location.
 				if len(fl) > 0 {
-					fmt.Println(n)
+					fmt.Println(p.getBaseDir())
 				}
 
 				// Print matched files.

@@ -40,21 +40,21 @@ func main() {
 	case "info":
 		info(os.Args[2:])
 	case "install":
-		install(os.Args[2:])
+		//install(os.Args[2:])
 	case "list":
 		list(os.Args[2:])
 	case "loc":
 		loc(os.Args[2:])
-	//	case "patch":
-	//		patch(os.Args[2:])
+	//case "patch":
+	//	patch(os.Args[2:])
 	case "prov":
 		prov(os.Args[2:])
 	case "pull":
 		pull(os.Args[2:])
 	case "sysup":
-		sysup(os.Args[2:])
+		//sysup(os.Args[2:])
 	case "uninstall":
-		uninstall(os.Args[2:])
+		//uninstall(os.Args[2:])
 	default:
 		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")
 	}

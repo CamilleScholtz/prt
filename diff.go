@@ -42,53 +42,46 @@ func diff(input []string) {
 	}
 
 	// Get installed ports.
-	inst, err := instPorts()
+	db, err := parseDatabase()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	// Get installed port versions.
-	instv, err := instVersPorts()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-
-	for i, n := range inst {
-		// Get port location.
-		ll, err := location(n, all)
+	for i, n := range db.Name {
+		pl, err := location(n, all)
 		if err != nil {
 			continue
 		}
-
-		p, err := parsePort(fullLocation(ll[0]), "Pkgfile")
-		if err != nil {
-			printe(err.Error())
-			continue
-		}
+		p := pl[0]
 
 		// Alias if needed.
 		if !*argn {
 			p.alias()
 		}
 
+		// Read out Pkgfile.
+		if err := p.parsePkgfile(); err != nil {
+			printe(err.Error())
+			continue
+		}
+
 		// Get available version and release from Pkgfile.
-		availv := p.Pkgfile.Version + "-" + p.Pkgfile.Release
+		v := p.Pkgfile.Version + "-" + p.Pkgfile.Release
 
 		// Print if installed and available version don't match.
-		if availv != instv[i] {
+		if v != db.Version[i] {
 			fmt.Print(p.Pkgfile.Name)
 
 			// Print version information if needed.
 			if *argv {
-				fmt.Print(" " + instv[i])
+				fmt.Print(" " + db.Version[i])
 
 				color.Set(config.DarkColor)
 				fmt.Print(" -> ")
 				color.Unset()
 
-				fmt.Print(availv)
+				fmt.Print(v)
 			}
 
 			fmt.Println()

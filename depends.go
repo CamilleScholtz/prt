@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/fatih/color"
 	"github.com/go2c/optparse"
 )
 
@@ -19,7 +21,8 @@ func depends(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
+		fmt.Fprintln(os.Stderr,
+			"Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
@@ -43,25 +46,61 @@ func depends(input []string) {
 	}
 
 	// Get installed ports.
-	var inst []string
+	var db database
 	if !*arga {
-		inst, err = instPorts()
+		db, err = parseDatabase()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 	}
 
-	p, err := parsePort(".", "Pkgfile")
-	if err != nil {
+	var p port
+	p.Location = "."
+	if err := p.parsePkgfile(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Println(*argt)
+	p.getDepends(!*argn, all)
 
-	// TODO: Fix ordering and shit.
-	dl := recursive(p, make(map[string][]string), !*argn, all, inst)
-	for i := range dl {
-		fmt.Println(dl[i])
+	var i int
+	var c []string
+	pl := p.Depends
+
+	var recursive func()
+	recursive = func() {
+		for _, p := range pl {
+			if !*arga {
+				if !stringInList(p.Pkgfile.Name, db.Name) {
+					if !stringInList(p.Pkgfile.Name, c) {
+						if *argt {
+							color.Set(config.DarkColor)
+							fmt.Printf(strings.Repeat(
+								config.IndentChar, i))
+							color.Unset()
+						}
+						fmt.Println(p.getBaseDir())
+
+						// Append to printed ports.
+						c = append(c, p.Pkgfile.Name)
+					}
+				}
+			} else {
+				if *argt {
+					color.Set(config.DarkColor)
+					fmt.Printf(strings.Repeat(config.IndentChar, i))
+					color.Unset()
+				}
+				fmt.Println(p.getBaseDir())
+			}
+
+			i++
+			if len(p.Depends) != 0 {
+				pl = p.Depends
+				recursive()
+			}
+			i--
+		}
 	}
+	recursive()
 }

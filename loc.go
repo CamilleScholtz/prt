@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/fatih/color"
@@ -21,7 +20,8 @@ func loc(input []string) {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
+		fmt.Fprintln(os.Stderr,
+			"Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
@@ -61,23 +61,18 @@ func loc(input []string) {
 		c = append(c, n)
 
 		// Get port location.
-		ll, err := location(n, all)
+		pl, err := location(n, all)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr,
+				"Port not found in the ports tree!")
 			continue
 		}
 		if !*argd {
-			ll = []string{ll[0]}
+			pl = []port{pl[0]}
 		}
 
 		var op string
-		for _, l := range ll {
-			p, err := parsePort(l)
-			if err != nil {
-				printe(err.Error())
-				continue
-			}
-
+		for _, p := range pl {
 			// Alias if needed.
 			if !*argn {
 				p.alias()
@@ -86,10 +81,10 @@ func loc(input []string) {
 			// Print duplicate indentation.
 			if *argd {
 				// Reset indentation on new port
-				if path.Base(p.Location) != op {
+				if p.getPortDir() != op {
 					i = 0
 				}
-				op = path.Base(p.Location)
+				op = p.getPortDir()
 
 				if i > 0 {
 					color.Set(config.DarkColor)
@@ -100,7 +95,7 @@ func loc(input []string) {
 			}
 
 			// Finally print the port.
-			fmt.Println(p.Location)
+			fmt.Println(p.getBaseDir())
 		}
 	}
 }

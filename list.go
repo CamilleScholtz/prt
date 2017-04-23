@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
 	"sort"
 
 	"github.com/go2c/optparse"
@@ -21,7 +20,8 @@ func list(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
+		fmt.Fprintln(os.Stderr,
+			"Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
@@ -44,69 +44,57 @@ func list(input []string) {
 		os.Exit(1)
 	}
 
-	var instv []string
+	var db database
 	if *argi {
 		// Get installed ports.
-		inst, err := instPorts()
+		db, err = parseDatabase()
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 
-		// Get installed port versions if needed.
-		if *argv {
-			instv, err = instVersPorts()
+		// Get port locations.
+		var pl []port
+		for _, n := range db.Name {
+			p, err := location(n, all)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				os.Exit(1)
+				continue
 			}
+			pl = append(pl, p[0])
 		}
 
-		// Get port locations if needed.
-		if *argr {
-			for i, n := range inst {
-				ll, err := location(n, all)
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-					continue
-				}
-				inst[i] = ll[0]
-			}
-		}
-
-		// We want pretty output, so sort.
-		sort.Strings(inst)
-
-		// I'm using all in the the following for loop, so alias inst to all.
-		all = inst
+		// I'm using all in the the following for loop, so alias db to
+		// all.
+		all = pl
 	}
 
-	for i, n := range all {
+	var pl []string
+	for i, p := range all {
+		var s string
+
+		if !*argr {
+			s = p.getPortDir()
+		} else {
+			s = p.getBaseDir()
+		}
+
 		if *argv {
-			var v string
 			if *argi {
-				// Get installed version.
-				v = instv[i]
+				s += " " + db.Version[i]
 			} else {
-				p, err := parsePort(fullLocation(n))
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
+				if err := p.parsePkgfile(); err != nil {
+					printe(err.Error())
 					continue
 				}
-
-				// Get available version from Pkgfile.
-				v = p.Pkgfile.Version
+				s += " " + p.Pkgfile.Version
 			}
-
-			// Merge port and version.
-			n += " " + v
 		}
 
-		// Remove repo if needed.
-		if !*argr && !*argi {
-			n = path.Base(n)
-		}
+		pl = append(pl, s)
+	}
 
-		fmt.Println(n)
+	sort.Strings(pl)
+	for _, p := range pl {
+		fmt.Println(p)
 	}
 }

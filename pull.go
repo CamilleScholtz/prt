@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
@@ -17,7 +18,8 @@ func pull(input []string) {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
+		fmt.Fprintln(os.Stderr,
+			"Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 
@@ -38,7 +40,8 @@ func pull(input []string) {
 		t = len(vals)
 	}
 
-	// TODO: Actually learn gitand check if all these commands are needed.
+	// TODO: Actually learn git and check if all these commands are
+	// needed.
 	var i int
 	for n, r := range config.Pull {
 		// Skip repos if needed.
@@ -55,7 +58,7 @@ func pull(input []string) {
 		color.Unset()
 		fmt.Println(".")
 
-		l := fullLocation(n)
+		l := path.Join(config.PrtDir, n)
 		g := git{r.Branch, l, r.URL}
 
 		// Check if location exists, clone if it doesn't.

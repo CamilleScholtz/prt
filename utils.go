@@ -59,3 +59,14 @@ func stringInList(s string, l []string) bool {
 
 	return false
 }
+
+// stringInPorts checks if a string is in a port list.
+func stringInPorts(s string, l []port) bool {
+	for _, ls := range l {
+		if ls.Location == s {
+			return true
+		}
+	}
+
+	return false
+}
