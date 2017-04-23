@@ -76,14 +76,15 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [x] Implement `depends` command.
 - [x] Implement `diff` command.
 - [x] Implement `info` command.
-- [x] Implement `install` command.
+- [x] Implement `graph` command.
+- [ ] Implement `install` command.
 - [x] Implement `list` command.
 - [x] Implement `loc` command.
 - [ ] Implement `patch` command.
 - [x] Implement `prov` command.
 - [x] Implement `pull` command.
-- [x] Implement `sysup` command. *(needs some improvements when it comes to installation order)*
-- [x] Implement `uninstall` command.
+- [ ] Implement `sysup` command.
+- [ ] Implement `uninstall` command.
 
 ---
 

@@ -66,7 +66,6 @@ func depends(input []string) {
 	var i int
 	var c []string
 	pl := p.Depends
-
 	var recursive func()
 	recursive = func() {
 		for _, p := range pl {
@@ -95,7 +94,7 @@ func depends(input []string) {
 			}
 
 			i++
-			if len(p.Depends) != 0 {
+			if len(p.Depends) > 0 {
 				pl = p.Depends
 				recursive()
 			}

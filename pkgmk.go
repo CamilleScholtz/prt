@@ -189,10 +189,10 @@ func (p port) createMd5sum(l string) error {
 
 	f, err := os.OpenFile(path.Join(l, ".md5sum"),
 		os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	defer f.Close()
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 
 	// Just leave the file empty if there are no sources.
 	if len(sl) == 0 {
@@ -208,10 +208,10 @@ func (p port) createMd5sum(l string) error {
 		}
 
 		hf, err := os.Open(s)
+		defer hf.Close()
 		if err != nil {
 			return err
 		}
-		defer hf.Close()
 
 		h := md5.New()
 		if _, err := io.Copy(h, hf); err != nil {

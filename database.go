@@ -18,10 +18,10 @@ type database struct {
 // parseDatabase lists all installed ports.
 func parseDatabase() (database, error) {
 	f, err := os.Open("/var/lib/pkg/db")
+	defer f.Close()
 	if err != nil {
 		return database{}, err
 	}
-	defer f.Close()
 	s := bufio.NewScanner(f)
 
 	var db database

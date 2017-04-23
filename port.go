@@ -142,10 +142,10 @@ func (p port) getBaseDir() string {
 // permissions and ownership information and their matching files.
 func (p *port) parseFootprint() error {
 	f, err := os.Open(path.Join(p.Location, ".footprint"))
+	defer f.Close()
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	s := bufio.NewScanner(f)
 
 	for s.Scan() {
@@ -164,10 +164,10 @@ func (p *port) parseFootprint() error {
 // matching files.
 func (p *port) parseMd5sum() error {
 	f, err := os.Open(path.Join(p.Location, ".md5sum"))
+	defer f.Close()
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	s := bufio.NewScanner(f)
 
 	for s.Scan() {
@@ -185,10 +185,10 @@ func (p *port) parseMd5sum() error {
 // a Pkgfile contains.
 func (p *port) parsePkgfile() error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
+	defer f.Close()
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	s := bufio.NewScanner(f)
 
 	for s.Scan() {
@@ -260,10 +260,10 @@ func (p *port) parsePkgfile() error {
 // Since this forks to bash this is relatively slow.
 func (p *port) parsePkgfileStrict() error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
+	defer f.Close()
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 	s := bufio.NewScanner(f)
 
 	for s.Scan() {
