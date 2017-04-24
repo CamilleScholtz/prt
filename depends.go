@@ -61,7 +61,7 @@ func depends(input []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.getDepends(!*argn, all)
+	p.depends(!*argn, all)
 
 	var i int
 	var c []string

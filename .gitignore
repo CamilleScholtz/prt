@@ -8,3 +8,6 @@ Pkgfile
 testfile
 testdir
 runtime/pkgmk/test
+
+firefox.svg
+firefox.dot

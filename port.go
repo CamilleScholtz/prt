@@ -70,7 +70,7 @@ type pkgfile struct {
 	Source []string
 }
 
-// Global variable needed by getDepends.
+// Global variable used by getDepends.
 var check []string
 
 // alias aliases ports using the config.Alias values.
@@ -82,8 +82,8 @@ func (p *port) alias() {
 	}
 }
 
-// getDepends is a function that calculates dependencies recursively.
-func (p *port) getDepends(alias bool, all []port) {
+// depends is a function that calculates dependencies recursively.
+func (p *port) depends(alias bool, all []port) {
 	// Continue if already checked.
 	if stringInList(p.Location, check) {
 		return
@@ -114,7 +114,7 @@ func (p *port) getDepends(alias bool, all []port) {
 		check = append(check, p.Location)
 
 		// Loop.
-		p.Depends[len(p.Depends)-1].getDepends(alias, all)
+		p.Depends[len(p.Depends)-1].depends(alias, all)
 	}
 }
 

@@ -12,6 +12,7 @@ import (
 func graph(input []string) {
 	// Define valid arguments.
 	o := optparse.New()
+	argd := o.Bool("duplicate", 'd', false)
 	argn := o.Bool("no-alias", 'n', false)
 	argh := o.Bool("help", 'h', false)
 
@@ -28,6 +29,7 @@ func graph(input []string) {
 		fmt.Println("Usage: prt graph [arguments] [location]")
 		fmt.Println("")
 		fmt.Println("arguments:")
+		fmt.Println("  -d,   --duplicate       graph duplicates as well")
 		fmt.Println("  -n,   --no-alias        disable aliasing")
 		fmt.Println("  -h,   --help            print help and exit")
 		os.Exit(0)
@@ -46,7 +48,7 @@ func graph(input []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	p.getDepends(!*argn, all)
+	p.depends(!*argn, all)
 
 	var f string
 	if len(vals) > 0 {
@@ -62,13 +64,21 @@ func graph(input []string) {
 		os.Exit(1)
 	}
 
+	var c []string
 	op := p.getBaseDir()
 	pl := p.Depends
 	var recursive func()
 	recursive = func() {
 		for _, p := range pl {
-			dot.SetLink(op, p.getBaseDir())
-			dot.SetLabel(p.getBaseDir(), p.getBaseDir())
+			if !stringInList(p.Pkgfile.Name, c) {
+				dot.SetLink(op, p.getBaseDir())
+				dot.SetLabel(p.getBaseDir(), p.getBaseDir())
+
+				// Append to checked ports.
+				if !*argd {
+					c = append(c, p.Pkgfile.Name)
+				}
+			}
 
 			if len(p.Depends) > 0 {
 				op = p.getBaseDir()
