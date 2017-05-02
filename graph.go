@@ -63,27 +63,27 @@ func graph(input []string) {
 	}
 
 	// Prettify graph.
-	fmt.Fprintln(f, "digraph G {")
-	fmt.Fprintln(f, "\tgraph [")
+	fmt.Fprintf(f, "digraph G {\n")
+	fmt.Fprintf(f, "\tgraph [\n")
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "tcenter", "true")
 	fmt.Fprintf(f, "\t\t%s=\"%f\"\n", "pad", 2.0)
-	fmt.Fprintln(f, "\t]\n")
+	fmt.Fprintf(f, "\t]\n\n")
 
 	// Prettify nodes.
-	fmt.Fprintln(f, "\tnode [")
+	fmt.Fprint(f, "\tnode [\n")
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "constraint", "false")
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "fontcolor", "#111e38")
 	fmt.Fprintf(f, "\t\t%s=\"%d\"\n", "penwidth", 3)
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "shape", "box")
-	fmt.Fprintln(f, "\t]\n")
+	fmt.Fprintf(f, "\t]\n\n")
 
 	// Prettify edges.
-	fmt.Fprintln(f, "\tedge [")
+	fmt.Fprintf(f, "\tedge [\n")
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "arrowhead", "dot")
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "color", "#cee0e3")
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "headport", "n")
 	fmt.Fprintf(f, "\t\t%s=\"%d\"\n", "penwidth", 2)
-	fmt.Fprintln(f, "\t]\n")
+	fmt.Fprintf(f, "\t]\n\n")
 
 	var c []string
 	op := p.getBaseDir()
