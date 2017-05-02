@@ -9,5 +9,5 @@ testfile
 testdir
 runtime/pkgmk/test
 
-firefox.svg
-firefox.dot
+*.svg
+*.dot
