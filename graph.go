@@ -55,7 +55,7 @@ func graph(input []string) {
 
 	// Set file to write to.
 	f, err := os.OpenFile(p.Pkgfile.Name+".dot",
-		os.O_WRONLY|os.O_CREATE, 0666)
+		os.O_CREATE|os.O_WRONLY, 0666)
 	defer f.Close()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -104,16 +104,15 @@ func graph(input []string) {
 			}
 
 			if len(p.Depends) > 0 {
-				op = p.getBaseDir()
 				pl = p.Depends
-
-				i++
-				if i > 128 {
-					i = 0
-				}
-
 				recursive()
 			}
+
+			i++
+			if i == 128 {
+				i = 0
+			}
+			op = p.getBaseDir()
 		}
 	}
 	recursive()
@@ -128,8 +127,9 @@ func graph(input []string) {
 	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt,
 		"-o", p.Pkgfile.Name+"."+*argt)
 	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "graphviz dot %s: Something went wrong",
-			p.Pkgfile.Name+*argt)
+		fmt.Fprintf(os.Stderr,
+			"graphviz dot %s: Something went wrong\n",
+			p.Pkgfile.Name+"."+*argt)
 		os.Exit(1)
 	}
 }
