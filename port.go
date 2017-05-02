@@ -132,9 +132,16 @@ func (p port) getRepoDir() string {
 
 // getBaseDir returns the port directory name. So `prtdir/repo/port`
 // becomes `repo/port`.
-// TODO: What if the location is `.` or `notprtdir/port`?
 func (p port) getBaseDir() string {
-	return strings.TrimPrefix(p.Location, config.PrtDir+"/")
+	var l string
+	if strings.Contains(p.Location, config.PrtDir) {
+		l = strings.TrimPrefix(p.Location, config.PrtDir+"/")
+	} else {
+		// TODO: This requires that parsePkgfile has been executed.
+		l = "./" + p.Pkgfile.Name
+	}
+
+	return l
 }
 
 // parseFootprint parses a .footprint file. It will read the
