@@ -94,8 +94,10 @@ func graph(input []string) {
 	recursive = func() {
 		for _, p := range pl {
 			if !stringInList(p.Pkgfile.Name, c) {
-				fmt.Fprintf(f, "\tnode [color=\"%s\"]\n", pal[i].Hex())
-				fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", op, p.getBaseDir())
+				fmt.Fprintf(f, "\tnode [color=\"%s\"]\n",
+					pal[i].Hex())
+				fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", op,
+					p.getBaseDir())
 
 				// Append to checked ports.
 				if !*argd {
@@ -109,7 +111,7 @@ func graph(input []string) {
 			}
 
 			i++
-			if i == 128 {
+			if i > 128 {
 				i = 0
 			}
 			op = p.getBaseDir()

@@ -32,8 +32,8 @@ func (p port) build(v bool) error {
 		cmd.Stderr = os.Stderr
 	}
 
-	// TODO: Make this behave like check/createmd5sum in regards
-	// to updating or not.
+	// TODO: Make this behave like check/createmd5sum in regards to
+	// updating or not.
 	printi("Building package")
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf(
@@ -470,28 +470,30 @@ func (p port) pkgmk(inst []string, v bool) error {
 	if err := p.md5sum(); err != nil {
 		return err
 	}
-	if err := p.unpack(); err != nil {
-		return err
-	}
-	if !stringInList(path.Base(p.Location), inst) {
-		if err := p.build(v); err != nil {
+	/*
+		if err := p.unpack(); err != nil {
 			return err
 		}
-	}
-	if stringInList(path.Base(p.Location), inst) {
-		printi("Updating package")
-		if err := p.update(v); err != nil {
+		if !stringInList(path.Base(p.Location), inst) {
+			if err := p.build(v); err != nil {
+				return err
+			}
+		}
+		if stringInList(path.Base(p.Location), inst) {
+			printi("Updating package")
+			if err := p.update(v); err != nil {
+				return err
+			}
+		} else {
+			printi("Installing package")
+			if err := p.install(v); err != nil {
+				return err
+			}
+		}
+		if err := p.post(v); err != nil {
 			return err
 		}
-	} else {
-		printi("Installing package")
-		if err := p.install(v); err != nil {
-			return err
-		}
-	}
-	if err := p.post(v); err != nil {
-		return err
-	}
+	*/
 
 	return nil
 }

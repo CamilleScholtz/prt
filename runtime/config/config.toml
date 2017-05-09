@@ -37,19 +37,19 @@ errorcolor = 9
 lightcolor = 11
 
 # Repos to pull.
-[pull]
-	[pull.contrib]
+[repo]
+	[repo.contrib]
 	url = "git://crux.nu/ports/contrib"
 	branch = "3.2"
 
-	[pull.core]
+	[repo.core]
 	url = "git://crux.nu/ports/core"
 	branch = "3.2"
 
-	[pull.opt]
+	[repo.opt]
 	url = "git://crux.nu/ports/opt"
 	branch = "3.2"
 
-	[pull.xorg]
+	[repo.xorg]
 	url = "git://crux.nu/ports/xorg"
 	branch = "3.2"

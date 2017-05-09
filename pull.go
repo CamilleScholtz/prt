@@ -35,7 +35,7 @@ func pull(input []string) {
 	// Count total repos that need to be pulled.
 	var t int
 	if len(vals) == 0 {
-		t = len(config.Pull)
+		t = len(config.Repo)
 	} else {
 		t = len(vals)
 	}
@@ -43,7 +43,7 @@ func pull(input []string) {
 	// TODO: Actually learn git and check if all these commands are
 	// needed.
 	var i int
-	for n, r := range config.Pull {
+	for n, r := range config.Repo {
 		// Skip repos if needed.
 		if len(vals) != 0 {
 			if !stringInList(n, vals) {

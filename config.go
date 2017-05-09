@@ -28,12 +28,11 @@ var config struct {
 	ErrorColor color.Attribute
 	LightColor color.Attribute
 
-	Pull map[string]Pull
+	Repo map[string]repo
 }
 
-// Pull is a struct with values related to repos.
-// TODO: Why does this need to be a global?
-type Pull struct {
+// pull is a struct with values related to repos.
+type repo struct {
 	URL    string
 	Branch string
 }
@@ -55,7 +54,7 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 	return i, nil
 }
 
-// decodeConfig parses a toml config.
+// pareConfig parses a toml config.
 func parseConfig() error {
 	_, err := toml.DecodeFile("/etc/prt/config.toml", &config)
 	if err != nil {
