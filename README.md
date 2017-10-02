@@ -75,7 +75,7 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 
 - [x] Implement `depends` command.
 - [x] Implement `diff` command.
-- [x] Implement `info` command.
+- [x] Implement `info` command. *(This always prints something, even when not in a port directory...)*
 - [x] Implement `graph` command.
 - [ ] Implement `install` command.
 - [x] Implement `list` command.
@@ -122,6 +122,7 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [ ] Make errors pretty and consistent.
 - [ ] Test environment variables.
 - [x] Write README and man pages. *(needs some updates with changes)*
+- [ ] Check for missing config values.
 
 
 ## AUTHORS
