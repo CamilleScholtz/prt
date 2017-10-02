@@ -74,8 +74,7 @@ func depends(input []string) {
 					if !stringInList(p.Pkgfile.Name, c) {
 						if *argt {
 							color.Set(config.DarkColor)
-							fmt.Printf(strings.Repeat(
-								config.IndentChar, i))
+							fmt.Printf(strings.Repeat(config.IndentChar, i))
 							color.Unset()
 						}
 						fmt.Println(p.getBaseDir())

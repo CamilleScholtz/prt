@@ -1,6 +1,5 @@
-// ports.go contains functions that interact with multiple ports.
-// These include functions such as getting a list of all ports in the
-// prtdir.
+// ports.go contains functions that interact with multiple ports. These include
+// functions such as getting a list of all ports in the prtdir.
 
 package main
 

@@ -7,7 +7,8 @@ import (
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Fprintln(os.Stderr, "Missing command, use help for a list of commands!")
+		fmt.Fprintln(os.Stderr,
+			"Missing command, use help for a list of commands!")
 		os.Exit(1)
 	}
 
@@ -59,7 +60,8 @@ func main() {
 	//case "uninstall":
 	//	uninstall(os.Args[2:])
 	default:
-		fmt.Fprintln(os.Stderr, "Invalid command, use help for a list of commands!")
+		fmt.Fprintln(os.Stderr,
+			"Invalid command, use help for a list of commands!")
 	}
 
 	os.Exit(0)

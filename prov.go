@@ -42,8 +42,7 @@ func prov(input []string) {
 	}
 
 	for _, v := range vals {
-		// TODO: Use Alias and Location here to always display repo
-		// info?
+		// TODO: Use Alias and Location here to always display repo info?
 		// TODO: Can I somehow use db.go for this? I should right?
 		if *argi {
 			// Read out pkg db.

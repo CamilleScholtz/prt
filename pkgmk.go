@@ -88,8 +88,8 @@ func (p port) checkMd5sum() error {
 	}
 
 	if e {
-		return fmt.Errorf(
-			"pkgmk md5sum %s: verification failed", p.getBaseDir())
+		return fmt.Errorf("pkgmk md5sum %s: verification failed",
+			p.getBaseDir())
 	}
 	return nil
 }
@@ -97,18 +97,15 @@ func (p port) checkMd5sum() error {
 // check check if all needed variables are present.
 func (p port) checkPkgfile() error {
 	if p.Pkgfile.Name == "" {
-		return fmt.Errorf(
-			"pkgfile checkPkgfile %s: Name variable is empty",
+		return fmt.Errorf("pkgfile checkPkgfile %s: Name variable is empty",
 			p.getBaseDir())
 	}
 	if p.Pkgfile.Version == "" {
-		return fmt.Errorf(
-			"pkgfile checkPkgfile %s: Version variable is empty",
+		return fmt.Errorf("pkgfile checkPkgfile %s: Version variable is empty",
 			p.getBaseDir())
 	}
 	if p.Pkgfile.Release == "" {
-		return fmt.Errorf(
-			"pkgfile checkPkgfile %s: Release variable is empty",
+		return fmt.Errorf("pkgfile checkPkgfile %s: Release variable is empty",
 			p.getBaseDir())
 	}
 	// TODO: Add a function function in port.go.
@@ -138,15 +135,15 @@ func (p port) checkSignature() error {
 			s = path.Join(p.Location, path.Base(s))
 		}
 
-		if err := os.Symlink(s, path.Join(
-			"/tmp/prt/"+path.Base(s))); err != nil {
+		if err := os.Symlink(s, path.Join("/tmp/prt/"+path.Base(s))); err !=
+			nil {
 			return err
 		}
 	}
 
 	// TODO: Do this in Go.
-	cmd := exec.Command("signify", "-q", "-C", "-x",
-		path.Join(p.Location, ".signature"))
+	cmd := exec.Command("signify", "-q", "-C", "-x", path.Join(p.Location,
+		".signature"))
 	cmd.Dir = "/tmp/prt"
 	var b bytes.Buffer
 	cmd.Stderr = &b
@@ -158,10 +155,9 @@ func (p port) checkSignature() error {
 			}
 
 			printe("Mismatch " + strings.Trim(l, ": FAIL"))
-
 		}
-		return fmt.Errorf(
-			"pkgmk signature %s: verification failed", p.getBaseDir())
+		return fmt.Errorf("pkgmk signature %s: verification failed",
+			p.getBaseDir())
 	}
 
 	return nil
@@ -218,8 +214,8 @@ func (p port) createMd5sum(l string) error {
 			return err
 		}
 
-		if _, err := f.WriteString(hex.EncodeToString(h.Sum(nil)) +
-			"  " + path.Base(s) + "\n"); err != nil {
+		if _, err := f.WriteString(hex.EncodeToString(h.Sum(nil)) + "  " +
+			path.Base(s) + "\n"); err != nil {
 			return err
 		}
 	}
@@ -229,16 +225,14 @@ func (p port) createMd5sum(l string) error {
 
 // createWrk creates the necessary WrkDir directories.
 func (p port) createWrk() error {
-	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name),
-		0777); err != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name), 0777); err !=
+		nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name,
-		"pkg"), 0777); err != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "pkg"), 0777); cerr != nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name,
-		"src"), 0777); err != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "src"), 0777); err != nil {
 		return err
 	}
 

@@ -19,7 +19,8 @@ func diff(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Invaild argument, use -h for a list of arguments!")
+		fmt.Fprintln(os.Stderr,
+			"Invaild argument, use -h for a list of arguments!")
 		os.Exit(1)
 	}
 

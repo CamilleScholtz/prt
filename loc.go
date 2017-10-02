@@ -63,8 +63,7 @@ func loc(input []string) {
 		// Get port location.
 		pl, err := location(n, all)
 		if err != nil {
-			fmt.Fprintln(os.Stderr,
-				"Port not found in the ports tree!")
+			fmt.Fprintln(os.Stderr, "Port not found in the ports tree!")
 			continue
 		}
 		if !*argd {

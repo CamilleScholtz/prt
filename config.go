@@ -1,5 +1,5 @@
-// config.go contains functions that interact with the config file,
-// this is a file called `config.toml` found in `/etc/prt/`.
+// config.go contains functions that interact with the config file, this is a
+// file called `config.toml` found in `/etc/prt/`.
 
 package main
 
@@ -10,9 +10,8 @@ import (
 	"github.com/fatih/color"
 )
 
-// config is a stuct with all config values. See
-// `runtime/config/config.toml` for more information about these
-// values.
+// config is a stuct with all config values. See `runtime/config/config.toml`
+// for more information about these values.
 var config struct {
 	PrtDir string
 	PkgDir string
@@ -37,12 +36,12 @@ type repo struct {
 	Branch string
 }
 
-// colorFix converts a config color (0..15) to a color compatible
-// color (30..97).
+// colorFix converts a config color (0..15) to a color compatible color (so
+// 30..97).
 func colorFix(i color.Attribute) (color.Attribute, error) {
 	if i > 15 {
-		return 0, fmt.Errorf(
-			"config: Could not convert '" + string(i) + "' to color!")
+		return 0, fmt.Errorf("config: Could not convert '" + string(i) +
+			"' to color!")
 	}
 
 	if i <= 7 {
@@ -58,8 +57,7 @@ func colorFix(i color.Attribute) (color.Attribute, error) {
 func parseConfig() error {
 	_, err := toml.DecodeFile("/etc/prt/config.toml", &config)
 	if err != nil {
-		return fmt.Errorf(
-			"config /etc/prt/config.toml: " + err.Error())
+		return fmt.Errorf("config /etc/prt/config.toml: " + err.Error())
 	}
 
 	config.DarkColor, err = colorFix(config.DarkColor)

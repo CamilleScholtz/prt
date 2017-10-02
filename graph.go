@@ -94,10 +94,8 @@ func graph(input []string) {
 	recursive = func() {
 		for _, p := range pl {
 			if !stringInList(p.Pkgfile.Name, c) {
-				fmt.Fprintf(f, "\tnode [color=\"%s\"]\n",
-					pal[i].Hex())
-				fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", op,
-					p.getBaseDir())
+				fmt.Fprintf(f, "\tnode [color=\"%s\"]\n", pal[i].Hex())
+				fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", op, p.getBaseDir())
 
 				// Append to checked ports.
 				if !*argd {
@@ -126,11 +124,10 @@ func graph(input []string) {
 	}
 
 	// Convert to graph.
-	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt,
-		"-o", p.Pkgfile.Name+"."+*argt)
+	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt, "-o",
+		p.Pkgfile.Name+"."+*argt)
 	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr,
-			"graphviz dot %s: Something went wrong\n",
+		fmt.Fprintf(os.Stderr, "graphviz dot %s: Something went wrong\n",
 			p.Pkgfile.Name+"."+*argt)
 		os.Exit(1)
 	}

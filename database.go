@@ -1,6 +1,6 @@
-// database.go contains functions that interact with the packag
-// database, this is a file called `db` found in `/var/lib/pkg`.
-// These include functions such as parsing the database file.
+// database.go contains functions that interact with the package database, this
+// is a file called `db` found in `/var/lib/pkg`. These include functions such
+// as parsing the database file.
 
 package main
 

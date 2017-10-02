@@ -43,7 +43,8 @@ func (g git) clean() error {
 
 // clone clones a repo.
 func (g git) clone() error {
-	cmd := exec.Command("git", "clone", "--depth", "1", "-b", g.Branch, g.URL, g.Loc)
+	cmd := exec.Command("git", "clone", "--depth", "1", "-b", g.Branch, g.URL,
+		g.Loc)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git clone %s: Something went wrong", g.URL)
@@ -54,13 +55,15 @@ func (g git) clone() error {
 
 // diff checks a repo for differences.
 func (g git) diff() ([]string, error) {
-	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter", "ACDMR", "origin/"+g.Branch)
+	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter",
+		"ACDMR", "origin/"+g.Branch)
 	cmd.Dir = g.Loc
 	bb := new(bytes.Buffer)
 	cmd.Stdout = bb
 
 	if err := cmd.Run(); err != nil {
-		return []string{}, fmt.Errorf("git diff %s: Something went wrong", g.Loc)
+		return []string{}, fmt.Errorf("git diff %s: Something went wrong",
+			g.Loc)
 	}
 
 	d := bb.String()
