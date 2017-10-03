@@ -3,33 +3,32 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 	"testing"
 )
 
-func BenchmarkGetDepends(b *testing.B) {
+func BenchmarkDepends(b *testing.B) {
 	if err := parseConfig(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
+	// Get all ports.
 	all, err := ports()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	inst, err := instPorts()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	p, err := parsePort(fullLocation("opt/firefox"), "Pkgfile")
-	if err != nil {
-		fmt.Println(err)
+
+	var p port
+	p.Location = path.Join(config.PrtDir, "opt/firefox")
+	if err := p.parsePkgfile(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	for i := 0; i < b.N; i++ {
-		recursive(p, make(map[string][]string), false, all, inst)
+		p.depends(false, all)
 	}
 }
 
@@ -40,7 +39,7 @@ func BenchmarkParseFootprint(b *testing.B) {
 	}
 
 	var p port
-	p.Location = fullLocation("opt/firefox")
+	p.Location = path.Join(config.PrtDir, "opt/firefox")
 
 	for i := 0; i < b.N; i++ {
 		p.parseFootprint()
@@ -54,7 +53,7 @@ func BenchmarkParseMd5sum(b *testing.B) {
 	}
 
 	var p port
-	p.Location = fullLocation("opt/firefox")
+	p.Location = path.Join(config.PrtDir, "opt/firefox")
 
 	for i := 0; i < b.N; i++ {
 		p.parseMd5sum()
@@ -68,7 +67,7 @@ func BenchmarkParsePkgfile(b *testing.B) {
 	}
 
 	var p port
-	p.Location = fullLocation("opt/firefox")
+	p.Location = path.Join(config.PrtDir, "opt/firefox")
 
 	for i := 0; i < b.N; i++ {
 		p.parsePkgfile()
@@ -81,9 +80,10 @@ func BenchmarkLocation(b *testing.B) {
 		os.Exit(1)
 	}
 
+	// Get all ports.
 	all, err := ports()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 

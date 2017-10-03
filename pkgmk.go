@@ -229,7 +229,7 @@ func (p port) createWrk() error {
 		nil {
 		return err
 	}
-	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "pkg"), 0777); cerr != nil {
+	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "pkg"), 0777); err != nil {
 		return err
 	}
 	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "src"), 0777); err != nil {
@@ -275,8 +275,7 @@ func (p port) download(v bool) error {
 
 		printi("Downloading " + path.Base(s))
 		if err := cmd.Run(); err != nil {
-			return fmt.Errorf(
-				"pkgmk download %s: Could not download source",
+			return fmt.Errorf("pkgmk download %s: Could not download source",
 				path.Base(s))
 		}
 
@@ -297,8 +296,7 @@ func (p port) install(v bool) error {
 	}
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf(
-			"install %s: Something went wrong", p.getBaseDir())
+		return fmt.Errorf("install %s: Something went wrong", p.getBaseDir())
 	}
 
 	return nil
