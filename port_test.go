@@ -74,6 +74,20 @@ func BenchmarkParsePkgfile(b *testing.B) {
 	}
 }
 
+/*func BenchmarkParsePkgfileSh(b *testing.B) {
+	if err := parseConfig(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	var p port
+	p.Location = path.Join(config.PrtDir, "opt/firefox")
+
+	for i := 0; i < b.N; i++ {
+		p.parsePkgfileSh()
+	}
+}*/
+
 func BenchmarkLocation(b *testing.B) {
 	if err := parseConfig(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

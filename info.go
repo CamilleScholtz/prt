@@ -59,7 +59,10 @@ func info(input []string) {
 	// Read out Pkgfile.
 	var p port
 	p.Location = "."
-	p.parsePkgfileStrict()
+	if err := p.parsePkgfile(true); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	// Print info from Pkgfile.
 	if *argd {

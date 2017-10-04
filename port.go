@@ -185,8 +185,11 @@ func (p *port) parseMd5sum() error {
 
 // parsePkgfile parses a Pkgfile file. It will read the Pkgfile file into a
 // pkgfile type, which is a struct containing the various info a Pkgfile
-// contains.
-func (p *port) parsePkgfile() error {
+// contains. Please keep in mind that parsePkgfile does not expand variables,
+// so `$version` will just be a literal string. If you want to expand variables
+// pass a bool as a parameter. This will use Bash to source the file, keep in
+// mind this is relatively slow.
+func (p *port) parsePkgfile(source ...bool) error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
 	defer f.Close()
 	if err != nil {
@@ -198,128 +201,126 @@ func (p *port) parsePkgfile() error {
 		i := s.Text()
 
 		if strings.HasPrefix(i, "#") {
-			switch {
-			case p.Pkgfile.Description == "" && strings.HasPrefix(i,
-				"# Description:"):
-				p.Pkgfile.Description = strings.TrimSpace(strings.TrimPrefix(i,
-					"# Description:"))
-			case p.Pkgfile.URL == "" && strings.HasPrefix(i, "# URL:"):
-				p.Pkgfile.URL = strings.TrimSpace(strings.TrimPrefix(i,
-					"# URL:"))
-			case p.Pkgfile.Maintainer == "" && strings.HasPrefix(i,
-				"# Maintainer:"):
-				p.Pkgfile.Maintainer = strings.TrimSpace(strings.TrimPrefix(i,
-					"# Maintainer:"))
+			kv := strings.SplitN(i, ":", 2)
 
-			case len(p.Pkgfile.Depends) == 0 && strings.HasPrefix(i,
-				"# Depends on:"):
+			switch kv[0] {
+			case "# Description":
+				p.Pkgfile.Description = strings.TrimSpace(kv[1])
+			case "URL":
+				p.Pkgfile.URL = strings.TrimSpace(kv[1])
+			case "# Maintainer":
+				p.Pkgfile.Maintainer = strings.TrimSpace(kv[1])
+			case "# Depends on":
 				p.Pkgfile.Depends = strings.Fields(strings.Replace(
-					strings.TrimSpace(strings.TrimPrefix(i, "# Depends on:")),
-					",", "", -1))
-			case len(p.Pkgfile.Optional) == 0 && strings.HasPrefix(i,
-				"# Optional:"):
+					strings.TrimSpace(kv[1]), ",", "", -1))
+			case "# Optional":
+			case "# Nice to have":
 				p.Pkgfile.Optional = strings.Fields(strings.Replace(
-					strings.TrimSpace(strings.TrimPrefix(i, "# Optional:")),
-					",", "", -1))
-			case len(p.Pkgfile.Optional) == 0 && strings.Contains(i,
-				"# Nice to have:"):
-				p.Pkgfile.Optional = strings.Fields(strings.Replace(
-					strings.TrimSpace(strings.TrimPrefix(i, "# Nice to have:")),
-					",", "", -1))
+					strings.TrimSpace(kv[1]), ",", "", -1))
 			}
 		} else {
-			switch {
-			case p.Pkgfile.Name == "" && strings.HasPrefix(i, "name="):
-				p.Pkgfile.Name = strings.TrimSpace(strings.TrimPrefix(i,
-					"name="))
-			case p.Pkgfile.Version == "" && strings.HasPrefix(i, "version="):
-				p.Pkgfile.Version = strings.TrimSpace(strings.TrimPrefix(i,
-					"version="))
-			case p.Pkgfile.Release == "" && strings.HasPrefix(i, "release="):
-				p.Pkgfile.Release = strings.TrimSpace(strings.TrimPrefix(i,
-					"release="))
+			kv := strings.SplitN(i, "=", 2)
 
-			case len(p.Pkgfile.Source) == 0 && strings.HasPrefix(i, "source="):
-				p.Pkgfile.Source = strings.Fields(strings.TrimSpace(
-					strings.TrimPrefix(i, "source=")))
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// parsePkgfileStrict parses a Pkgfile file. It will read the Pkgfile file into
-// a pkgfile type, which is a struct containing the various info a Pkgfile
-// contains. parsePkgfileStrict differs from parsePkgfile in that source is used
-// to parse the source field. Since this forks to bash this is relatively slow.
-func (p *port) parsePkgfileStrict() error {
-	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
-	defer f.Close()
-	if err != nil {
-		return err
-	}
-	s := bufio.NewScanner(f)
-
-	for s.Scan() {
-		i := s.Text()
-
-		if strings.HasPrefix(i, "#") {
-			switch {
-			case p.Pkgfile.Description == "" && strings.HasPrefix(i,
-				"# Description:"):
-				p.Pkgfile.Description = strings.TrimSpace(strings.TrimPrefix(i,
-					"# Description:"))
-			case p.Pkgfile.URL == "" && strings.HasPrefix(i, "# URL:"):
-				p.Pkgfile.URL = strings.TrimSpace(strings.TrimPrefix(i,
-					"# URL:"))
-			case p.Pkgfile.Maintainer == "" && strings.HasPrefix(i,
-				"# Maintainer:"):
-				p.Pkgfile.Maintainer = strings.TrimSpace(strings.TrimPrefix(i,
-					"# Maintainer:"))
-
-			case len(p.Pkgfile.Depends) == 0 && strings.HasPrefix(i,
-				"# Depends on:"):
-				p.Pkgfile.Depends = strings.Fields(strings.Replace(
-					strings.TrimSpace(strings.TrimPrefix(i, "# Depends on:")),
-					",", "", -1))
-			case len(p.Pkgfile.Optional) == 0 && strings.HasPrefix(i,
-				"# Optional:"):
-				p.Pkgfile.Optional = strings.Fields(strings.Replace(
-					strings.TrimSpace(strings.TrimPrefix(i, "# Optional:")),
-					",", "", -1))
-			case len(p.Pkgfile.Optional) == 0 && strings.Contains(i,
-				"# Nice to have:"):
-				p.Pkgfile.Optional = strings.Fields(strings.Replace(
-					strings.TrimSpace(strings.TrimPrefix(i, "# Nice to have:")),
-					",", "", -1))
-			}
-		} else {
-			switch {
-			case p.Pkgfile.Name == "" && strings.HasPrefix(i, "name="):
-				p.Pkgfile.Name = strings.TrimSpace(strings.TrimPrefix(i,
-					"name="))
-			case p.Pkgfile.Version == "" && strings.HasPrefix(i, "version="):
-				p.Pkgfile.Version = strings.TrimSpace(strings.TrimPrefix(i,
-					"version="))
-			case p.Pkgfile.Release == "" && strings.HasPrefix(i, "release="):
-				p.Pkgfile.Release = strings.TrimSpace(strings.TrimPrefix(i,
-					"release="))
-
-			case len(p.Pkgfile.Source) == 0 && strings.HasPrefix(i, "source="):
-				t, err := p.source("source")
-				if err != nil {
-					return err
+			switch kv[0] {
+			case "name":
+				p.Pkgfile.Name = strings.TrimSpace(kv[1])
+			case "version":
+				p.Pkgfile.Version = strings.TrimSpace(kv[1])
+			case "release":
+				p.Pkgfile.Release = strings.TrimSpace(kv[1])
+			case "source":
+				if len(source) == 0 {
+					p.Pkgfile.Source = strings.Fields(strings.TrimSpace(kv[1]))
+				} else {
+					s, err := p.source("source")
+					if err != nil {
+						return err
+					}
+					p.Pkgfile.Source = strings.Fields(s)
 				}
-				p.Pkgfile.Source = strings.Fields(t)
-				break
+
+				// Since source should be the last meaningfull value in a
+				// Pkgfile, we will stop walking.
+				return nil
 			}
 		}
 	}
 
 	return nil
 }
+
+// parsePkgfileSh parses a Pkgfile file. It will read the Pkgfile file into a
+// pkgfile type, which is a struct containing the various info a Pkgfile
+// contains. This is an experimental version mvdan.cc/sh, and currently too slow
+// for actual use.
+/*func (p *port) parsePkgfileSh() error {
+	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+
+	sp := syntax.NewParser(syntax.KeepComments, syntax.Variant(syntax.LangBash))
+	sh, err := sp.Parse(f, "")
+	if err != nil {
+		return err
+	}
+
+	syntax.Walk(sh, func(node syntax.Node) bool {
+		switch t := node.(type) {
+		case *syntax.Comment:
+			kv := strings.SplitN(t.Text, ":", 2)
+
+			switch kv[0] {
+			case "Description:":
+				p.Pkgfile.Description = strings.TrimSpace(kv[1])
+			case "URL:":
+				p.Pkgfile.URL = strings.TrimSpace(kv[1])
+			case "Maintainer:":
+				p.Pkgfile.Maintainer = strings.TrimSpace(kv[1])
+			case "Depends":
+				p.Pkgfile.Depends = strings.Fields(strings.Replace(
+					strings.TrimSpace(kv[1]), ",", "", -1))
+			case "Optional:":
+			case "Nice to have:":
+				p.Pkgfile.Optional = strings.Fields(strings.Replace(
+					strings.TrimSpace(kv[1]), ",", "", -1))
+			}
+		case *syntax.Assign:
+			switch t.Name.Value {
+			case "name":
+				p.Pkgfile.Name = t.Value.Parts[0].(*syntax.Lit).Value
+			case "version":
+				p.Pkgfile.Version = t.Value.Parts[0].(*syntax.Lit).Value
+			case "release":
+				p.Pkgfile.Release = t.Value.Parts[0].(*syntax.Lit).Value
+			case "source":
+				var vl []string
+				for _, s := range t.Array.Elems {
+					var v string
+					for _, sp := range s.Value.Parts {
+						switch spt := sp.(type) {
+						case *syntax.Lit:
+							v += spt.Value
+						case *syntax.ParamExp:
+							v += spt.Param.Value
+						}
+					}
+					vl = append(vl, v)
+				}
+				p.Pkgfile.Source = vl
+
+				// Since source should be the last meaningfull value in a
+				// Pkgfile, we will stop walking.
+				return false
+			}
+		}
+
+		return true
+	})
+
+	return nil
+}*/
 
 // location tries to get the location of a port. It returns a list with possible
 // ports, ordered using the config Order value.
@@ -335,8 +336,7 @@ func location(n string, all []port) ([]port, error) {
 		return []port{}, fmt.Errorf("location %s: Not in the ports tree", n)
 	}
 
-	// If there are multiple matches, sort using the config Order
-	// value.
+	// If there are multiple matches, sort using the config Order value.
 	if len(pl) > 1 {
 		var i int
 		for _, r := range config.Order {
