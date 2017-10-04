@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"sort"
 
 	"github.com/go2c/optparse"
 )
 
 // list lists ports.
-func list(input []string) {
+func list(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
@@ -20,9 +19,7 @@ func list(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -34,14 +31,14 @@ func list(input []string) {
 		fmt.Println("  -r,   --repo            list with repo info")
 		fmt.Println("  -v,   --version         list with version info")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// Get all ports.
 	all, err := ports()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	var db database
@@ -49,8 +46,7 @@ func list(input []string) {
 		// Get installed ports.
 		db, err = parseDatabase()
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 
 		// Get port locations.
@@ -97,4 +93,6 @@ func list(input []string) {
 	for _, p := range pl {
 		fmt.Println(p)
 	}
+
+	return nil
 }

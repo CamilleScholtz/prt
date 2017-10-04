@@ -10,7 +10,7 @@ import (
 )
 
 // pull pulls in ports.
-func pull(input []string) {
+func pull(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argh := o.Bool("help", 'h', false)
@@ -18,9 +18,7 @@ func pull(input []string) {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -29,7 +27,8 @@ func pull(input []string) {
 		fmt.Println("")
 		fmt.Println("arguments:")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// Count total repos that need to be pulled.
@@ -101,4 +100,6 @@ func pull(input []string) {
 			continue
 		}
 	}
+
+	return nil
 }

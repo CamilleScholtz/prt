@@ -10,7 +10,7 @@ import (
 )
 
 // loc prints port locations
-func loc(input []string) {
+func loc(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argd := o.Bool("duplicate", 'd', false)
@@ -20,9 +20,7 @@ func loc(input []string) {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -33,20 +31,19 @@ func loc(input []string) {
 		fmt.Println("  -d,   --duplicate       list duplicate ports as well")
 		fmt.Println("  -n,   --no-alias        disable aliasing")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// This command needs a value.
 	if len(vals) == 0 {
-		fmt.Fprintln(os.Stderr, "Please specify a port!")
-		os.Exit(1)
+		return fmt.Errorf("please specify a port")
 	}
 
 	// Get all ports.
 	all, err := ports()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	var c []string
@@ -97,4 +94,6 @@ func loc(input []string) {
 			fmt.Println(p.getBaseDir())
 		}
 	}
+
+	return nil
 }

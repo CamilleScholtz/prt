@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"unicode"
 
 	"github.com/fatih/color"
 )
@@ -21,6 +22,12 @@ func (s byBase) Less(i, j int) bool {
 		return false
 	}
 	return path.Base(s[i]) < path.Base(s[j])
+}
+
+func capitalize(s string) string {
+	a := []rune(s)
+	a[0] = unicode.ToUpper(a[0])
+	return string(a)
 }
 
 // printe prints a string with an error character prefix.

@@ -11,7 +11,7 @@ import (
 )
 
 // prov searches ports for files.
-func prov(input []string) {
+func prov(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
@@ -20,9 +20,7 @@ func prov(input []string) {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -32,13 +30,13 @@ func prov(input []string) {
 		fmt.Println("arguments:")
 		fmt.Println("  -i,   --installed       search in installed ports only")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// This command needs a value.
 	if len(vals) == 0 {
-		fmt.Fprintln(os.Stderr, "Please specify a query!")
-		os.Exit(1)
+		return fmt.Errorf("please specify a query")
 	}
 
 	for _, v := range vals {
@@ -122,4 +120,6 @@ func prov(input []string) {
 			}
 		}
 	}
+
+	return nil
 }

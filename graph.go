@@ -10,7 +10,7 @@ import (
 )
 
 // graph generates a dependency grap.
-func graph(input []string) {
+func graph(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argd := o.Bool("duplicate", 'd', false)
@@ -21,9 +21,7 @@ func graph(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -35,21 +33,20 @@ func graph(input []string) {
 		fmt.Println("  -n,   --no-alias        disable aliasing")
 		fmt.Println("  -t,   --type            filetype to use")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// Get all ports.
 	all, err := ports()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	var p port
 	p.Location = "."
 	if err := p.parsePkgfile(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 	p.depends(!*argn, all)
 
@@ -58,8 +55,7 @@ func graph(input []string) {
 		os.O_CREATE|os.O_WRONLY, 0666)
 	defer f.Close()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	// Prettify graph.
@@ -120,15 +116,16 @@ func graph(input []string) {
 
 	f.Close()
 	if *argt == "dot" {
-		os.Exit(0)
+		return nil
 	}
 
 	// Convert to graph.
 	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt, "-o",
 		p.Pkgfile.Name+"."+*argt)
 	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "graphviz dot %s: Something went wrong\n",
+		return fmt.Errorf("graphviz dot %s: Something went wrong",
 			p.Pkgfile.Name+"."+*argt)
-		os.Exit(1)
 	}
+
+	return nil
 }

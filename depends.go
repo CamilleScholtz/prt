@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -10,7 +9,7 @@ import (
 )
 
 // depends lists dependencies recursively.
-func depends(input []string) {
+func depends(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	arga := o.Bool("all", 'a', false)
@@ -21,9 +20,7 @@ func depends(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -35,14 +32,14 @@ func depends(input []string) {
 		fmt.Println("  -n,   --no-alias        disable aliasing")
 		fmt.Println("  -t,   --tree            list using tree view")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// Get all ports.
 	all, err := ports()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	// Get installed ports.
@@ -50,16 +47,14 @@ func depends(input []string) {
 	if !*arga {
 		db, err = parseDatabase()
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 	}
 
 	var p port
 	p.Location = "."
 	if err := p.parsePkgfile(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 	p.depends(!*argn, all)
 
@@ -101,4 +96,6 @@ func depends(input []string) {
 		}
 	}
 	recursive()
+
+	return nil
 }

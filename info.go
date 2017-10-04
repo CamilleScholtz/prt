@@ -2,17 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/go2c/optparse"
 )
 
-// TODO: Check this for all command files, should I use os.Exit or return an
-// err?
-
 // info prints port information.
-func info(input []string) {
+func info(input []string) error {
 	// Enable all arguments if the user hasn't specified any.
 	var b bool
 	if len(input) == 0 {
@@ -34,9 +30,7 @@ func info(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -53,15 +47,15 @@ func info(input []string) {
 		fmt.Println("  -r,   --release         print release")
 		fmt.Println("  -s,   --source          print sources")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// Read out Pkgfile.
 	var p port
 	p.Location = "."
 	if err := p.parsePkgfile(true); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	// Print info from Pkgfile.
@@ -89,4 +83,6 @@ func info(input []string) {
 	if *args {
 		fmt.Println("Source: " + strings.Join(p.Pkgfile.Source, ", "))
 	}
+
+	return nil
 }

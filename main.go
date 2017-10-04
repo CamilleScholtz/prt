@@ -17,6 +17,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	var err error
 	switch os.Args[1] {
 	case "help":
 		fmt.Println("Usage: prt command [arguments]")
@@ -36,33 +37,36 @@ func main() {
 		//fmt.Println("  uninstall               uninstall packages")
 		fmt.Println("  help                    print help and exit")
 	case "depends":
-		depends(os.Args[2:])
+		err = depends(os.Args[2:])
 	case "diff":
-		diff(os.Args[2:])
+		err = diff(os.Args[2:])
 	case "graph":
-		graph(os.Args[2:])
+		err = graph(os.Args[2:])
 	case "info":
-		info(os.Args[2:])
+		err = info(os.Args[2:])
 	//case "install":
-	//	install(os.Args[2:])
+	//	err =install(os.Args[2:])
 	case "list":
-		list(os.Args[2:])
+		err = list(os.Args[2:])
 	case "loc":
-		loc(os.Args[2:])
+		err = loc(os.Args[2:])
 	//case "patch":
-	//	patch(os.Args[2:])
+	//	err = patch(os.Args[2:])
 	case "prov":
-		prov(os.Args[2:])
+		err = prov(os.Args[2:])
 	case "pull":
-		pull(os.Args[2:])
+		err = pull(os.Args[2:])
 	//case "sysup":
-	//	sysup(os.Args[2:])
+	//	err = sysup(os.Args[2:])
 	//case "uninstall":
-	//	uninstall(os.Args[2:])
+	//	err = uninstall(os.Args[2:])
 	default:
-		fmt.Fprintln(os.Stderr,
-			"Invalid command, use help for a list of commands!")
+		err = fmt.Errorf("invalid command, use help for a list of commands")
 	}
 
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s!\n", capitalize(err.Error()))
+		os.Exit(1)
+	}
 	os.Exit(0)
 }

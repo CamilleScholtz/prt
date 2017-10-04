@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
 )
 
 // Diff lists outdated packages.
-func diff(input []string) {
+func diff(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argn := o.Bool("no-alias", 'n', false)
@@ -19,9 +18,7 @@ func diff(input []string) {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			"Invaild argument, use -h for a list of arguments!")
-		os.Exit(1)
+		return fmt.Errorf("invaild argument, use -h for a list of arguments")
 	}
 
 	// Print help.
@@ -32,21 +29,20 @@ func diff(input []string) {
 		fmt.Println("  -n,   --no-alias        disable aliasing")
 		fmt.Println("  -v,   --version         print with version info")
 		fmt.Println("  -h,   --help            print help and exit")
-		os.Exit(0)
+
+		return nil
 	}
 
 	// Get all ports.
 	all, err := ports()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	// Get installed ports.
 	db, err := parseDatabase()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
 	for i, n := range db.Name {
@@ -88,4 +84,6 @@ func diff(input []string) {
 			fmt.Println()
 		}
 	}
+
+	return nil
 }
