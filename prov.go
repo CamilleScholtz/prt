@@ -20,7 +20,7 @@ func prov(input []string) error {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		return fmt.Errorf("invaild argument, use -h for a list of arguments")
+		return fmt.Errorf("invaild argument, use `-h` for a list of arguments")
 	}
 
 	// Print help.

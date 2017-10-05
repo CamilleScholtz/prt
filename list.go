@@ -19,7 +19,7 @@ func list(input []string) error {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		return fmt.Errorf("invaild argument, use -h for a list of arguments")
+		return fmt.Errorf("invaild argument, use `-h` for a list of arguments")
 	}
 
 	// Print help.
@@ -59,8 +59,7 @@ func list(input []string) error {
 			pl = append(pl, p[0])
 		}
 
-		// I'm using all in the the following for loop, so alias db to
-		// all.
+		// I'm using all in the the following for loop, so alias db to all.
 		all = pl
 	}
 

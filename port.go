@@ -148,7 +148,7 @@ func (p *port) parseFootprint() error {
 	f, err := os.Open(path.Join(p.Location, ".footprint"))
 	defer f.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("could not open `%s/.footprint`", p.Location)
 	}
 	s := bufio.NewScanner(f)
 
@@ -169,7 +169,7 @@ func (p *port) parseMd5sum() error {
 	f, err := os.Open(path.Join(p.Location, ".md5sum"))
 	defer f.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("could not open `%s/.md5sum`", p.Location)
 	}
 	s := bufio.NewScanner(f)
 
@@ -193,7 +193,7 @@ func (p *port) parsePkgfile(source ...bool) error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
 	defer f.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("could not open `%s/Pkgfile`", p.Location)
 	}
 	s := bufio.NewScanner(f)
 
@@ -206,7 +206,7 @@ func (p *port) parsePkgfile(source ...bool) error {
 			switch kv[0] {
 			case "# Description":
 				p.Pkgfile.Description = strings.TrimSpace(kv[1])
-			case "URL":
+			case "# URL":
 				p.Pkgfile.URL = strings.TrimSpace(kv[1])
 			case "# Maintainer":
 				p.Pkgfile.Maintainer = strings.TrimSpace(kv[1])
@@ -251,13 +251,13 @@ func (p *port) parsePkgfile(source ...bool) error {
 
 // parsePkgfileSh parses a Pkgfile file. It will read the Pkgfile file into a
 // pkgfile type, which is a struct containing the various info a Pkgfile
-// contains. This is an experimental version mvdan.cc/sh, and currently too slow
-// for actual use.
+// contains. This is an experimental version using mvdan.cc/sh, and currently
+// too slow for actual use.
 /*func (p *port) parsePkgfileSh() error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
 	defer f.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("could not open `%s/Pkgfile`", p.Location)
 	}
 
 	sp := syntax.NewParser(syntax.KeepComments, syntax.Variant(syntax.LangBash))
@@ -333,7 +333,7 @@ func location(n string, all []port) ([]port, error) {
 	}
 
 	if len(pl) == 0 {
-		return []port{}, fmt.Errorf("location %s: Not in the ports tree", n)
+		return []port{}, fmt.Errorf("could not find `%s` in the ports tree", n)
 	}
 
 	// If there are multiple matches, sort using the config Order value.
@@ -366,11 +366,14 @@ func (p port) source(k string) (string, error) {
 	cmd.Stdout = &b
 
 	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("source %s: Could not source", k)
+		return "", fmt.Errorf(
+			"could not source variable `%s` from `%s/Pkgfile`", k, p.Location)
 	}
 
 	if len(b.String()) == 0 {
-		return "", fmt.Errorf("source %s: No such variable", k)
+		return "", fmt.Errorf(
+			"no variable with the name `%s` found in `%s/Pkgfile`", k,
+			p.Location)
 	}
 
 	return b.String(), nil

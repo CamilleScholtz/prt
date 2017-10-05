@@ -18,7 +18,7 @@ func diff(input []string) error {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		return fmt.Errorf("invaild argument, use -h for a list of arguments")
+		return fmt.Errorf("invaild argument, use `-h` for a list of arguments")
 	}
 
 	// Print help.

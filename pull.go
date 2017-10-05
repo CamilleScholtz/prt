@@ -18,7 +18,7 @@ func pull(input []string) error {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		return fmt.Errorf("invaild argument, use -h for a list of arguments")
+		return fmt.Errorf("invaild argument, use `-h` for a list of arguments")
 	}
 
 	// Print help.
@@ -39,8 +39,7 @@ func pull(input []string) error {
 		t = len(vals)
 	}
 
-	// TODO: Actually learn git and check if all these commands are
-	// needed.
+	// TODO: Actually learn git and check if all these commands are needed.
 	var i int
 	for n, r := range config.Repo {
 		// Skip repos if needed.

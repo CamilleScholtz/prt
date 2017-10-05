@@ -21,7 +21,7 @@ func graph(input []string) error {
 	// Parse arguments.
 	_, err := o.Parse(input)
 	if err != nil {
-		return fmt.Errorf("invaild argument, use -h for a list of arguments")
+		return fmt.Errorf("invaild argument, use `-h` for a list of arguments")
 	}
 
 	// Print help.
@@ -51,11 +51,10 @@ func graph(input []string) error {
 	p.depends(!*argn, all)
 
 	// Set file to write to.
-	f, err := os.OpenFile(p.Pkgfile.Name+".dot",
-		os.O_CREATE|os.O_WRONLY, 0666)
+	f, err := os.OpenFile(p.Pkgfile.Name+".dot", os.O_CREATE|os.O_WRONLY, 0666)
 	defer f.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create `%s`", p.Pkgfile.Name+".dot")
 	}
 
 	// Prettify graph.
@@ -81,11 +80,11 @@ func graph(input []string) error {
 	fmt.Fprintf(f, "\t\t%s=\"%d\"\n", "penwidth", 2)
 	fmt.Fprintf(f, "\t]\n\n")
 
+	var i int
 	var c []string
 	op := p.getBaseDir()
 	pl := p.Depends
 	pal, _ := colorful.SoftPalette(128)
-	var i int
 	var recursive func()
 	recursive = func() {
 		for _, p := range pl {
@@ -105,7 +104,7 @@ func graph(input []string) error {
 			}
 
 			i++
-			if i > 128 {
+			if i >= 128 {
 				i = 0
 			}
 			op = p.getBaseDir()
@@ -120,11 +119,11 @@ func graph(input []string) error {
 	}
 
 	// Convert to graph.
+	// TODO: Remove *.dot file?
 	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt, "-o",
 		p.Pkgfile.Name+"."+*argt)
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("graphviz dot %s: Something went wrong",
-			p.Pkgfile.Name+"."+*argt)
+		return fmt.Errorf("something went wrong with GrapViz")
 	}
 
 	return nil

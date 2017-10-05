@@ -61,7 +61,7 @@ func main() {
 	//case "uninstall":
 	//	err = uninstall(os.Args[2:])
 	default:
-		err = fmt.Errorf("invalid command, use help for a list of commands")
+		err = fmt.Errorf("invalid command, use `help` for a list of commands")
 	}
 
 	if err != nil {

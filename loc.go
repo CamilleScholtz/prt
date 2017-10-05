@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -20,7 +19,7 @@ func loc(input []string) error {
 	// Parse arguments.
 	vals, err := o.Parse(input)
 	if err != nil {
-		return fmt.Errorf("invaild argument, use -h for a list of arguments")
+		return fmt.Errorf("invaild argument, use `-h` for a list of arguments")
 	}
 
 	// Print help.
@@ -60,8 +59,7 @@ func loc(input []string) error {
 		// Get port location.
 		pl, err := location(n, all)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Port not found in the ports tree!")
-			continue
+			return err
 		}
 		if !*argd {
 			pl = []port{pl[0]}
