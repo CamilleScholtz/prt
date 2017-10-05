@@ -1,7 +1,6 @@
-// pkgmk.go contains functions related to building and installing
-// ports/packages. These include function such downloading port
-// sourcers, creating the wrkdir, removing the wrkdir and installing
-// package contents to right location.
+// make.go contains functions related to building and installing ports/packages.
+// These include function such downloading port sources, creating the wrkdir,
+// removing the wrkdir and installing package contents to right location.
 
 package main
 

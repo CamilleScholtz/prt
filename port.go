@@ -1,7 +1,3 @@
-// port.go contains functions that interact with single ports. These include
-// functions such as getting the location of a port, reading out a .footprint
-// file, or reading out a Pkgfile.
-
 package main
 
 import (
@@ -14,12 +10,16 @@ import (
 	"strings"
 )
 
-// port is a struct type with all the files a port can have.
+// A port type describes a port. A port is a directory containing the files
+// needed for building a package.
 type port struct {
-	// The location of the port, is often used as the "key" for the port type.
+	// Location specifies the location of the port, this is used as the
+	// "primary key" of a port type. A location looks like follow; `repo/port`,
+	// an example of this would be `opt/firefox`.
 	Location string
 
-	// This is a recursive variable that gets filled by getDepends.
+	// Depends is a recursive variable that gets filled by `getDepends()`.
+	// TODO: Move this to Pkgfile or somewhere else?
 	Depends []port
 
 	// TODO: Add signature, .nostrip, et cetera.
@@ -28,20 +28,27 @@ type port struct {
 	Pkgfile   pkgfile
 }
 
-// footprint is a struct type describing a .footprint file.
+// footprint is a type describing the `.footprint` file of a port. This file is
+// used for regression testing and contains a list of files a package is
+// expected to contain once it is built.
+// TODO: Consider using some type other than `string`.
 type footprint struct {
 	Permission []string
 	Owner      []string
 	File       []string
 }
 
-// md5sum is a struct type describing a .md5sum file.
+// md5sum is a type describing the`.md5sum` file of a port. This file is used to
+// validate the sources of a port.
+// TODO: Consider using some type other than `string`.
 type md5sum struct {
 	Hash []string
 	File []string
 }
 
-// pkgfile is a struct type describing a parsed Pkgfile file.
+// pkgfile is a type describing the `Pkgfile` file of a port. This file contains
+// information about the package (such as `name`, `version`, etc) and the
+// commands that should be executed in order to compile the package in question.
 type pkgfile struct {
 	// Comments with various information that isn't strictly needed in order to
 	// build a package.
@@ -50,27 +57,31 @@ type pkgfile struct {
 	Maintainer  string
 
 	// Comments with information about dependencies. These need some more
-	// parsing because there isn't an official styling guideline, so some
-	// Pkgfiles use commas to separate dependencies, and some don't.
+	// parsing because some `Pkgfile`s use commas to separate dependencies, and
+	// others use spaces.
 	Depends  []string
 	Optional []string
 
-	// Variables with various information that is required in order to build a
-	// package.
+	// `bash(1)` variables with various information that is required in order to
+	// build a package.
 	Name    string
 	Version string
 	Release string
 
-	// A variable array with the needed sources of a port. We probably need to
-	// parse this by actually using bash because people often use variables
-	// (such as $name or $version) and bashisms in the source variable.
+	// A `bash(1)` array with the sources needed to build a package. We probably
+	// need to parse this by actually using the `source(1)` because `Pkgfile`s
+	// often use `bash(1)` variables (such as `$name` or `$version`) and
+	// bashisms in the source variable.
+	// TODO: Possibly use `mvdan.cc/sh/interp` for this.
 	Source []string
 }
 
 // Global variable used by getDepends.
+// TODO: Not that clean, can I move this?
 var check []string
 
-// alias aliases ports using the config.Alias values.
+// alias aliases ports using the `config.Alias` values. An example of this would
+// be alliasing `core/openssl` to `6c37/libressl`.
 func (p *port) alias() {
 	for _, a := range config.Alias {
 		if a[0] == p.getBaseDir() {
@@ -134,16 +145,15 @@ func (p port) getBaseDir() string {
 	if strings.Contains(p.Location, config.PrtDir) {
 		l = strings.TrimPrefix(p.Location, config.PrtDir+"/")
 	} else {
-		// TODO: This requires that parsePkgfile has been executed.
+		// TODO: This requires that parsePkgfile has been executed, is that
+		// something we want?
 		l = "./" + p.Pkgfile.Name
 	}
 
 	return l
 }
 
-// parseFootprint parses a .footprint file. It will read the .footprint file
-// into a footprint type, which is a struct containing  permissions and
-// ownership information and their matching files.
+// parseFootprint parses the `.footprint` file of a port.
 func (p *port) parseFootprint() error {
 	f, err := os.Open(path.Join(p.Location, ".footprint"))
 	defer f.Close()
@@ -163,8 +173,7 @@ func (p *port) parseFootprint() error {
 	return nil
 }
 
-// parseMd5sum parses a .md5sum file. It will read the .md5sum file into am
-// md5sum type, which is a struct containing hashes and their matching files.
+// parseMd5sum parses the `.md5sum` file of a port.
 func (p *port) parseMd5sum() error {
 	f, err := os.Open(path.Join(p.Location, ".md5sum"))
 	defer f.Close()
@@ -183,12 +192,11 @@ func (p *port) parseMd5sum() error {
 	return nil
 }
 
-// parsePkgfile parses a Pkgfile file. It will read the Pkgfile file into a
-// pkgfile type, which is a struct containing the various info a Pkgfile
-// contains. Please keep in mind that parsePkgfile does not expand variables,
-// so `$version` will just be a literal string. If you want to expand variables
-// pass a bool as a parameter. This will use Bash to source the file, keep in
-// mind this is relatively slow.
+// parsePkgfile parses a `Pkgfile` file of a port. Keep in mind that this does
+// not expand `bash(1)` variables, so `$version` will just be a literal string.
+// If you want to expand variables pass a bool as a parameter. This will force
+// the use of `source(1)` to get the `source` `bash(1)` array of a `Pkgfile`.
+// Using `source(1)` is relatively slow.
 func (p *port) parsePkgfile(source ...bool) error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
 	defer f.Close()
@@ -232,6 +240,7 @@ func (p *port) parsePkgfile(source ...bool) error {
 				if len(source) == 0 {
 					p.Pkgfile.Source = strings.Fields(strings.TrimSpace(kv[1]))
 				} else {
+					// TODO: Possibly use `mvdan.cc/sh/interp` for this.
 					s, err := p.source("source")
 					if err != nil {
 						return err
@@ -239,8 +248,8 @@ func (p *port) parsePkgfile(source ...bool) error {
 					p.Pkgfile.Source = strings.Fields(s)
 				}
 
-				// Since source should be the last meaningfull value in a
-				// Pkgfile, we will stop walking.
+				// Since `source` should be the last meaningfull value in a
+				// `Pkgfile`, we will stop walking.
 				return nil
 			}
 		}
@@ -249,10 +258,9 @@ func (p *port) parsePkgfile(source ...bool) error {
 	return nil
 }
 
-// parsePkgfileSh parses a Pkgfile file. It will read the Pkgfile file into a
-// pkgfile type, which is a struct containing the various info a Pkgfile
-// contains. This is an experimental version using mvdan.cc/sh, and currently
-// too slow for actual use.
+// parsePkgfileSh parses a `Pkgfile` file of a port. This is an experimental
+// version of parsePkgfile using `mvdan.cc/sh/syntax`, and currently too slow
+// for actual use.
 /*func (p *port) parsePkgfileSh() error {
 	f, err := os.Open(path.Join(p.Location, "Pkgfile"))
 	defer f.Close()
@@ -323,7 +331,7 @@ func (p *port) parsePkgfile(source ...bool) error {
 }*/
 
 // location tries to get the location of a port. It returns a list with possible
-// ports, ordered using the config Order value.
+// ports, ordered using the `config.Order` value.
 func location(n string, all []port) ([]port, error) {
 	var pl []port
 	for _, p := range all {
@@ -336,7 +344,7 @@ func location(n string, all []port) ([]port, error) {
 		return []port{}, fmt.Errorf("could not find `%s` in the ports tree", n)
 	}
 
-	// If there are multiple matches, sort using the config Order value.
+	// If there are multiple matches, sort using the `config.Order` value.
 	if len(pl) > 1 {
 		var i int
 		for _, r := range config.Order {
@@ -346,7 +354,7 @@ func location(n string, all []port) ([]port, error) {
 				i++
 			}
 
-			// Break if everything has been ordered.
+			// Break once everything has been ordered.
 			if i == len(pl) {
 				break
 			}
@@ -356,9 +364,9 @@ func location(n string, all []port) ([]port, error) {
 	return pl, nil
 }
 
-// source reads a variable from a Pkgfile, this actually uses bash source. This
-// is relatively slow but also more precise because it completes variables. This
-// is especially (only?) useful for the source variable in Pkgfiles.
+// source reads a variable from a `Pkgfile` file using `source(1). This is
+// relatively slow but sometimes needed because it expands `bash(1)` variables.
+// This is especially (only?) useful for the source variable in `Pkgfile` files.
 func (p port) source(k string) (string, error) {
 	cmd := exec.Command("bash", "-c", "source ./Pkgfile && echo ${"+k+"[@]}")
 	cmd.Dir = p.Location
