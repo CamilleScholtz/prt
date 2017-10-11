@@ -2,7 +2,8 @@
 
 *This project is currently in early alpha stage!*
 
-prt - CRUX port utility written in Go, aiming to replace prt-get, ports, and some pkgutils (on my machine)
+prt - CRUX port utility written in Go, aiming to replace prt-get, ports, and
+some pkgutils (on my machine)
 
 
 ## SYNOPSIS
@@ -12,32 +13,56 @@ prt command [arguments]
 
 ## DESCRIPTION
 
-prt is like `prt-get(8)` a port/package management utility which provides additional functionality to the CRUX pkgutils. It works with the local ports tree and is therefore fully compatible with `ports(8)`, `pkgmk(8)`, `pkgadd(8)` and of course `prt-get(8)`. It offers the following features:
+prt is like `prt-get(8)` a port/package management utility which provides
+additional functionality to the CRUX pkgutils. In addition to that it also
+strives to replace the CRUX pkgutils in Go. It works with the local ports tree
+and is therefore fully compatible with `ports(8)`, `pkgmk(8)`, `pkgadd(8)` and
+of course `prt-get(8)`. It offers the following features:
 
-* listing dependencies of ports recursively, with an optional flag to print using tree view
-* listing outdated package, by comparing port versions with the installed version
-* easily printing port information such as the maintainer, version, release, et cetera
-* install ports and their dependencies with a single command
-* list ports, with optional flags to also only list installed ports, print with repo information or to print with additional version information
-* print the location of a port
-* searching through files ports provide, with an optional flag to only search through installed ports
-* pull in ports using git(1)
-* update outdated packages
-* uninstall installed packages
+* Listing dependencies of ports recursively, with an optional flag to print
+  using tree view.
+* Generating graphs of port dependencies
+* Listing outdated package, by comparing port versions with the installed
+  version
+* Easily printing port information such as the maintainer, version, release, et
+  cetera
+* Install ports and their dependencies with a single command
+* List ports, with optional flags to also only list installed ports, print with
+  repo information or to print with additional version information
+* Print the location of a port
+* Searching through files ports provide, with an optional flag to only search
+  through installed ports
+* Pull in ports using `git(1)`
+* Update outdated packages
+* Uninstall installed packages
 
-Unlike `prt-get(8)`, prt reimplements `pkgmk(8)`/`pkgadd(8)` fully in Go. This is mostly for more control (and for fun). Like `prt-get` it does provide some nice exyta functionality such as listing and installing dependencies, getting the location of a port, aliasing ports (for example `core/openssl` to `6c37-dropin/libressl`), and ordering ports with the same name depending on how "important" the repo is the port resides in.
+Like said before, unlike `prt-get(8)`, prt reimplements `pkgmk(8)`/`pkgadd(8)`
+fully in Go. This is mostly for more control. Like `prt-get` it does provide
+some nice extra functionality such as listing and installing dependencies,
+getting the location of a port, aliasing ports (for example `core/openssl` to
+`6c37-dropin/libressl`), and ordering ports with the same name depending on how
+"important" the repo is the port resides in.
 
-There are a few differences, for example, unlike `prt-get(8)` you need to  be in the port's directory for most commands to work, like how `pkgmk(8)` works. This has a few advantages, for example you can quickly download a port
-anywhere on the filesystem, and install it and its dependencies using `prt install`. Because `prt-get depinst` needs a port name, you can *only* install ports that are located in a predefined `prtdir`.
+There are a few differences, for example, unlike `prt-get(8)` you need to be in
+the port's directory for most commands to work, like how `pkgmk(8)` works. This
+has a few advantages, for example you can quickly download a port anywhere on
+the filesystem, and install it and its dependencies using `prt install`. Because
+`prt-get depinst` needs a port name, you can *only* install ports that are
+located in a predefined `prtdir`.
 
-Another difference with `prt-get(8)` is that prt does not use a cache file, while still being nearly as fast or faster in some cases.
+Another difference with `prt-get(8)` is that prt does not use a cache file,
+while still being nearly as fast or faster in some cases.
 
-Aliasing is also handeled a bit different. `prt-get(8)` aliases ports based on name, but prt on name and repo. This makes it possible to alias `foo/bar` to `baz/bar`.
+Aliasing is also handeled a bit different. `prt-get(8)` aliases ports based on
+name, but prt on name and repo. This makes it possible to alias `foo/bar` to
+`baz/bar`.
 
 
 ## COMMANDS
 
-The prt syntax is inspired by `prt-get(8)`, `git(8)` and `go(8)`, and thus uses so called commands which always have to be the first non-option argument passed. The commands are:
+The prt syntax is inspired by `prt-get(8)`, `git(8)` and `go(8)`, and thus uses
+so called commands which always have to be the first non-option argument passed.
+The commands are:
 
 `depends`   list dependencies recursively,
 
@@ -66,16 +91,19 @@ The prt syntax is inspired by `prt-get(8)`, `git(8)` and `go(8)`, and thus uses 
 
 https://github.com/onodera-punpun/crux-ports/blob/master/prt/Pkgfile
 
-Make sure to check `/etc/prt/config.toml` after installation and edit values to fit your needs and setup.
+Make sure to check `/etc/prt/config.toml` after installation and edit values to
+fit your needs and setup.
 
-If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some handy completions.
+If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some
+handy completions.
 
 
 ## TODO
 
 - [x] Implement `depends` command.
 - [x] Implement `diff` command.
-- [x] Implement `info` command. *(This always prints something, even when not in a port directory...)*
+- [x] Implement `info` command. *(This always prints something, even when not in
+  a port directory...)*
 - [x] Implement `graph` command.
 - [ ] Implement `install` command.
 - [x] Implement `list` command.
@@ -88,18 +116,22 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 
 ---
 
-- [x] Convert `pkgmk` `get_filename` function to Go. *(so uhh, `pkgmk` does something with "absolute paths", do I need this as well?)*
+- [x] Convert `pkgmk` `get_filename` function to Go. *(so uhh, `pkgmk` does
+  something with "absolute paths", do I need this as well?)*
 - [x] Convert `pkgmk` `get_basename` function to Go.
 - [x] Convert `pkgmk` `check_pkgfile` function to Go.
 - [x] Convert `pkgmk` `check_directory` function to Go.
 - [x] Convert `pkgmk` `check_file` function to Go.
-- [x] Convert `pkgmk` `download_file` function to Go. *(`curl` is still used, is there some pure Go implementation?)*
+- [x] Convert `pkgmk` `download_file` function to Go. *(`curl` is still used, is
+  there some pure Go implementation?)*
 - [x] Convert `pkgmk` `download_source` function to Go.
-- [x] Convert `pkgmk` `unpack_source` function to Go. *(some `Pkgfile`s create their own unpack functions, I still need to detect and use those.)*
+- [x] Convert `pkgmk` `unpack_source` function to Go. *(some `Pkgfile`s create
+  their own unpack functions, I still need to detect and use those.)*
 - [x] Convert `pkgmk` `make_md5sum` function to Go.
 - [ ] Convert `pkgmk` `make_footprint` function to Go.
 - [x] Convert `pkgmk` `check_md5sum` function to Go.
-- [x] Convert `pkgmk` `check_signature` function to Go. *(`signify` is still used, is there some pure Go implementation?)*
+- [x] Convert `pkgmk` `check_signature` function to Go. *(`signify` is still
+  used, is there some pure Go implementation?)*
 - [ ] Convert `pkgmk` `make_signature` function to Go.
 - [ ] Convert `pkgmk` `strip_files` function to Go.
 - [ ] Convert `pkgmk` `compress_manpages` function to Go.
@@ -107,7 +139,8 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 - [x] Convert `pkgmk` `make_work_dir` function to Go.
 - [x] Convert `pkgmk` `remove_work_dir` function to Go.
 - [ ] Convert `pkgmk` `install_package` function to Go.
-- [x] Convert `pkgmk` `clean` function to Go. *(not going to implement, there is `rm`)*
+- [x] Convert `pkgmk` `clean` function to Go. *(not going to implement, there is
+  `rm`)*
 
 ---
 
@@ -128,8 +161,3 @@ If you use `fish` a `cd` wrapper for `prt loc` will also be installed, and some 
 ## AUTHORS
 
 Camille Scholtz
-
-
-## NOTES
-
-Since this is my first Go project I'm probably making some mistakes, feedback is highly appreciated!

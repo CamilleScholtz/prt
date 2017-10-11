@@ -51,8 +51,7 @@ func depends(input []string) error {
 		}
 	}
 
-	var p port
-	p.Location = "."
+	p := newPort(".")
 	if err := p.parsePkgfile(); err != nil {
 		return err
 	}
@@ -61,8 +60,8 @@ func depends(input []string) error {
 	var i int
 	var c []string
 	pl := p.Depends
-	var recursive func()
-	recursive = func() {
+	var recurse func()
+	recurse = func() {
 		for _, p := range pl {
 			if !*arga {
 				if !stringInList(p.Pkgfile.Name, db.Name) {
@@ -72,7 +71,7 @@ func depends(input []string) error {
 							fmt.Printf(strings.Repeat(config.IndentChar, i))
 							color.Unset()
 						}
-						fmt.Println(p.getBaseDir())
+						fmt.Println(p.Location.base())
 
 						// Append to printed ports.
 						c = append(c, p.Pkgfile.Name)
@@ -84,18 +83,18 @@ func depends(input []string) error {
 					fmt.Printf(strings.Repeat(config.IndentChar, i))
 					color.Unset()
 				}
-				fmt.Println(p.getBaseDir())
+				fmt.Println(p.Location.base())
 			}
 
 			i++
 			if len(p.Depends) > 0 {
 				pl = p.Depends
-				recursive()
+				recurse()
 			}
 			i--
 		}
 	}
-	recursive()
+	recurse()
 
 	return nil
 }

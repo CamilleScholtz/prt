@@ -52,7 +52,7 @@ func list(input []string) error {
 		// Get port locations.
 		var pl []port
 		for _, n := range db.Name {
-			p, err := location(n, all)
+			p, err := getLocation(n, all)
 			if err != nil {
 				continue
 			}
@@ -68,9 +68,9 @@ func list(input []string) error {
 		var s string
 
 		if !*argr {
-			s = p.getPortDir()
+			s = p.Location.Port
 		} else {
-			s = p.getBaseDir()
+			s = p.Location.base()
 		}
 
 		if *argv {

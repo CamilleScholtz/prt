@@ -46,7 +46,7 @@ func diff(input []string) error {
 	}
 
 	for i, n := range db.Name {
-		pl, err := location(n, all)
+		pl, err := getLocation(n, all)
 		if err != nil {
 			continue
 		}

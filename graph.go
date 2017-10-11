@@ -43,8 +43,7 @@ func graph(input []string) error {
 		return err
 	}
 
-	var p port
-	p.Location = "."
+	p := newPort(".")
 	if err := p.parsePkgfile(); err != nil {
 		return err
 	}
@@ -82,7 +81,8 @@ func graph(input []string) error {
 
 	var i int
 	var c []string
-	op := p.getBaseDir()
+	// TODO: Is op still needed?
+	op := p.Location.base()
 	pl := p.Depends
 	pal, _ := colorful.SoftPalette(128)
 	var recursive func()
@@ -90,7 +90,7 @@ func graph(input []string) error {
 		for _, p := range pl {
 			if !stringInList(p.Pkgfile.Name, c) {
 				fmt.Fprintf(f, "\tnode [color=\"%s\"]\n", pal[i].Hex())
-				fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", op, p.getBaseDir())
+				fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", op, p.Location.base())
 
 				// Append to checked ports.
 				if !*argd {
@@ -107,7 +107,7 @@ func graph(input []string) error {
 			if i >= 128 {
 				i = 0
 			}
-			op = p.getBaseDir()
+			op = p.Location.base()
 		}
 	}
 	recursive()

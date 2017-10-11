@@ -107,7 +107,7 @@ func prov(input []string) error {
 
 				// Print port location.
 				if len(fl) > 0 {
-					fmt.Println(p.getBaseDir())
+					fmt.Println(p.Location.base())
 				}
 
 				// Print matched files.

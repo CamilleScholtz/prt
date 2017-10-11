@@ -70,7 +70,7 @@ func stringInList(s string, l []string) bool {
 // stringInPorts checks if a string is in a port list.
 func stringInPorts(s string, l []port) bool {
 	for _, ls := range l {
-		if ls.Location == s {
+		if ls.Location.base() == s {
 			return true
 		}
 	}

@@ -52,8 +52,7 @@ func info(input []string) error {
 	}
 
 	// Read out Pkgfile.
-	var p port
-	p.Location = "."
+	p := newPort(".")
 	if err := p.parsePkgfile(true); err != nil {
 		return err
 	}

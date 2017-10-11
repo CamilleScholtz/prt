@@ -18,7 +18,9 @@ func ports() ([]port, error) {
 	var ptl []port
 	for _, p := range pl {
 		var pt port
-		pt.Location = path.Dir(p)
+		// TODO: Repair
+		pt.Location.Repo = path.Dir(p)
+		pt.Location.Port = path.Dir(p)
 		ptl = append(ptl, pt)
 	}
 

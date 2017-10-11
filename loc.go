@@ -57,7 +57,7 @@ func loc(input []string) error {
 		c = append(c, n)
 
 		// Get port location.
-		pl, err := location(n, all)
+		pl, err := getLocation(n, all)
 		if err != nil {
 			return err
 		}
@@ -75,10 +75,10 @@ func loc(input []string) error {
 			// Print duplicate indentation.
 			if *argd {
 				// Reset indentation on new port
-				if p.getPortDir() != op {
+				if p.Location.Port != op {
 					i = 0
 				}
-				op = p.getPortDir()
+				op = p.Location.Port
 
 				if i > 0 {
 					color.Set(config.DarkColor)
@@ -89,7 +89,7 @@ func loc(input []string) error {
 			}
 
 			// Finally print the port.
-			fmt.Println(p.getBaseDir())
+			fmt.Println(p.Location.base())
 		}
 	}
 
