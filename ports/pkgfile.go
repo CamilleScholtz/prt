@@ -53,10 +53,10 @@ type Pkgfile struct {
 // Using `source(1)` is relatively slow.
 func (f *Pkgfile) Parse(source ...bool) error {
 	fr, err := os.Open(path.Join(f.Location.Full(), "Pkgfile"))
-	defer fr.Close()
 	if err != nil {
 		return fmt.Errorf("could not open `%s/Pkgfile`", f.Location.Full())
 	}
+	defer fr.Close()
 	s := bufio.NewScanner(fr)
 
 	for s.Scan() {
@@ -93,7 +93,7 @@ func (f *Pkgfile) Parse(source ...bool) error {
 			case "source":
 				if len(source) > 0 {
 					// TODO: Possibly use `mvdan.cc/sh/interp` for this.
-					s, err := f.Expand("source")
+					s, err := f.expand("source")
 					if err != nil {
 						return err
 					}
@@ -156,10 +156,10 @@ func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
 	return depends, nil
 }
 
-// Expand reads a variable from a `Pkgfile` file using `source(1)`. This is
+// expand reads a variable from a `Pkgfile` file using `source(1)`. This is
 // relatively slow but sometimes needed because it expands BASH variables. This
 // is especially (only?) useful for the `source` BASH array in `Pkgfile` files.
-func (f Pkgfile) Expand(key string) (string, error) {
+func (f Pkgfile) expand(key string) (string, error) {
 	cmd := exec.Command("bash", "-c", "source ./Pkgfile && echo ${"+key+"[@]}")
 	cmd.Dir = f.Location.Full()
 	var b bytes.Buffer
@@ -167,14 +167,14 @@ func (f Pkgfile) Expand(key string) (string, error) {
 
 	if err := cmd.Run(); err != nil {
 		return "", fmt.Errorf(
-			"could not source variable `%s` from `%s/Pkgfile`", key,
-			f.Location.Full())
+			"could not source variable `%s` from `%s/Pkgfile`", key, f.
+				Location.Full())
 	}
 
 	if len(b.String()) == 0 {
 		return "", fmt.Errorf(
-			"no variable with the name `%s` found in `%s/Pkgfile`", key,
-			f.Location.Full())
+			"no variable with the name `%s` found in `%s/Pkgfile`", key, f.
+				Location.Full())
 	}
 
 	return b.String(), nil

@@ -23,10 +23,10 @@ type Footprint struct {
 // in the given `*Footprint`.
 func (f *Footprint) Parse() error {
 	fr, err := os.Open(path.Join(f.Location.Full(), ".footprint"))
-	defer fr.Close()
 	if err != nil {
 		return fmt.Errorf("could not open `%s/.footprint`", f.Location.Full())
 	}
+	defer fr.Close()
 	s := bufio.NewScanner(fr)
 
 	for s.Scan() {

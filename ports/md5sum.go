@@ -21,10 +21,10 @@ type Md5sum struct {
 // the given `*Md5sum`.
 func (f *Md5sum) Parse() error {
 	fr, err := os.Open(path.Join(f.Location.Full(), ".md5sum"))
-	defer fr.Close()
 	if err != nil {
 		return fmt.Errorf("could not open `%s/.md5sum`", f.Location.Full())
 	}
+	defer fr.Close()
 	s := bufio.NewScanner(fr)
 
 	for s.Scan() {
