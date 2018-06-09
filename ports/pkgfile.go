@@ -7,9 +7,9 @@ import (
 	"path"
 	"strings"
 
+	"github.com/onodera-punpun/prt/array"
 	"mvdan.cc/sh/interp"
 	"mvdan.cc/sh/shell"
-	"mvdan.cc/sh/syntax"
 )
 
 // A Pkgfile is a type describing the `Pkgfile` file of a port. This file
@@ -42,29 +42,6 @@ type Pkgfile struct {
 	// BASH variables (such as `$name` or `$version`) and bashisms in the source
 	// variable.
 	Source []string
-}
-
-// ParseSh ...
-func (f *Pkgfile) ParseSh() (*interp.Runner, error) {
-	r, err := os.Open(path.Join(f.Location.Full(), "Pkgfile"))
-	if err != nil {
-		return nil, fmt.Errorf("could not open `%s/Pkgfile`", f.Location.Full())
-	}
-	defer r.Close()
-
-	s := syntax.NewParser()
-	n, err := s.Parse(r, "Pkgfile")
-	if err != nil {
-		return nil, fmt.Errorf("could not parse: %v", err)
-	}
-
-	i := &interp.Runner{}
-	i.Reset()
-	if err := i.Run(n); err != nil {
-		return nil, fmt.Errorf("could not run: %v", err)
-	}
-
-	return i, nil
 }
 
 // Parse parses the `Pkgfile` file of a port and populates the various fields in
@@ -144,10 +121,12 @@ var depends []Port
 // RecursiveDepends is a function that calculates dependencies recursively. This
 // function requires `Parse()` to be run on the `Pkgfile` in question
 // beforehand.
+// TODO: Use pointers here?
+// TODO: Use go-routines here?
 func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
 	all []Port) ([]Port, error) {
 	// Continue if already checked.
-	if stringInStrings(f.Location.Port, check) {
+	if array.ContainsString(check, f.Location.Port) {
 		return depends, nil
 	}
 
@@ -176,7 +155,7 @@ func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
 		check = append(check, f.Location.Port)
 
 		// Loop.
-		go depends[len(depends)-1].Pkgfile.RecursiveDepends(aliases, order, all)
+		depends[len(depends)-1].Pkgfile.RecursiveDepends(aliases, order, all)
 	}
 
 	return depends, nil

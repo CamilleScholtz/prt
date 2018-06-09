@@ -24,6 +24,7 @@ func (s byBase) Less(i, j int) bool {
 	return path.Base(s[i]) < path.Base(s[j])
 }
 
+// TODO: Use toTitle or Title.
 func capitalize(s string) string {
 	a := []rune(s)
 	a[0] = unicode.ToUpper(a[0])
@@ -47,33 +48,11 @@ func printi(s string) {
 }
 
 // reverseList reverses a list
-func reverseList(l []string) []string {
+/*func reverseList(l []string) []string {
 	var nl []string
 	for i := range l {
 		nl = append(nl, l[len(l)-1-i])
 	}
 
 	return nl
-}
-
-// stringInList checks if a string is in a list.
-func stringInList(s string, l []string) bool {
-	for _, ls := range l {
-		if ls == s {
-			return true
-		}
-	}
-
-	return false
-}
-
-// stringInPorts checks if a string is in a port list.
-func stringInPorts(s string, l []port) bool {
-	for _, ls := range l {
-		if ls.Location.base() == s {
-			return true
-		}
-	}
-
-	return false
-}
+}*/

@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/go2c/optparse"
+	"github.com/onodera-punpun/prt/ports"
 )
 
 // list lists ports.
@@ -36,7 +37,7 @@ func list(input []string) error {
 	}
 
 	// Get all ports.
-	all, err := ports()
+	all, err := ports.All(config.PrtDir)
 	if err != nil {
 		return err
 	}
@@ -50,7 +51,7 @@ func list(input []string) error {
 		}
 
 		// Get port locations.
-		var pl []port
+		var pl []ports.Port
 		for _, n := range db.Name {
 			p, err := getLocation(n, all)
 			if err != nil {

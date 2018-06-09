@@ -61,8 +61,8 @@ func Locate(port string, order []string, all []Port) ([]Port, error) {
 	if len(pl) > 1 {
 		var i int
 		for _, r := range order {
-			if stringInPorts(path.Join(pl[i].Location.Root, r, pl[i].Location.
-				Port), all) {
+			if Contains(all, path.Join(pl[i].Location.Root, r, pl[i].Location.
+				Port)) {
 				pl[i].Location.Repo = r
 				i++
 			}

@@ -6,6 +6,8 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
+	"github.com/onodera-punpun/prt/array"
+	"github.com/onodera-punpun/prt/ports"
 )
 
 // loc prints port locations
@@ -40,36 +42,36 @@ func loc(input []string) error {
 	}
 
 	// Get all ports.
-	all, err := ports()
+	all, err := ports.All(config.PrtDir)
 	if err != nil {
 		return err
 	}
 
-	var c []string
+	var check []string
 	var i int
 	for _, n := range vals {
 		// Continue if already checked.
-		if stringInList(n, c) {
+		if array.ContainsString(check, n) {
 			continue
 		}
 
 		// Add to checked ports.
-		c = append(c, n)
+		check = append(check, n)
 
 		// Get port location.
-		pl, err := getLocation(n, all)
+		pl, err := ports.Locate(n, config.Order, all)
 		if err != nil {
 			return err
 		}
 		if !*argd {
-			pl = []port{pl[0]}
+			pl = []ports.Port{pl[0]}
 		}
 
 		var op string
 		for _, p := range pl {
 			// Alias if needed.
 			if !*argn {
-				p.alias()
+				p.Alias(config.Alias)
 			}
 
 			// Print duplicate indentation.
@@ -89,7 +91,7 @@ func loc(input []string) error {
 			}
 
 			// Finally print the port.
-			fmt.Println(p.Location.base())
+			fmt.Println(p.Location.Base())
 		}
 	}
 
