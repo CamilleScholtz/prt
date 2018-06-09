@@ -2,12 +2,14 @@ package ports
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
+
+	"mvdan.cc/sh/interp"
+	"mvdan.cc/sh/shell"
+	"mvdan.cc/sh/syntax"
 )
 
 // A Pkgfile is a type describing the `Pkgfile` file of a port. This file
@@ -42,6 +44,29 @@ type Pkgfile struct {
 	Source []string
 }
 
+// ParseSh ...
+func (f *Pkgfile) ParseSh() (*interp.Runner, error) {
+	r, err := os.Open(path.Join(f.Location.Full(), "Pkgfile"))
+	if err != nil {
+		return nil, fmt.Errorf("could not open `%s/Pkgfile`", f.Location.Full())
+	}
+	defer r.Close()
+
+	s := syntax.NewParser()
+	n, err := s.Parse(r, "Pkgfile")
+	if err != nil {
+		return nil, fmt.Errorf("could not parse: %v", err)
+	}
+
+	i := &interp.Runner{}
+	i.Reset()
+	if err := i.Run(n); err != nil {
+		return nil, fmt.Errorf("could not run: %v", err)
+	}
+
+	return i, nil
+}
+
 // Parse parses the `Pkgfile` file of a port and populates the various fields in
 // the given `*Pkgfile`. Keep in mind that this does not expand BASH ariables by
 // default. so `$version` will just be a literal string. Nor does this parse the
@@ -49,15 +74,15 @@ type Pkgfile struct {
 // and because it's simply too hard too parse.
 //
 // If you want to expand BASH variables pass a bool as a parameter. This will
-// force the use of `source(1)` to get the `source` BASH array of a `Pkgfile`.
-// Using `source(1)` is relatively slow.
+// force the use of a bash interpreter to get the `source` BASH array of a
+// `Pkgfile`, this is relatively slow.
 func (f *Pkgfile) Parse(source ...bool) error {
-	fr, err := os.Open(path.Join(f.Location.Full(), "Pkgfile"))
+	r, err := os.Open(path.Join(f.Location.Full(), "Pkgfile"))
 	if err != nil {
 		return fmt.Errorf("could not open `%s/Pkgfile`", f.Location.Full())
 	}
-	defer fr.Close()
-	s := bufio.NewScanner(fr)
+	defer r.Close()
+	s := bufio.NewScanner(r)
 
 	for s.Scan() {
 		i := s.Text()
@@ -92,12 +117,13 @@ func (f *Pkgfile) Parse(source ...bool) error {
 				f.Release = strings.TrimSpace(kv[1])
 			case "source":
 				if len(source) > 0 {
-					// TODO: Possibly use `mvdan.cc/sh/interp` for this.
-					s, err := f.expand("source")
+					v, err := shell.SourceFile(path.Join(f.Location.Full(),
+						"Pkgfile"))
 					if err != nil {
 						return err
 					}
-					f.Source = strings.Fields(s)
+
+					f.Source = v["source"].Value.(interp.IndexArray)
 				}
 
 				// Since `source` should be the last meaningfull value in a
@@ -150,32 +176,8 @@ func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
 		check = append(check, f.Location.Port)
 
 		// Loop.
-		depends[len(depends)-1].Pkgfile.RecursiveDepends(aliases, order, all)
+		go depends[len(depends)-1].Pkgfile.RecursiveDepends(aliases, order, all)
 	}
 
 	return depends, nil
-}
-
-// expand reads a variable from a `Pkgfile` file using `source(1)`. This is
-// relatively slow but sometimes needed because it expands BASH variables. This
-// is especially (only?) useful for the `source` BASH array in `Pkgfile` files.
-func (f Pkgfile) expand(key string) (string, error) {
-	cmd := exec.Command("bash", "-c", "source ./Pkgfile && echo ${"+key+"[@]}")
-	cmd.Dir = f.Location.Full()
-	var b bytes.Buffer
-	cmd.Stdout = &b
-
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf(
-			"could not source variable `%s` from `%s/Pkgfile`", key, f.
-				Location.Full())
-	}
-
-	if len(b.String()) == 0 {
-		return "", fmt.Errorf(
-			"no variable with the name `%s` found in `%s/Pkgfile`", key, f.
-				Location.Full())
-	}
-
-	return b.String(), nil
 }

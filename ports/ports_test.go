@@ -1,7 +1,6 @@
 package ports
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -18,7 +17,6 @@ func TestLocate(t *testing.T) {
 	o := []string{"opt", "6c37-git", "contrib", "6c37"}
 	a := []Port{
 		New("/usr/src/prt/contrib/mpv"),
-		New("/usr/src/prt/6c37/mpv"),
 		New("/usr/src/prt/opt/firefox"),
 		New("/usr/src/prt/6c37-git/mpv"),
 	}
@@ -49,19 +47,23 @@ func TestLocate(t *testing.T) {
 	if got != want {
 		t.Errorf("p[1].Location: Got %s, want %s", got, want)
 	}
-	got = p[2].Location
-	want = Location{"/usr/src/prt", "6c37", "mpv"}
-	if got != want {
-		t.Errorf("p[2].Location: Got %s, want %s", got, want)
+}
+
+func BenchmarkLocate(b *testing.B) {
+	o := []string{"opt", "6c37-git", "contrib", "6c37"}
+	a := []Port{
+		New("/usr/src/prt/contrib/mpv"),
+		New("/usr/src/prt/opt/firefox"),
+		New("/usr/src/prt/6c37-git/mpv"),
+	}
+
+	for i := 0; i < b.N; i++ {
+		Locate("firefox", o, a)
 	}
 }
 
-func ExampleLocate() {
-	order := []string{"core", "opt", "contrib"}
-	all, _ := All("/usr/src/prt")
-	p, _ := Locate("firefox", order, all)
-
-	fmt.Println(p[0].Location.Full())
-	// Output:
-	// /usr/src/prt/opt/firefox
+func BenchmarkAll(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		All("/usr/srt/prt")
+	}
 }

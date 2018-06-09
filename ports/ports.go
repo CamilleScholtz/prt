@@ -2,6 +2,7 @@ package ports
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
 )
@@ -20,14 +21,20 @@ func (p *Port) Alias(aliases [][]Location) {
 
 // All lists all ports found in a specified root directory.
 func All(root string) ([]Port, error) {
-	ll, err := filepath.Glob(path.Join(root, "/*/*/Pkgfile"))
-	if err != nil {
-		return []Port{}, err
-	}
-
 	var pl []Port
-	for _, l := range ll {
-		pl = append(pl, New(path.Dir(l)))
+	err := filepath.Walk(root, func(p string, i os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !i.IsDir() && i.Name() == "Pkgfile" {
+			pl = append(pl, New(path.Dir(p)))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return pl, err
 	}
 
 	return pl, nil
@@ -54,8 +61,8 @@ func Locate(port string, order []string, all []Port) ([]Port, error) {
 	if len(pl) > 1 {
 		var i int
 		for _, r := range order {
-			if stringInPorts(path.Join(pl[i].Location.Root, r,
-				pl[i].Location.Port), all) {
+			if stringInPorts(path.Join(pl[i].Location.Root, r, pl[i].Location.
+				Port), all) {
 				pl[i].Location.Repo = r
 				i++
 			}

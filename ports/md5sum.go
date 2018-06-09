@@ -20,12 +20,12 @@ type Md5sum struct {
 // Parse parses the `.md5sum` file of a port and populates the various fields in
 // the given `*Md5sum`.
 func (f *Md5sum) Parse() error {
-	fr, err := os.Open(path.Join(f.Location.Full(), ".md5sum"))
+	r, err := os.Open(path.Join(f.Location.Full(), ".md5sum"))
 	if err != nil {
 		return fmt.Errorf("could not open `%s/.md5sum`", f.Location.Full())
 	}
-	defer fr.Close()
-	s := bufio.NewScanner(fr)
+	defer r.Close()
+	s := bufio.NewScanner(r)
 
 	for s.Scan() {
 		l := strings.Split(s.Text(), "  ")

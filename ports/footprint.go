@@ -22,12 +22,12 @@ type Footprint struct {
 // Parse parses the `.footprint` file of a port and populates the various fields
 // in the given `*Footprint`.
 func (f *Footprint) Parse() error {
-	fr, err := os.Open(path.Join(f.Location.Full(), ".footprint"))
+	r, err := os.Open(path.Join(f.Location.Full(), ".footprint"))
 	if err != nil {
 		return fmt.Errorf("could not open `%s/.footprint`", f.Location.Full())
 	}
-	defer fr.Close()
-	s := bufio.NewScanner(fr)
+	defer r.Close()
+	s := bufio.NewScanner(r)
 
 	for s.Scan() {
 		l := strings.Split(s.Text(), "\t")
