@@ -28,7 +28,7 @@ func main() {
 		//fmt.Println("  graph                   generate dependency graph")
 		//fmt.Println("  info                    print port information")
 		//fmt.Println("  install                 build and install ports and their dependencies")
-		//fmt.Println("  list                    list ports and packages")
+		fmt.Println("  list                    list ports and packages")
 		fmt.Println("  loc                     print port locations")
 		//fmt.Println("  patch                   patch ports")
 		//fmt.Println("  prov                    search ports for files")
@@ -46,8 +46,8 @@ func main() {
 	//	err = info(os.Args[2:])
 	//case "install":
 	//	err =install(os.Args[2:])
-	//case "list":
-	//	err = list(os.Args[2:])
+	case "list":
+		err = list(os.Args[2:])
 	case "loc":
 		err = loc(os.Args[2:])
 	//case "patch":

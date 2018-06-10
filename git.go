@@ -16,8 +16,6 @@ type git struct {
 	URL      string
 }
 
-// TODO: Use exec.LookPath maybe.
-
 // checkout checks out a repo.
 func (g git) checkout() error {
 	cmd := exec.Command("git", "checkout", g.Branch)

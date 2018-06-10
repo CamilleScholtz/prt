@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/go2c/optparse"
+	"github.com/onodera-punpun/prt/packages"
 	"github.com/onodera-punpun/prt/ports"
 )
 
@@ -42,18 +43,17 @@ func list(input []string) error {
 		return err
 	}
 
-	var db database
+	var db packages.Database
 	if *argi {
 		// Get installed ports.
-		db, err = parseDatabase()
-		if err != nil {
+		if err := db.Parse(); err != nil {
 			return err
 		}
 
 		// Get port locations.
 		var pl []ports.Port
-		for _, n := range db.Name {
-			p, err := getLocation(n, all)
+		for _, n := range db.Package {
+			p, err := ports.Locate(n.Name, config.Order, all)
 			if err != nil {
 				continue
 			}
@@ -71,14 +71,14 @@ func list(input []string) error {
 		if !*argr {
 			s = p.Location.Port
 		} else {
-			s = p.Location.base()
+			s = p.Location.Base()
 		}
 
 		if *argv {
 			if *argi {
-				s += " " + db.Version[i]
+				s += " " + db.Package[i].Version
 			} else {
-				if err := p.parsePkgfile(); err != nil {
+				if err := p.Pkgfile.Parse(); err != nil {
 					printe(err.Error())
 					continue
 				}
