@@ -10,7 +10,7 @@ import (
 // Alias aliases ports by using a list of aliases as input. An example of this
 // would be aliasing `core/openssl` to `6c37/libressl`.
 // TODO: Instead of aliasing a single port, alias a whole bunch of ports at
-// once.
+// once?
 func (p *Port) Alias(aliases [][]Location) {
 	for _, a := range aliases {
 		if a[0] == p.Location {

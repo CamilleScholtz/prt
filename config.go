@@ -8,6 +8,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/fatih/color"
+	"github.com/onodera-punpun/prt/ports"
 )
 
 // config is a stuct with all config values. See `runtime/config/config.toml`
@@ -19,7 +20,7 @@ var config struct {
 	WrkDir string
 
 	Order []string
-	Alias [][]string
+	Alias [][]ports.Location
 
 	IndentChar string
 	ErrorChar  string
@@ -28,6 +29,11 @@ var config struct {
 	LightColor color.Attribute
 
 	Repo map[string]repo
+}
+
+type location struct {
+	repo string
+	port string
 }
 
 // pull is a struct with values related to repos.

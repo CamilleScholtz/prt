@@ -14,11 +14,11 @@ order = [
 
 # Alias ports.
 alias = [
-#	[ "core/openssl", "6c37-dropin/libressl" ],
-#	[ "core/pkg-config", "6c37-dropin/pkgconf" ],
-#	[ "opt/cairo", "6c37-dropin/cairo-iu" ],
-#	[ "opt/fontconfig", "6c37-dropin/fontconfig-iu" ],
-#	[ "opt/freetype", "6c37-dropin/freetype-iu" ]
+#	[ { root = "/usr/src/prt", repo = "core", port = "openssl" },
+#	[ { root = "/usr/src/prt", repo = "6c37-dropin", port = "libressl" } ],
+
+#	[ { root = "/usr/src/prt", repo = "core", port = "pkg-config" },
+#	[ { root = "/usr/src/prt", repo = "6c37-dropin", port = "pkgconf" } ],
 ]
 
 # Characters used for indentation.
