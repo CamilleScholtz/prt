@@ -32,7 +32,7 @@ func main() {
 		fmt.Println("  loc                     print port locations")
 		//fmt.Println("  patch                   patch ports")
 		//fmt.Println("  prov                    search ports for files")
-		//fmt.Println("  pull                    pull in ports")
+		fmt.Println("  pull                    pull in ports")
 		//fmt.Println("  sysup                   update outdated packages")
 		//fmt.Println("  uninstall               uninstall packages")
 		fmt.Println("  help                    print help and exit")
@@ -54,8 +54,8 @@ func main() {
 	//	err = patch(os.Args[2:])
 	//case "prov":
 	//	err = prov(os.Args[2:])
-	//case "pull":
-	//	err = pull(os.Args[2:])
+	case "pull":
+		err = pull(os.Args[2:])
 	//case "sysup":
 	//	err = sysup(os.Args[2:])
 	//case "uninstall":

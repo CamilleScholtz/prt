@@ -19,10 +19,10 @@ type Port struct {
 
 // New returns a Port with the Location field populated. Use the various
 // `Parse*` functions to populate the other fields.
-func New(l string) Port {
+func New(location string) Port {
 	var p Port
-	p.Location = Location{path.Dir(path.Dir(l)), path.Base(path.Dir(l)), path.
-		Base(l)}
+	p.Location = Location{path.Dir(path.Dir(location)), path.Base(path.Dir(
+		location)), path.Base(location)}
 	p.Footprint = Footprint{Port: &p}
 	p.Md5sum = Md5sum{Port: &p}
 	p.Pkgfile = Pkgfile{Port: &p}

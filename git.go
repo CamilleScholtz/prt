@@ -1,5 +1,7 @@
 package main
 
+// TODO: Use a Go package for git stuff, if posssible.
+
 import (
 	"bytes"
 	"fmt"
@@ -9,21 +11,20 @@ import (
 )
 
 type git struct {
-	Branch string
-	Loc    string
-	URL    string
+	Branch   string
+	Location string
+	URL      string
 }
 
 // TODO: Use exec.LookPath maybe.
-// TODO: Use a Go package for git stuff maybe.
 
 // checkout checks out a repo.
 func (g git) checkout() error {
 	cmd := exec.Command("git", "checkout", g.Branch)
-	cmd.Dir = g.Loc
+	cmd.Dir = g.Location
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git checkout %s: Something went wrong", g.Loc)
+		return fmt.Errorf("git checkout %s: Something went wrong", g.Location)
 	}
 
 	return nil
@@ -32,10 +33,10 @@ func (g git) checkout() error {
 // clean cleans a repo.
 func (g git) clean() error {
 	cmd := exec.Command("git", "clean", "-f")
-	cmd.Dir = g.Loc
+	cmd.Dir = g.Location
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git clean %s: Something went wrong", g.Loc)
+		return fmt.Errorf("git clean %s: Something went wrong", g.Location)
 	}
 
 	return nil
@@ -44,7 +45,7 @@ func (g git) clean() error {
 // clone clones a repo.
 func (g git) clone() error {
 	cmd := exec.Command("git", "clone", "--depth", "1", "-b", g.Branch, g.URL,
-		g.Loc)
+		g.Location)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git clone %s: Something went wrong", g.URL)
@@ -57,13 +58,13 @@ func (g git) clone() error {
 func (g git) diff() ([]string, error) {
 	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter",
 		"ACDMR", "origin/"+g.Branch)
-	cmd.Dir = g.Loc
+	cmd.Dir = g.Location
 	bb := new(bytes.Buffer)
 	cmd.Stdout = bb
 
 	if err := cmd.Run(); err != nil {
-		return []string{}, fmt.Errorf("git diff %s: Something went wrong",
-			g.Loc)
+		return []string{}, fmt.Errorf("git diff %s: Something went wrong", g.
+			Location)
 	}
 
 	d := bb.String()
@@ -72,11 +73,11 @@ func (g git) diff() ([]string, error) {
 	}
 
 	// Make output pretty.
-	d = strings.Replace(d, "A\t", "Adding ", -1)
-	d = strings.Replace(d, "C\t", "Copying ", -1)
-	d = strings.Replace(d, "D\t", "Deleting ", -1)
-	d = strings.Replace(d, "M\t", "Editing ", -1)
-	d = strings.Replace(d, "R\t", "Renaming ", -1)
+	d = strings.Replace(d, "A\t", "Added ", -1)
+	d = strings.Replace(d, "C\t", "Copied ", -1)
+	d = strings.Replace(d, "D\t", "Deleted ", -1)
+	d = strings.Replace(d, "M\t", "Modiefied ", -1)
+	d = strings.Replace(d, "R\t", "Renamed ", -1)
 	dl := strings.Split(d, "\n")
 	sort.Strings(dl)
 
@@ -86,10 +87,10 @@ func (g git) diff() ([]string, error) {
 // fetch fetches a repo.
 func (g git) fetch() error {
 	cmd := exec.Command("git", "fetch", "--depth", "1")
-	cmd.Dir = g.Loc
+	cmd.Dir = g.Location
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git fetch %s: Something went wrong", g.Loc)
+		return fmt.Errorf("git fetch %s: Something went wrong", g.Location)
 	}
 
 	return nil
@@ -98,10 +99,10 @@ func (g git) fetch() error {
 // reset resets a repo.
 func (g git) reset() error {
 	cmd := exec.Command("git", "reset", "--hard", "origin/"+g.Branch)
-	cmd.Dir = g.Loc
+	cmd.Dir = g.Location
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git reset %s: Something went wrong", g.Loc)
+		return fmt.Errorf("git reset %s: Something went wrong", g.Location)
 	}
 
 	return nil

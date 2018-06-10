@@ -7,6 +7,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go2c/optparse"
+	"github.com/onodera-punpun/prt/array"
 )
 
 // pull pulls in ports.
@@ -31,7 +32,7 @@ func pull(input []string) error {
 		return nil
 	}
 
-	// Count total repos that need to be pulled.
+	// Count repos that need to be pulled.
 	var t int
 	if len(vals) == 0 {
 		t = len(config.Repo)
@@ -44,7 +45,7 @@ func pull(input []string) error {
 	for n, r := range config.Repo {
 		// Skip repos if needed.
 		if len(vals) != 0 {
-			if !stringInList(n, vals) {
+			if !array.ContainsString(vals, n) {
 				continue
 			}
 		}
