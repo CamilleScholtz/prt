@@ -23,7 +23,7 @@ func main() {
 		fmt.Println("Usage: prt command [arguments]")
 		fmt.Println("")
 		fmt.Println("commands:")
-		//fmt.Println("  depends                 list dependencies recursively")
+		fmt.Println("  depends                 list dependencies recursively")
 		//fmt.Println("  diff                    list outdated packages")
 		//fmt.Println("  graph                   generate dependency graph")
 		//fmt.Println("  info                    print port information")
@@ -36,8 +36,8 @@ func main() {
 		//fmt.Println("  sysup                   update outdated packages")
 		//fmt.Println("  uninstall               uninstall packages")
 		fmt.Println("  help                    print help and exit")
-	//case "depends":
-	//	err = depends(os.Args[2:])
+	case "depends":
+		err = depends(os.Args[2:])
 	//case "diff":
 	//	err = diff(os.Args[2:])
 	//case "graph":

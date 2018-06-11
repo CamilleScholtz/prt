@@ -71,6 +71,7 @@ func (g git) diff() ([]string, error) {
 	}
 
 	// Make output pretty.
+	// TODO: This prints Deleted when it should be Added.
 	d = strings.Replace(d, "A\t", "Added ", -1)
 	d = strings.Replace(d, "C\t", "Copied ", -1)
 	d = strings.Replace(d, "D\t", "Deleted ", -1)

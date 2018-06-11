@@ -122,7 +122,6 @@ var depends []Port
 // function requires `Parse()` to be run on the `Pkgfile` in question
 // beforehand.
 // TODO: Use pointers here?
-// TODO: Use go-routines here?
 func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
 	all []Port) ([]Port, error) {
 	// Continue if already checked.
@@ -138,10 +137,7 @@ func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
 		d := pl[0]
 
 		// Alias ports if needed.
-		// TODO: Is this if needed?
-		if len(aliases) != 0 {
-			d.Alias(aliases)
-		}
+		d.Alias(aliases)
 
 		// Read out Pkgfile.
 		if err := d.Pkgfile.Parse(); err != nil {
@@ -155,7 +151,10 @@ func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
 		check = append(check, f.Location.Port)
 
 		// Loop.
-		depends[len(depends)-1].Pkgfile.RecursiveDepends(aliases, order, all)
+		if _, err := depends[len(depends)-1].Pkgfile.RecursiveDepends(aliases,
+			order, all); err != nil {
+				return []Port{}, err
+		}
 	}
 
 	return depends, nil
