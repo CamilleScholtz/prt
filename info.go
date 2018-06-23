@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/go2c/optparse"
+	"github.com/onodera-punpun/prt/ports"
 )
 
 // info prints port information.
@@ -52,8 +53,8 @@ func info(input []string) error {
 	}
 
 	// Read out Pkgfile.
-	p := newPort(".")
-	if err := p.parsePkgfile(true); err != nil {
+	p := ports.New(".")
+	if err := p.Pkgfile.Parse(true); err != nil {
 		return err
 	}
 

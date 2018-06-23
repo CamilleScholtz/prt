@@ -59,20 +59,16 @@ func Locate(port string, order []string, all []Port) ([]Port, error) {
 	if len(pl) > 1 {
 		var i int
 		for _, r := range order {
-			l := Location{
-				Root: pl[i].Location.Root,
-				Repo: r,
-				Port: pl[i].Location.Port,
+			for j, p := range pl {
+				if p.Location.Repo == r {
+					pl[i], pl[j] = pl[j], pl[i]
+					i++
+				}
 			}
-			if Contains(all, l) {
-				pl[i].Location = l
-				i++
-			}
+		}
 
-			// Break once everything has been ordered.
-			if i == len(pl) {
-				break
-			}
+		if i != len(pl) {
+			return []Port{}, fmt.Errorf("could not order `%s`", port)
 		}
 	}
 

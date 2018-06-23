@@ -26,12 +26,12 @@ func main() {
 		fmt.Println("  depends                 list dependencies recursively")
 		fmt.Println("  diff                    list outdated packages")
 		fmt.Println("  graph                   generate dependency graph")
-		//fmt.Println("  info                    print port information")
+		fmt.Println("  info                    print port information")
 		//fmt.Println("  install                 build and install ports and their dependencies")
 		fmt.Println("  list                    list ports and packages")
 		fmt.Println("  loc                     print port locations")
 		//fmt.Println("  patch                   patch ports")
-		//fmt.Println("  prov                    search ports for files")
+		fmt.Println("  prov                    search ports for files")
 		fmt.Println("  pull                    pull in ports")
 		//fmt.Println("  sysup                   update outdated packages")
 		//fmt.Println("  uninstall               uninstall packages")
@@ -42,8 +42,8 @@ func main() {
 		err = diff(os.Args[2:])
 	case "graph":
 		err = graph(os.Args[2:])
-	//case "info":
-	//	err = info(os.Args[2:])
+	case "info":
+		err = info(os.Args[2:])
 	//case "install":
 	//	err =install(os.Args[2:])
 	case "list":
@@ -52,8 +52,8 @@ func main() {
 		err = loc(os.Args[2:])
 	//case "patch":
 	//	err = patch(os.Args[2:])
-	//case "prov":
-	//	err = prov(os.Args[2:])
+	case "prov":
+		err = prov(os.Args[2:])
 	case "pull":
 		err = pull(os.Args[2:])
 	//case "sysup":

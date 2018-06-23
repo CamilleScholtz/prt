@@ -13,8 +13,8 @@ import (
 type Md5sum struct {
 	*Port
 
-	Hash []string
-	File []string
+	Hashes []string
+	Files  []string
 }
 
 // Parse parses the `.md5sum` file of a port and populates the various fields in
@@ -30,8 +30,8 @@ func (f *Md5sum) Parse() error {
 	for s.Scan() {
 		l := strings.Split(s.Text(), "  ")
 
-		f.Hash = append(f.Hash, l[0])
-		f.File = append(f.File, l[1])
+		f.Hashes = append(f.Hashes, l[0])
+		f.Files = append(f.Files, l[1])
 	}
 
 	return nil

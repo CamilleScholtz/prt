@@ -48,17 +48,14 @@ func loc(input []string) error {
 
 	var check []string
 	var i int
-	for _, n := range vals {
+	for _, v := range vals {
 		// Continue if already checked.
-		if array.ContainsString(check, n) {
+		if array.ContainsString(check, v) {
 			continue
 		}
+		check = append(check, v)
 
-		// Add to checked ports.
-		check = append(check, n)
-
-		// Get port location.
-		pl, err := ports.Locate(n, config.Order, all)
+		pl, err := ports.Locate(v, config.Order, all)
 		if err != nil {
 			return err
 		}

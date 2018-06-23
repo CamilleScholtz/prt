@@ -14,9 +14,9 @@ import (
 type Footprint struct {
 	*Port
 
-	Permission []string
-	Owner      []string
-	File       []string
+	Permissions []string
+	Owners      []string
+	Files       []string
 }
 
 // Parse parses the `.footprint` file of a port and populates the various fields
@@ -32,9 +32,9 @@ func (f *Footprint) Parse() error {
 	for s.Scan() {
 		l := strings.Split(s.Text(), "\t")
 
-		f.Permission = append(f.Permission, l[0])
-		f.Owner = append(f.Owner, l[1])
-		f.File = append(f.File, l[2])
+		f.Permissions = append(f.Permissions, l[0])
+		f.Owners = append(f.Owners, l[1])
+		f.Files = append(f.Files, l[2])
 	}
 
 	return nil
