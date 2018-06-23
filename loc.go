@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/array"
+	"github.com/onodera-punpun/go-utils/array"
 	"github.com/onodera-punpun/prt/ports"
 )
 
@@ -83,9 +82,7 @@ func loc(input []string) error {
 				op = p.Location.Port
 
 				if i > 0 {
-					color.Set(config.DarkColor)
-					fmt.Printf(strings.Repeat(config.IndentChar, i))
-					color.Unset()
+					fmt.Print(dark(strings.Repeat(config.IndentChar, i)))
 				}
 				i++
 			}

@@ -7,7 +7,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/onodera-punpun/prt/array"
 	"mvdan.cc/sh/interp"
 	"mvdan.cc/sh/shell"
 )
@@ -111,51 +110,4 @@ func (f *Pkgfile) Parse(source ...bool) error {
 	}
 
 	return nil
-}
-
-// Global variables used by `RecursiveDepends()`.
-// TODO: Not that clean, can I move this?
-var check []string
-var depends []Port
-
-// RecursiveDepends is a function that calculates dependencies recursively. This
-// function requires `Parse()` to be run on the `Pkgfile` in question
-// beforehand.
-// TODO: Use pointers here?
-func (f *Pkgfile) RecursiveDepends(aliases [][]Location, order []string,
-	all []Port) ([]Port, error) {
-	// Continue if already checked.
-	if array.ContainsString(check, f.Location.Port) {
-		return depends, nil
-	}
-
-	for _, n := range f.Depends {
-		pl, err := Locate(n, order, all)
-		if err != nil {
-			continue
-		}
-		d := pl[0]
-
-		// Alias ports if needed.
-		d.Alias(aliases)
-
-		// Read out Pkgfile.
-		if err := d.Pkgfile.Parse(); err != nil {
-			return []Port{}, err
-		}
-
-		// Append to `depends`.
-		depends = append(depends, d)
-
-		// Append port to checked ports.
-		check = append(check, f.Location.Port)
-
-		// Loop.
-		if _, err := depends[len(depends)-1].Pkgfile.RecursiveDepends(aliases,
-			order, all); err != nil {
-				return []Port{}, err
-		}
-	}
-
-	return depends, nil
 }

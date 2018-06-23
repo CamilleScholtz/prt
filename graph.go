@@ -7,13 +7,14 @@ import (
 
 	"github.com/go2c/optparse"
 	colorful "github.com/lucasb-eyer/go-colorful"
+	"github.com/onodera-punpun/prt/ports"
 )
 
 // graph generates a dependency grap.
 func graph(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
-	argd := o.Bool("duplicate", 'd', false)
+	//argd := o.Bool("duplicate", 'd', false)
 	argn := o.Bool("no-alias", 'n', false)
 	argt := o.String("type", 't', "svg")
 	argh := o.Bool("help", 'h', false)
@@ -38,23 +39,30 @@ func graph(input []string) error {
 	}
 
 	// Get all ports.
-	all, err := ports()
+	all, err := ports.All(config.PrtDir)
 	if err != nil {
 		return err
 	}
 
-	p := newPort(".")
-	if err := p.parsePkgfile(); err != nil {
+	p := ports.New(".")
+	if err := p.Pkgfile.Parse(); err != nil {
 		return err
 	}
-	p.depends(!*argn, all)
+
+	var a [][]ports.Location
+	if !*argn {
+		a = config.Alias
+	}
+	if err := p.ParseDepends(a, config.Order, all); err != nil {
+		return err
+	}
 
 	// Set file to write to.
 	f, err := os.OpenFile(p.Pkgfile.Name+".dot", os.O_CREATE|os.O_WRONLY, 0666)
-	defer f.Close()
 	if err != nil {
 		return fmt.Errorf("could not create `%s`", p.Pkgfile.Name+".dot")
 	}
+	defer f.Close()
 
 	// Prettify graph.
 	fmt.Fprintf(f, "digraph G {\n")
@@ -79,39 +87,10 @@ func graph(input []string) error {
 	fmt.Fprintf(f, "\t\t%s=\"%d\"\n", "penwidth", 2)
 	fmt.Fprintf(f, "\t]\n\n")
 
-	var i int
-	var c []string
-	// TODO: Is op still needed?
-	op := p.Location.base()
-	pl := p.Depends
 	pal, _ := colorful.SoftPalette(128)
-	var recursive func()
-	recursive = func() {
-		for _, p := range pl {
-			if !stringInList(p.Pkgfile.Name, c) {
-				fmt.Fprintf(f, "\tnode [color=\"%s\"]\n", pal[i].Hex())
-				fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", op, p.Location.base())
+	graphRecurse(&p, 0, f, pal)
 
-				// Append to checked ports.
-				if !*argd {
-					c = append(c, p.Pkgfile.Name)
-				}
-			}
-
-			if len(p.Depends) > 0 {
-				pl = p.Depends
-				recursive()
-			}
-
-			i++
-			if i >= 128 {
-				i = 0
-			}
-			op = p.Location.base()
-		}
-	}
-	recursive()
-	fmt.Fprintln(f, "}")
+	fmt.Fprintf(f, "}")
 
 	f.Close()
 	if *argt == "dot" {
@@ -120,11 +99,32 @@ func graph(input []string) error {
 
 	// Convert to graph.
 	// TODO: Remove *.dot file?
-	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt, "-o",
-		p.Pkgfile.Name+"."+*argt)
+	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt, "-o", p.
+		Pkgfile.Name+"."+*argt)
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("something went wrong with GrapViz")
 	}
 
 	return nil
+}
+
+var graphCheck []*ports.Port
+
+func graphRecurse(p *ports.Port, l int, f *os.File, pal []colorful.Color) {
+outer:
+	for _, d := range p.Depends {
+		// Continue if already checked.
+		for _, c := range graphCheck {
+			if c.Pkgfile.Name == d.Pkgfile.Name {
+				continue outer
+			}
+		}
+		graphCheck = append(graphCheck, d)
+
+		fmt.Fprintf(f, "\tnode [color=\"%s\"]\n", pal[l].Hex())
+		fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", p.Location.Base(), d.Location.
+			Base())
+
+		graphRecurse(d, l+1, f, pal)
+	}
 }

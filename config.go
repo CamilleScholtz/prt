@@ -22,11 +22,12 @@ var config struct {
 	Order []string
 	Alias [][]ports.Location
 
-	IndentChar string
-	ErrorChar  string
-	DarkColor  color.Attribute
-	ErrorColor color.Attribute
-	LightColor color.Attribute
+	IndentChar  string
+	WarningChar string
+
+	DarkColor    color.Attribute
+	LightColor   color.Attribute
+	WarningColor color.Attribute
 
 	Repo map[string]repo
 }
@@ -42,22 +43,7 @@ type repo struct {
 	Branch string
 }
 
-// colorFix converts a config color (0..15) to a color compatible color (so
-// 30..97).
-func colorFix(i color.Attribute) (color.Attribute, error) {
-	if i > 15 {
-		return 0, fmt.Errorf("config: Could not convert '" + string(i) +
-			"' to color!")
-	}
-
-	if i <= 7 {
-		i += 30
-	} else if i <= 15 {
-		i += 82
-	}
-
-	return i, nil
-}
+var dark, light, warning func(a ...interface{}) string
 
 // pareConfig parses a toml config.
 func parseConfig() error {
@@ -66,18 +52,9 @@ func parseConfig() error {
 		return fmt.Errorf("config /etc/prt/config.toml: " + err.Error())
 	}
 
-	config.DarkColor, err = colorFix(config.DarkColor)
-	if err != nil {
-		return err
-	}
-	config.ErrorColor, err = colorFix(config.ErrorColor)
-	if err != nil {
-		return err
-	}
-	config.LightColor, err = colorFix(config.LightColor)
-	if err != nil {
-		return err
-	}
+	dark = color.New(config.DarkColor).SprintFunc()
+	light = color.New(config.LightColor).SprintFunc()
+	warning = color.New(config.WarningColor).SprintFunc()
 
 	return nil
 }

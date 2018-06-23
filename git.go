@@ -11,9 +11,9 @@ import (
 )
 
 type git struct {
-	Branch   string
 	Location string
 	URL      string
+	Branch   string
 }
 
 // checkout checks out a repo.

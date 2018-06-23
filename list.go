@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/go2c/optparse"
@@ -52,20 +53,30 @@ func list(input []string) error {
 
 		// Get port locations.
 		var pl []ports.Port
-		for _, n := range db.Package {
+		for _, n := range db.Packages {
 			p, err := ports.Locate(n.Name, config.Order, all)
 			if err != nil {
-				continue
+				// In case `err` is not `nil` we didn't manage to locate this
+				// port, this is most likely because the port is not in the
+				// ports-tree. We append an empty `Port` so that the variable
+				// `i` in the next for loop increments correctly.
+				pl = append(pl, ports.Port{})
+			} else {
+				pl = append(pl, p[0])
 			}
-			pl = append(pl, p[0])
 		}
 
-		// I'm using all in the the following for loop, so alias db to all.
+		// I'm using all in the the following for loop, so copy `db` to `all`.
 		all = pl
 	}
 
 	var pl []string
 	for i, p := range all {
+		// If the Location is empty it means we didn't manage to locate a ports,
+		if p.Location.Port == "" {
+			continue
+		}
+
 		var s string
 
 		if !*argr {
@@ -76,10 +87,11 @@ func list(input []string) error {
 
 		if *argv {
 			if *argi {
-				s += " " + db.Package[i].Version
+				s += " " + db.Packages[i].Version
 			} else {
 				if err := p.Pkgfile.Parse(); err != nil {
-					printe(err.Error())
+					fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.
+						WarningChar), err)
 					continue
 				}
 				s += " " + p.Pkgfile.Version

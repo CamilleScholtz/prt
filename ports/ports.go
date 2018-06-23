@@ -9,8 +9,6 @@ import (
 
 // Alias aliases ports by using a list of aliases as input. An example of this
 // would be aliasing `core/openssl` to `6c37/libressl`.
-// TODO: Instead of aliasing a single port, alias a whole bunch of ports at
-// once?
 func (p *Port) Alias(aliases [][]Location) {
 	for _, a := range aliases {
 		if a[0] == p.Location {
@@ -61,9 +59,13 @@ func Locate(port string, order []string, all []Port) ([]Port, error) {
 	if len(pl) > 1 {
 		var i int
 		for _, r := range order {
-			if Contains(all, path.Join(pl[i].Location.Root, r, pl[i].Location.
-				Port)) {
-				pl[i].Location.Repo = r
+			l := Location{
+				Root: pl[i].Location.Root,
+				Repo: r,
+				Port: pl[i].Location.Port,
+			}
+			if Contains(all, l) {
+				pl[i].Location = l
 				i++
 			}
 

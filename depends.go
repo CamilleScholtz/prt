@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/prt/packages"
@@ -13,8 +14,8 @@ func depends(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	arga := o.Bool("all", 'a', false)
-	//argn := o.Bool("no-alias", 'n', false)
-	//argt := o.Bool("tree", 't', false)
+	argn := o.Bool("no-alias", 'n', false)
+	argt := o.Bool("tree", 't', false)
 	argh := o.Bool("help", 'h', false)
 
 	// Parse arguments.
@@ -55,14 +56,58 @@ func depends(input []string) error {
 		return err
 	}
 
-	dl, err := p.Pkgfile.RecursiveDepends(config.Alias, config.Order, all)
-	if err != nil {
+	var a [][]ports.Location
+	if !*argn {
+		a = config.Alias
+	}
+	if err := p.ParseDepends(a, config.Order, all); err != nil {
 		return err
 	}
 
-	for _, d := range dl {
-		fmt.Println(d.Pkgfile.Name)
-	}
+	dependsRecurse(&p, db, 0, *argt)
 
 	return nil
+}
+
+var dependsCheck []*ports.Port
+var dependsArrow bool
+
+func dependsRecurse(p *ports.Port, db packages.Database, l int, t bool) {
+outer:
+	for _, d := range p.Depends {
+		// Continue if installed.
+		for _, n := range db.Packages {
+			if d.Pkgfile.Name == n.Name {
+				continue outer
+			}
+		}
+
+		// Continue if already checked.
+		for _, c := range dependsCheck {
+			if d.Pkgfile.Name == c.Pkgfile.Name {
+				if !t {
+					continue outer
+				}
+
+				if len(d.Pkgfile.Depends) > 0 {
+					if !dependsArrow {
+						fmt.Printf("%s%s%s\n", dark(strings.Repeat(config.
+							IndentChar, l)), d.Pkgfile.Name, dark(" ->"))
+
+						continue outer
+					}
+
+					dependsArrow = !dependsArrow
+				}
+			}
+		}
+		dependsCheck = append(dependsCheck, d)
+
+		if t {
+			fmt.Print(dark(strings.Repeat(config.IndentChar, l)))
+		}
+		fmt.Println(d.Pkgfile.Name)
+
+		dependsRecurse(d, db, l+1, t)
+	}
 }

@@ -9,7 +9,7 @@ import (
 // installed packages, the version of these packages, and the files these
 // packages installed.
 type Database struct {
-	Package []Package
+	Packages []Package
 }
 
 // Parse parses the `db` file and populates the various fields in the given
@@ -33,7 +33,7 @@ func (f *Database) Parse() error {
 			p.Version = s.Text()
 			name = false
 		} else if s.Text() == "" {
-			f.Package = append(f.Package, p)
+			f.Packages = append(f.Packages, p)
 			blank = true
 		} else {
 			p.Files = append(p.Files, s.Text())

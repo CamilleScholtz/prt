@@ -15,26 +15,27 @@ order = [
 # Alias ports.
 alias = [
 #	[ { root = "/usr/src/prt", repo = "core", port = "openssl" },
-#	[ { root = "/usr/src/prt", repo = "6c37-dropin", port = "libressl" } ],
+#	  { root = "/usr/src/prt", repo = "6c37-dropin", port = "libressl" } ],
 
 #	[ { root = "/usr/src/prt", repo = "core", port = "pkg-config" },
-#	[ { root = "/usr/src/prt", repo = "6c37-dropin", port = "pkgconf" } ],
+#	  { root = "/usr/src/prt", repo = "6c37-dropin", port = "pkgconf" } ],
 ]
 
 # Characters used for indentation.
 indentchar = "-  "
 
-# Characters used for errors.
-errorchar = "!  "
+# Characters used for warnings.
+warningchar = "!  "
 
 # Color used for indentation, arrows, et cetera.
-darkcolor = 8
-
-# Color used for errors.
-errorcolor = 9
+# See: https://misc.flogisoft.com/bash/tip_colors_and_formatting
+darkcolor = 90
 
 # Color used to highlight repos to pull, ports to install, et cetera.
-lightcolor = 11
+lightcolor = 93
+
+# Color used for warnings.
+warningcolor = 91
 
 # Repos to pull.
 [repo]

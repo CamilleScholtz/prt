@@ -5,9 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/fatih/color"
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/array"
+	"github.com/onodera-punpun/go-utils/array"
 )
 
 // pull pulls in ports.
@@ -51,52 +50,49 @@ func pull(input []string) error {
 		}
 		i++
 
-		fmt.Printf("Pulling in repo %d/%d, ", i, t)
-		color.Set(config.LightColor)
-		fmt.Printf(n)
-		color.Unset()
-		fmt.Println(".")
+		fmt.Printf("Pulling in repo %d/%d, %s.\n", i, t, light(n))
 
 		l := path.Join(config.PrtDir, n)
-		g := git{r.Branch, l, r.URL}
+		g := git{
+			Location: l,
+			URL:      r.URL,
+			Branch:   r.Branch,
+		}
 
 		// Check if location exists, clone if it doesn't.
 		if _, err := os.Stat(l); err != nil {
-			err := g.clone()
-			if err != nil {
-				printe(err.Error())
+			if err := g.clone(); err != nil {
+				fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar),
+					err)
 			}
 			continue
 		}
 
 		if err := g.checkout(); err != nil {
-			printe(err.Error())
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
 			continue
 		}
 		if err := g.fetch(); err != nil {
-			printe(err.Error())
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
 			continue
 		}
 
 		// Print changes.
 		dl, err := g.diff()
 		if err != nil {
-			printe(err.Error())
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
 			continue
 		}
 		for _, d := range dl {
-			color.Set(config.DarkColor)
-			fmt.Print(config.IndentChar)
-			color.Unset()
-			fmt.Println(d)
+			fmt.Printf("%s%s\n", dark(config.IndentChar), d)
 		}
 
 		if err := g.clean(); err != nil {
-			printe(err.Error())
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
 			continue
 		}
 		if err := g.reset(); err != nil {
-			printe(err.Error())
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
 			continue
 		}
 	}
