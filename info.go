@@ -8,8 +8,8 @@ import (
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// info prints port information.
-func info(input []string) error {
+// infoCommand prints port information.
+func infoCommand(input []string) error {
 	// Enable all arguments if the user hasn't specified any.
 	var b bool
 	if len(input) == 0 {

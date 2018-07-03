@@ -11,12 +11,14 @@ import (
 // A Footprint describes the `.footprint` file of a port. This file is used for
 // regression testing and contains a list of files a package is expected to
 // contain once it is built.
+// TODO: Handle symlinks (`->`).
 type Footprint struct {
 	*Port
 
-	Permissions []string
-	Owners      []string
-	Files       []string
+	Files []struct {
+		Path       string
+		Permission Permission
+	}
 }
 
 // Parse parses the `.footprint` file of a port and populates the various fields
@@ -31,10 +33,16 @@ func (f *Footprint) Parse() error {
 
 	for s.Scan() {
 		l := strings.Split(s.Text(), "\t")
-
-		f.Permissions = append(f.Permissions, l[0])
-		f.Owners = append(f.Owners, l[1])
-		f.Files = append(f.Files, l[2])
+		f.Files = append(f.Files, struct {
+			Path       string
+			Permission Permission
+		}{
+			Path: l[2],
+			Permission: Permission{
+				FileMode: toFileMode(l[0]),
+				Owner:    l[1],
+			},
+		})
 	}
 
 	return nil

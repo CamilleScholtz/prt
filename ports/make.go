@@ -1,64 +1,7 @@
-// make.go contains functions related to building and installing ports/packages.
-// These include function such downloading port sources, creating the wrkdir,
-// removing the wrkdir and installing package contents to right location.
+package ports
 
-package main
-
-import (
-	"bytes"
-	"crypto/md5"
-	"encoding/hex"
-	"fmt"
-	"io"
-	"os"
-	"os/exec"
-	"path"
-	"regexp"
-	"sort"
-	"strings"
-
-	"github.com/mholt/archiver"
-)
-
-// build builds a port. It does this by running a custom fork
-// of pkgmk.
-func (p port) build(v bool) error {
-	var cmd *exec.Cmd
-	cmd = exec.Command("/usr/share/prt/pkgmk")
-	cmd.Dir = p.Location
-	if v {
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-	}
-
-	// TODO: Make this behave like check/createmd5sum in regards to
-	// updating or not.
-	printi("Building package")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf(
-			"build %s: Something went wrong", p.getBaseDir())
-	}
-
-	return nil
-}
-
-// check checks if all directories need to build a port are present.
-func checkDir() error {
-	if _, err := os.Stat(config.SrcDir); os.IsNotExist(err) {
-		return err
-	}
-	if _, err := os.Stat(config.PkgDir); os.IsNotExist(err) {
-		return err
-	}
-	if _, err := os.Stat(config.WrkDir); os.IsNotExist(err) {
-		return err
-	}
-
-	return nil
-}
-
-// checkMd5sum validates the .md5sum file.
-func (p port) checkMd5sum() error {
+// ValidateMd5sum validates the .md5sum file.
+/*func (p Port) ValidateMd5sum() error {
 	p.createMd5sum("/tmp/prt")
 
 	var t port
@@ -91,10 +34,11 @@ func (p port) checkMd5sum() error {
 			p.getBaseDir())
 	}
 	return nil
-}
+}*/
 
+/*
 // check check if all needed variables are present.
-func (p port) checkPkgfile() error {
+func (p Port) checkPkgfile() error {
 	if p.Pkgfile.Name == "" {
 		return fmt.Errorf("pkgfile checkPkgfile %s: Name variable is empty",
 			p.getBaseDir())
@@ -119,7 +63,7 @@ func (p port) checkPkgfile() error {
 
 // checkSignature checks the .signature file.
 // TODO: Rewrite this.
-func (p port) checkSignature() error {
+func (p Port) checkSignature() error {
 	sl := p.Pkgfile.Source
 	sort.Sort(byBase(sl))
 
@@ -163,7 +107,7 @@ func (p port) checkSignature() error {
 }
 
 // cleanWrk removes the necessary WrkDir directories.
-func (p port) cleanWrk() error {
+func (p Port) cleanWrk() error {
 	if err := os.RemoveAll(path.Join(config.WrkDir,
 		p.Pkgfile.Name)); err != nil {
 		return err
@@ -178,7 +122,7 @@ func (p port) cleanWrk() error {
 }
 
 // createMd5sum creates a .md5sum file.
-func (p port) createMd5sum(l string) error {
+func (p Port) createMd5sum(l string) error {
 	sl := p.Pkgfile.Source
 	sort.Sort(byBase(sl))
 
@@ -484,7 +428,8 @@ func (p port) pkgmk(inst []string, v bool) error {
 		if err := p.post(v); err != nil {
 			return err
 		}
-	*/
-
+*/
+/*
 	return nil
 }
+*/

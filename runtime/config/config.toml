@@ -13,12 +13,12 @@ order = [
 ]
 
 # Alias ports.
-alias = [
-#	[ { root = "/usr/src/prt", repo = "core", port = "openssl" },
-#	  { root = "/usr/src/prt", repo = "6c37-dropin", port = "libressl" } ],
+aliases = [
+#	[ { repo = "core",        port = "openssl" },
+#	  { repo = "6c37-dropin", port = "libressl" } ],
 
-#	[ { root = "/usr/src/prt", repo = "core", port = "pkg-config" },
-#	  { root = "/usr/src/prt", repo = "6c37-dropin", port = "pkgconf" } ],
+#	[ { repo = "core",        port = "pkg-config" },
+#	  { repo = "6c37-dropin", port = "pkgconf" } ],
 ]
 
 # Characters used for indentation.

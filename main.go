@@ -30,6 +30,7 @@ func main() {
 		//fmt.Println("  install                 build and install ports and their dependencies")
 		fmt.Println("  list                    list ports and packages")
 		fmt.Println("  loc                     print port locations")
+		//fmt.Println("  make                    make package from port")
 		//fmt.Println("  patch                   patch ports")
 		fmt.Println("  prov                    search ports for files")
 		fmt.Println("  pull                    pull in ports")
@@ -37,29 +38,31 @@ func main() {
 		//fmt.Println("  uninstall               uninstall packages")
 		fmt.Println("  help                    print help and exit")
 	case "depends":
-		err = depends(os.Args[2:])
+		err = dependsCommand(os.Args[2:])
 	case "diff":
-		err = diff(os.Args[2:])
+		err = diffCommand(os.Args[2:])
 	case "graph":
-		err = graph(os.Args[2:])
+		err = graphCommand(os.Args[2:])
 	case "info":
-		err = info(os.Args[2:])
+		err = infoCommand(os.Args[2:])
 	//case "install":
-	//	err =install(os.Args[2:])
+	//	err = installCommand(os.Args[2:])
 	case "list":
-		err = list(os.Args[2:])
+		err = listCommand(os.Args[2:])
 	case "loc":
-		err = loc(os.Args[2:])
+		err = locCommand(os.Args[2:])
+	//case "make":
+	//	err = makeCommand(os.Args[2:])
 	//case "patch":
-	//	err = patch(os.Args[2:])
+	//	err = patchCommand(os.Args[2:])
 	case "prov":
-		err = prov(os.Args[2:])
+		err = provCommand(os.Args[2:])
 	case "pull":
-		err = pull(os.Args[2:])
+		err = pullCommand(os.Args[2:])
 	//case "sysup":
-	//	err = sysup(os.Args[2:])
+	//	err = sysupCommand(os.Args[2:])
 	//case "uninstall":
-	//	err = uninstall(os.Args[2:])
+	//	err = uninstallCommand(os.Args[2:])
 	default:
 		err = fmt.Errorf("invalid command, use `help` for a list of commands")
 	}

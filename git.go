@@ -1,6 +1,6 @@
 package main
 
-// TODO: Use a Go package for git stuff, if posssible.
+// TODO: Use a Go package for git stuff, if possible.
 
 import (
 	"bytes"

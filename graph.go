@@ -10,8 +10,8 @@ import (
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// graph generates a dependency grap.
-func graph(input []string) error {
+// graphCommand generates a dependency grap.
+func graphCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	//argd := o.Bool("duplicate", 'd', false)
@@ -38,22 +38,18 @@ func graph(input []string) error {
 		return nil
 	}
 
-	// Get all ports.
-	all, err := ports.All(config.PrtDir)
-	if err != nil {
-		return err
-	}
-
 	p := ports.New(".")
 	if err := p.Pkgfile.Parse(); err != nil {
 		return err
 	}
 
-	var a [][]ports.Location
-	if !*argn {
-		a = config.Alias
+	// Get all ports.
+	all, err := ports.All()
+	if err != nil {
+		return err
 	}
-	if err := p.ParseDepends(a, config.Order, all); err != nil {
+
+	if err := p.ParseDepends(all, !*argn); err != nil {
 		return err
 	}
 
@@ -98,11 +94,15 @@ func graph(input []string) error {
 	}
 
 	// Convert to graph.
-	// TODO: Remove *.dot file?
 	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt, "-o", p.
 		Pkgfile.Name+"."+*argt)
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("something went wrong with GrapViz")
+	}
+
+	// Remove dot file.
+	if err := os.Remove(p.Pkgfile.Name + ".dot"); err != nil {
+		return err
 	}
 
 	return nil

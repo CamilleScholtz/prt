@@ -6,12 +6,11 @@ import (
 	"sort"
 
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/packages"
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// list lists ports.
-func list(input []string) error {
+// listCommand lists ports.
+func listCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
@@ -39,12 +38,12 @@ func list(input []string) error {
 	}
 
 	// Get all ports.
-	all, err := ports.All(config.PrtDir)
+	all, err := ports.All()
 	if err != nil {
 		return err
 	}
 
-	var db packages.Database
+	var db ports.Database
 	if *argi {
 		// Get installed ports.
 		if err := db.Parse(); err != nil {
@@ -54,7 +53,7 @@ func list(input []string) error {
 		// Get port locations.
 		var pl []ports.Port
 		for _, n := range db.Packages {
-			p, err := ports.Locate(n.Name, config.Order, all)
+			p, err := ports.Locate(all, n.Name)
 			if err != nil {
 				// In case `err` is not `nil` we didn't manage to locate this
 				// port, this is most likely because the port is not in the

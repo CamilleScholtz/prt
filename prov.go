@@ -5,12 +5,11 @@ import (
 	"regexp"
 
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/packages"
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// prov searches ports for files.
-func prov(input []string) error {
+// provCommand searches ports for files.
+func provCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argi := o.Bool("installed", 'i', false)
@@ -39,9 +38,8 @@ func prov(input []string) error {
 	}
 
 	for _, v := range vals {
-
 		if *argi {
-			var db packages.Database
+			var db ports.Database
 			if err := db.Parse(); err != nil {
 				return err
 			}
@@ -70,7 +68,7 @@ func prov(input []string) error {
 				}
 			}
 		} else {
-			all, err := ports.All(config.PrtDir)
+			all, err := ports.All()
 			if err != nil {
 				return err
 			}
@@ -83,12 +81,12 @@ func prov(input []string) error {
 				// Search for files.
 				var fl []string
 				for _, f := range p.Footprint.Files {
-					m, err := regexp.MatchString(v, f)
+					m, err := regexp.MatchString(v, f.Path)
 					if err != nil {
 						return err
 					}
 					if m {
-						fl = append(fl, f)
+						fl = append(fl, f.Path)
 					}
 				}
 

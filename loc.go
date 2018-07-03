@@ -9,8 +9,8 @@ import (
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// loc prints port locations
-func loc(input []string) error {
+// locCommand prints port locations
+func locCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argd := o.Bool("duplicate", 'd', false)
@@ -41,7 +41,7 @@ func loc(input []string) error {
 	}
 
 	// Get all ports.
-	all, err := ports.All(config.PrtDir)
+	all, err := ports.All()
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func loc(input []string) error {
 		}
 		check = append(check, v)
 
-		pl, err := ports.Locate(v, config.Order, all)
+		pl, err := ports.Locate(all, v)
 		if err != nil {
 			return err
 		}
@@ -67,7 +67,7 @@ func loc(input []string) error {
 		for _, p := range pl {
 			// Alias if needed.
 			if !*argn {
-				p.Alias(config.Alias)
+				p.Alias()
 			}
 
 			// Print duplicate indentation.

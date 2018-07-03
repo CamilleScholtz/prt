@@ -1,8 +1,6 @@
 package ports
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestNew(t *testing.T) {
 	p := New("/usr/src/prt/opt/firefox")
@@ -15,14 +13,15 @@ func TestNew(t *testing.T) {
 }
 
 func BenchmarkParseDepends(b *testing.B) {
-	p := New("/usr/src/prt/opt/firefox")
-	o := []string{"punpun", "6c37-dropin", "core", "6c37-git", "6c37-update",
+	Order = []string{"punpun", "6c37-dropin", "core", "6c37-git", "6c37-update",
 		"6c37", "opt", "xorg", "contrib"}
-	a, _ := All("/usr/src/prt")
+	PrtDir = "/usr/src/prt"
+	p := New("/usr/src/prt/opt/firefox")
+	a, _ := All()
 
 	p.Pkgfile.Parse()
 
 	for i := 0; i < b.N; i++ {
-		p.ParseDepends([][]Location{}, o, a)
+		p.ParseDepends(a, false)
 	}
 }

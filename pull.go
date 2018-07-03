@@ -9,8 +9,8 @@ import (
 	"github.com/onodera-punpun/go-utils/array"
 )
 
-// pull pulls in ports.
-func pull(input []string) error {
+// pullCommand pulls in ports.
+func pullCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argh := o.Bool("help", 'h', false)

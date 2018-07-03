@@ -1,11 +1,6 @@
 package ports
 
-import (
-	"fmt"
-	"testing"
-)
-
-func TestParsePkgfile(t *testing.T) {
+/*func TestParsePkgfile(t *testing.T) {
 	p := New("/usr/src/prt/opt/firefox")
 
 	if err := p.Pkgfile.Parse(); err != nil {
@@ -89,4 +84,4 @@ func BenchmarkParsePkgfileSource(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		p.Pkgfile.Parse(true)
 	}
-}
+}*/

@@ -19,8 +19,8 @@ var config struct {
 	SrcDir string
 	WrkDir string
 
-	Order []string
-	Alias [][]ports.Location
+	Order   []string
+	Aliases [][]ports.Location
 
 	IndentChar  string
 	WarningChar string
@@ -30,11 +30,6 @@ var config struct {
 	WarningColor color.Attribute
 
 	Repo map[string]repo
-}
-
-type location struct {
-	repo string
-	port string
 }
 
 // pull is a struct with values related to repos.
@@ -51,6 +46,14 @@ func parseConfig() error {
 	if err != nil {
 		return fmt.Errorf("config /etc/prt/config.toml: " + err.Error())
 	}
+
+	ports.PrtDir = config.PrtDir
+	ports.PkgDir = config.PkgDir
+	ports.SrcDir = config.SrcDir
+	ports.WrkDir = config.WrkDir
+
+	ports.Order = config.Order
+	ports.Aliases = config.Aliases
 
 	dark = color.New(config.DarkColor).SprintFunc()
 	light = color.New(config.LightColor).SprintFunc()

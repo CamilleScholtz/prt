@@ -5,12 +5,11 @@ import (
 	"os"
 
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/packages"
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// Diff lists outdated packages.
-func diff(input []string) error {
+// DiffCommand lists outdated packages.
+func diffCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	argn := o.Bool("no-alias", 'n', false)
@@ -36,19 +35,19 @@ func diff(input []string) error {
 	}
 
 	// Get all ports.
-	all, err := ports.All(config.PrtDir)
+	all, err := ports.All()
 	if err != nil {
 		return err
 	}
 
 	// Get installed ports.
-	var db packages.Database
+	var db ports.Database
 	if err := db.Parse(); err != nil {
 		return err
 	}
 
 	for _, n := range db.Packages {
-		pl, err := ports.Locate(n.Name, config.Order, all)
+		pl, err := ports.Locate(all, n.Name)
 		if err != nil {
 			continue
 		}
@@ -56,7 +55,7 @@ func diff(input []string) error {
 
 		// Alias if needed.
 		if !*argn {
-			p.Alias(config.Alias)
+			p.Alias()
 		}
 
 		// Read out Pkgfile.

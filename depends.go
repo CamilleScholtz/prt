@@ -5,12 +5,11 @@ import (
 	"strings"
 
 	"github.com/go2c/optparse"
-	"github.com/onodera-punpun/prt/packages"
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// depends lists dependencies recursively.
-func depends(input []string) error {
+// dependsCommand lists dependencies recursively.
+func dependsCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	arga := o.Bool("all", 'a', false)
@@ -37,13 +36,12 @@ func depends(input []string) error {
 		return nil
 	}
 
-	// Get all ports.
-	all, err := ports.All(config.PrtDir)
-	if err != nil {
+	p := ports.New(".")
+	if err := p.Pkgfile.Parse(); err != nil {
 		return err
 	}
 
-	var db packages.Database
+	var db ports.Database
 	if !*arga {
 		// Get installed ports.
 		if err := db.Parse(); err != nil {
@@ -51,16 +49,13 @@ func depends(input []string) error {
 		}
 	}
 
-	p := ports.New(".")
-	if err := p.Pkgfile.Parse(); err != nil {
+	// Get all ports.
+	all, err := ports.All()
+	if err != nil {
 		return err
 	}
 
-	var a [][]ports.Location
-	if !*argn {
-		a = config.Alias
-	}
-	if err := p.ParseDepends(a, config.Order, all); err != nil {
+	if err := p.ParseDepends(all, !*argn); err != nil {
 		return err
 	}
 
@@ -72,7 +67,7 @@ func depends(input []string) error {
 var dependsCheck []*ports.Port
 var dependsArrow bool
 
-func dependsRecurse(p *ports.Port, db packages.Database, l int, t bool) {
+func dependsRecurse(p *ports.Port, db ports.Database, l int, t bool) {
 outer:
 	for _, d := range p.Depends {
 		// Continue if installed.
