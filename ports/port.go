@@ -20,7 +20,7 @@ type Port struct {
 }
 
 // New returns a Port with the Location field populated. Use the various
-// `Parse*` functions to populate the other fields.
+// `Parse` functions to populate the other fields.
 func New(location string) Port {
 	var p Port
 
@@ -51,8 +51,8 @@ func (p *Port) Alias() {
 var check []*Port
 
 // ParseDepends is a function that calculates dependencies recursively and
-// populates `Depends`.
-//TODO: This requires `Pkgfile.Parse` has been run on the given Port.
+// populates `Depends`. This function requires `Pkgfile.Parse()` to be run
+// prior.
 func (p *Port) ParseDepends(ports []Port, alias bool) error {
 	// Continue if already checked.
 	for _, c := range check {

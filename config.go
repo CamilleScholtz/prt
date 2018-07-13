@@ -22,6 +22,8 @@ var config struct {
 	Order   []string
 	Aliases [][]ports.Location
 
+	ConcurrentDownloads int
+
 	IndentChar  string
 	WarningChar string
 

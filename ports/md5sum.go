@@ -23,12 +23,9 @@ type Md5sum struct {
 	}
 }
 
-// Create creates an `.md5sum` file for a Port.
+// Create creates an `.md5sum` file for a Port. This function requires
+// `Pkgfile.Parse(true)` to be run prior.
 func (f *Md5sum) Create() error {
-	if err := f.Pkgfile.Parse(true); err != nil {
-		return err
-	}
-
 	nf, err := os.OpenFile(path.Join(f.Location.Full(), ".md5sum"), os.O_CREATE|
 		os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
@@ -82,15 +79,10 @@ func (f *Md5sum) Parse() error {
 	return nil
 }
 
+// Validate compares the Ports `.md5sum` file to the hashed source files. This
+// function requires `Pkgfile.Parse(true)` and `Md5sum.Parse()` to be run prior.
+// TODO: This required some download function to be run.
 func (f *Md5sum) Validate() error {
-	if err := f.Pkgfile.Parse(true); err != nil {
-		return err
-	}
-
-	if err := f.Parse(); err != nil {
-		return err
-	}
-
 	r := regexp.MustCompile("^(http|https|ftp|file)://")
 	for _, l := range f.Md5sum.Files {
 		for _, s := range f.Pkgfile.Source {

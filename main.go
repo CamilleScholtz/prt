@@ -24,6 +24,7 @@ func main() {
 		fmt.Println("")
 		fmt.Println("commands:")
 		fmt.Println("  depends                 list dependencies recursively")
+		fmt.Println("  download                download port sources")
 		fmt.Println("  diff                    list outdated packages")
 		fmt.Println("  graph                   generate dependency graph")
 		fmt.Println("  info                    print port information")
@@ -39,6 +40,8 @@ func main() {
 		fmt.Println("  help                    print help and exit")
 	case "depends":
 		err = dependsCommand(os.Args[2:])
+	case "download":
+		err = downloadCommand(os.Args[2:])
 	case "diff":
 		err = diffCommand(os.Args[2:])
 	case "graph":

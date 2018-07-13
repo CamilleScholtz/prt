@@ -1,66 +1,56 @@
 package ports
 
-// ValidateMd5sum validates the .md5sum file.
-/*func (p Port) ValidateMd5sum() error {
-	p.createMd5sum("/tmp/prt")
+// Download downloads a Ports sources to the `SrcDir`. This function requires
+// `Pkgfile.Parse(true)` to be run prior.
+/*func (p *Port) Download(verbose int) error {
+	r := regexp.MustCompile("^(http|https|ftp|file)://")
+	for _, s := range p.Pkgfile.Source {
+		f := path.Join(SrcDir, path.Base(s))
 
-	var t port
-	t.Location = path.Join("/tmp/prt", p.Pkgfile.Name)
-	if err := t.parseMd5sum(); err != nil {
-		return err
-	}
+		// Continue if file is not an URL.
+		if !r.MatchString(s) {
+			continue
+		}
 
-	var e bool
-	for pi, pl := range p.Md5sum.Hash {
-		for ti, tl := range t.Md5sum.Hash {
-			if pl == tl {
-				if len(tl) == 0 {
-					e = true
-					printe("1 Mismatch " + pl)
-				} else if pl != tl {
-					e = true
-					printe("2 Mismatch " + tl)
-				}
-			}
+		// Continue if file has already been downloaded.
+		if _, err := os.Stat(f); err == nil {
+			continue
+		}
 
-			if ti <= pi {
-				break
-			}
+		// Create partial file.
+		o, err := os.Create(f + ".partial")
+		if err != nil {
+			return err
+		}
+		defer o.Close()
+
+		// Download partial file.
+		res, err := grab.Get(s)
+		if err != nil {
+			return err
+		}
+		defer res.Body.Close()
+		if res.StatusCode != http.StatusOK {
+			return fmt.Errorf("bad status: %s", res.Status)
+		}
+
+		// Write the download body to the partial file.
+		_, err = io.Copy(o, res.Body)
+		if err != nil {
+			return err
+		}
+		o.Close()
+
+		// Remove partial postfix.
+		if err := os.Rename(f+".partial", f); err != nil {
+			return err
 		}
 	}
 
-	if e {
-		return fmt.Errorf("pkgmk md5sum %s: verification failed",
-			p.getBaseDir())
-	}
 	return nil
 }*/
 
 /*
-// check check if all needed variables are present.
-func (p Port) checkPkgfile() error {
-	if p.Pkgfile.Name == "" {
-		return fmt.Errorf("pkgfile checkPkgfile %s: Name variable is empty",
-			p.getBaseDir())
-	}
-	if p.Pkgfile.Version == "" {
-		return fmt.Errorf("pkgfile checkPkgfile %s: Version variable is empty",
-			p.getBaseDir())
-	}
-	if p.Pkgfile.Release == "" {
-		return fmt.Errorf("pkgfile checkPkgfile %s: Release variable is empty",
-			p.getBaseDir())
-	}
-	// TODO: Add a function function in port.go.
-	//if err := p.function("build"); err != nil {
-	//	return fmt.Errorf(
-	//	"pkgfile checkPkgfile %s: Build function is empty",
-	//	p.getBaseDir())
-	//}
-
-	return nil
-}
-
 // checkSignature checks the .signature file.
 // TODO: Rewrite this.
 func (p Port) checkSignature() error {
@@ -116,51 +106,6 @@ func (p Port) cleanWrk() error {
 	// Temp directory used by some functions.
 	if err := os.RemoveAll("/tmp/prt"); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// createMd5sum creates a .md5sum file.
-func (p Port) createMd5sum(l string) error {
-	sl := p.Pkgfile.Source
-	sort.Sort(byBase(sl))
-
-	f, err := os.OpenFile(path.Join(l, ".md5sum"),
-		os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
-	defer f.Close()
-	if err != nil {
-		return err
-	}
-
-	// Just leave the file empty if there are no sources.
-	if len(sl) == 0 {
-		return nil
-	}
-
-	for _, s := range sl {
-		r := regexp.MustCompile("^(http|https|ftp|file)://")
-		if r.MatchString(s) {
-			s = path.Join(config.SrcDir, path.Base(s))
-		} else {
-			s = path.Join(p.Location, path.Base(s))
-		}
-
-		hf, err := os.Open(s)
-		defer hf.Close()
-		if err != nil {
-			return err
-		}
-
-		h := md5.New()
-		if _, err := io.Copy(h, hf); err != nil {
-			return err
-		}
-
-		if _, err := f.WriteString(hex.EncodeToString(h.Sum(nil)) + "  " +
-			path.Base(s) + "\n"); err != nil {
-			return err
-		}
 	}
 
 	return nil

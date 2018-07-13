@@ -21,6 +21,9 @@ aliases = [
 #	  { repo = "6c37-dropin", port = "pkgconf" } ],
 ]
 
+# The amount of files to download concurrently.
+concurrentdownloads = 4
+
 # Characters used for indentation.
 indentchar = "-  "
 

@@ -111,3 +111,23 @@ func (f *Pkgfile) Parse(source ...bool) error {
 
 	return nil
 }
+
+// Validate checks if all required variables and functions are in a `Pkgfile`
+// file.
+// TODO: Check for `build()` function
+func (f *Pkgfile) Validate() error {
+	if f.Name == "" {
+		return fmt.Errorf("pkgfile %s: Name variable is empty", f.Location.
+			Base())
+	}
+	if f.Version == "" {
+		return fmt.Errorf("pkgfile %s: Version variable is empty", f.Location.
+			Base())
+	}
+	if f.Release == "" {
+		return fmt.Errorf("pkgfile %s: Release variable is empty", f.Location.
+			Base())
+	}
+
+	return nil
+}
