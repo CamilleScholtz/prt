@@ -62,60 +62,61 @@ func downloadCommand(input []string) error {
 
 		urls = append(urls, s)
 	}
+	if len(urls) == 0 {
+		return nil
+	}
 
-	res, err := grab.GetBatch(config.ConcurrentDownloads, "/tmp", urls...)
+	b, err := grab.GetBatch(config.ConcurrentDownloads, ports.SrcDir, urls...)
 	if err != nil {
 		return err
 	}
 
 	// Monitor downloads.
-	dl := make([]*grab.Response, 0, len(urls))
-	t := time.NewTicker(200 * time.Millisecond)
+	rl := make([]*grab.Response, 0, len(urls))
+	t := time.NewTicker(100 * time.Millisecond)
 	defer t.Stop()
 
 	// Hide cursor.
 	fmt.Print(cursor.Hide())
+	defer fmt.Print(cursor.Show())
 
-outer:
-	for {
+	var complete int
+	for complete != len(urls) {
 		select {
-		case r := <-res:
+		case r := <-b:
 			if r != nil {
-				dl = append(dl, r)
-			} else {
-				if err := downloadPrint(dl); err != nil {
-					return err
-				}
-				break outer
+				rl = append(rl, r)
 			}
 		case <-t.C:
-			if err := downloadPrint(dl); err != nil {
-				return err
+			complete = 0
+			for i, r := range rl {
+				if r.IsComplete() {
+					// TODO: A more descriptive error message.
+					if err := r.Err(); err != nil {
+						return err
+					}
+
+					complete++
+				}
+
+				f := path.Base(r.Filename)
+				c := humanize.Bytes(uint64(r.BytesComplete()))
+				m := humanize.Bytes(uint64(r.Size))
+
+				fmt.Printf("Downloading source %d/%d, %s.\n", i+1, len(rl),
+					light(f))
+				fmt.Printf("%s%s%s of %s\n", cursor.ClearEntireLine(), dark(
+					config.IndentChar), c, m)
 			}
+
+			// Move cursor two lines of for each download.
+			fmt.Print(cursor.MoveUp(len(rl) * 2))
 		}
 	}
 
-	// Show cursor again.
-	fmt.Printf("\033[%dB%s", len(dl)*2, cursor.Show())
-
-	return nil
-}
-
-// downloadPrint prints the progress of all downloads to the terminal.
-func downloadPrint(downloads []*grab.Response) error {
-	for i, d := range downloads {
-		f := path.Base(d.Filename)
-		c := humanize.Bytes(uint64(d.BytesComplete()))
-		m := humanize.Bytes(uint64(d.Size))
-
-		fmt.Printf("Downloading source %d/%d, %s.\n", i+1, len(downloads),
-			light(f))
-		fmt.Printf("%s%s%s of %s\n", cursor.ClearEntireLine(), dark(
-			config.IndentChar), c, m)
-	}
-
-	// Move cursor two lines of for each download.
-	fmt.Printf("\033[%dA", len(downloads)*2)
+	// Move the cursor to the bottom.
+	// TODO: When prt gets interrupted this doesn't get called.
+	fmt.Print(cursor.MoveDown(len(rl) * 2))
 
 	return nil
 }
