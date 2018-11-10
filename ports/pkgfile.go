@@ -2,12 +2,12 @@ package ports
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"path"
 	"strings"
 
-	"mvdan.cc/sh/interp"
 	"mvdan.cc/sh/shell"
 )
 
@@ -93,13 +93,13 @@ func (f *Pkgfile) Parse(source ...bool) error {
 				f.Release = strings.TrimSpace(kv[1])
 			case "source":
 				if len(source) > 0 {
-					v, err := shell.SourceFile(path.Join(f.Location.Full(),
-						"Pkgfile"))
+					v, err := shell.SourceFile(context.TODO(), path.Join(
+						f.Location.Full(), "Pkgfile"))
 					if err != nil {
 						return err
 					}
 
-					f.Source = v["source"].Value.(interp.IndexArray)
+					f.Source = v["source"].Value.([]string)
 				}
 
 				// Since `source` should be the last meaningfull value in a
