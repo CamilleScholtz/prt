@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"path"
 	"regexp"
 	"time"
@@ -48,15 +47,8 @@ func downloadCommand(input []string) error {
 	var urls = []string{}
 	r := regexp.MustCompile("^(http|https|ftp|file)://")
 	for _, s := range p.Pkgfile.Source {
-		f := path.Join(ports.SrcDir, path.Base(s))
-
 		// Continue if file is not an URL.
 		if !r.MatchString(s) {
-			continue
-		}
-
-		// Continue if file has already been downloaded.
-		if _, err := os.Stat(f); err == nil {
 			continue
 		}
 

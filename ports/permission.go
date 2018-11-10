@@ -4,6 +4,8 @@ import (
 	"os"
 )
 
+// An Permission is a type describing the permission bits found in the `.md5sum`
+// file of a port.
 type Permission struct {
 	FileMode os.FileMode
 	// TODO: Create a custom type for this.

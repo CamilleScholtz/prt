@@ -7,6 +7,8 @@ import (
 
 	"github.com/go2c/optparse"
 	"github.com/onodera-punpun/go-utils/array"
+	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 // pullCommand pulls in ports.
@@ -53,47 +55,65 @@ func pullCommand(input []string) error {
 		fmt.Printf("Pulling in repo %d/%d, %s.\n", i, t, light(n))
 
 		l := path.Join(config.PrtDir, n)
-		g := git{
-			Location: l,
-			URL:      r.URL,
-			Branch:   r.Branch,
+
+		g, err := git.PlainOpen(l)
+		if err != nil && err != git.ErrRepositoryNotExists {
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
+			continue
 		}
 
 		// Check if location exists, clone if it doesn't.
-		if _, err := os.Stat(l); err != nil {
-			if err := g.clone(); err != nil {
+		if err == git.ErrRepositoryNotExists {
+			g, err = git.PlainClone(l, false, &git.CloneOptions{
+				URL:           r.URL,
+				ReferenceName: plumbing.ReferenceName("refs/heads/" + r.Branch),
+				SingleBranch:  true,
+				Depth:         1,
+				Progress:      nil,
+			})
+			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar),
 					err)
 			}
+
+			fmt.Printf("%sInitialized\n", dark(config.IndentChar))
+
 			continue
 		}
 
-		if err := g.checkout(); err != nil {
-			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
-			continue
-		}
-		if err := g.fetch(); err != nil {
+		if err := g.Fetch(&git.FetchOptions{
+			Depth:    1,
+			Progress: nil,
+		}); err != nil && err != git.NoErrAlreadyUpToDate {
 			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
 			continue
 		}
 
-		// Print changes.
-		dl, err := g.diff()
+		wt, err := g.Worktree()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
 			continue
 		}
-		for _, d := range dl {
-			fmt.Printf("%s%s\n", dark(config.IndentChar), d)
+
+		if err := wt.Clean(&git.CleanOptions{
+			Dir: true,
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
+			continue
+		}
+		if err := wt.Reset(&git.ResetOptions{
+			Mode: git.HardReset,
+		}); err != nil {
+			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
+			continue
 		}
 
-		if err := g.clean(); err != nil {
+		sl, err := wt.Status()
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
-			continue
 		}
-		if err := g.reset(); err != nil {
-			fmt.Fprintf(os.Stderr, "%s%s\n", warning(config.WarningChar), err)
-			continue
+		for _, s := range sl {
+			fmt.Println("%s%s\n", dark(config.IndentChar), s)
 		}
 	}
 
