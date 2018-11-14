@@ -72,6 +72,9 @@ func downloadCommand(input []string) error {
 	fmt.Print(cursor.Hide())
 	defer fmt.Print(cursor.Show())
 
+	// Move the cursor back to the bottom on close.
+	defer fmt.Print(cursor.MoveDown(len(urls) * 2))
+
 	var complete int
 	for complete != len(urls) {
 		select {
@@ -105,10 +108,6 @@ func downloadCommand(input []string) error {
 			fmt.Print(cursor.MoveUp(len(rl) * 2))
 		}
 	}
-
-	// Move the cursor to the bottom.
-	// TODO: When prt gets interrupted this doesn't get called.
-	fmt.Print(cursor.MoveDown(len(rl) * 2))
 
 	return nil
 }
