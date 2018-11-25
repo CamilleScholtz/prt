@@ -36,35 +36,28 @@ func downloadCommand(input []string) error {
 	}
 
 	p := ports.New(".")
-	if err := p.Pkgfile.Parse(); err != nil {
-		return err
-	}
-
 	if err := p.Pkgfile.Parse(true); err != nil {
 		return err
 	}
 
-	var urls = []string{}
+	var sl = []string{}
 	r := regexp.MustCompile("^(http|https|ftp|file)://")
 	for _, s := range p.Pkgfile.Source {
-		// Continue if file is not an URL.
-		if !r.MatchString(s) {
-			continue
+		if r.MatchString(s) {
+			sl = append(sl, s)
 		}
-
-		urls = append(urls, s)
 	}
-	if len(urls) == 0 {
+	if len(sl) == 0 {
 		return nil
 	}
 
-	b, err := grab.GetBatch(config.ConcurrentDownloads, ports.SrcDir, urls...)
+	b, err := grab.GetBatch(config.ConcurrentDownloads, ports.SrcDir, sl...)
 	if err != nil {
 		return err
 	}
 
 	// Monitor downloads.
-	rl := make([]*grab.Response, 0, len(urls))
+	rl := make([]*grab.Response, 0, len(sl))
 	t := time.NewTicker(100 * time.Millisecond)
 	defer t.Stop()
 
@@ -73,17 +66,17 @@ func downloadCommand(input []string) error {
 	defer fmt.Print(cursor.Show())
 
 	// Move the cursor back to the bottom on close.
-	defer fmt.Print(cursor.MoveDown(len(urls) * 2))
+	defer fmt.Print(cursor.MoveDown(len(sl) * 2))
 
-	var complete int
-	for complete != len(urls) {
+	var c int
+	for c != len(sl) {
 		select {
 		case r := <-b:
 			if r != nil {
 				rl = append(rl, r)
 			}
 		case <-t.C:
-			complete = 0
+			c = 0
 			for i, r := range rl {
 				if r.IsComplete() {
 					// TODO: A more descriptive error message.
@@ -91,17 +84,14 @@ func downloadCommand(input []string) error {
 						return err
 					}
 
-					complete++
+					c++
 				}
 
-				f := path.Base(r.Filename)
-				c := humanize.Bytes(uint64(r.BytesComplete()))
-				m := humanize.Bytes(uint64(r.Size))
-
 				fmt.Printf("Downloading source %d/%d, %s.\n", i+1, len(rl),
-					light(f))
+					light(path.Base(r.Filename)))
 				fmt.Printf("%s%s%s of %s\n", cursor.ClearEntireLine(), dark(
-					config.IndentChar), c, m)
+					config.IndentChar), humanize.Bytes(uint64(r.
+					BytesComplete())), humanize.Bytes(uint64(r.Size)))
 			}
 
 			// Move cursor two lines of for each download.

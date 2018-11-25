@@ -37,6 +37,7 @@ func main() {
 		fmt.Println("  pull                    pull in ports")
 		//fmt.Println("  sysup                   update outdated packages")
 		//fmt.Println("  uninstall               uninstall packages")
+		fmt.Println("  unpack                  unpack port sources")
 		fmt.Println("  help                    print help and exit")
 	case "depends":
 		err = dependsCommand(os.Args[2:])
@@ -66,6 +67,8 @@ func main() {
 	//	err = sysupCommand(os.Args[2:])
 	//case "uninstall":
 	//	err = uninstallCommand(os.Args[2:])
+	case "unpack":
+		err = unpackCommand(os.Args[2:])
 	default:
 		err = fmt.Errorf("invalid command, use `help` for a list of commands")
 	}

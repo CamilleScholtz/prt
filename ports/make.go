@@ -1,50 +1,37 @@
 package ports
 
-// Download downloads a Ports sources to the `SrcDir`. This function requires
-// `Pkgfile.Parse(true)` to be run prior.
-/*func (p *Port) Download(verbose int) error {
-	r := regexp.MustCompile("^(http|https|ftp|file)://")
-	for _, s := range p.Pkgfile.Source {
-		f := path.Join(SrcDir, path.Base(s))
+import (
+	"os"
+	"path"
+)
 
-		// Continue if file is not an URL.
-		if !r.MatchString(s) {
-			continue
-		}
+// TODO: Move Download function from prt.
+// TODO: Move Unpack function from prt.
 
-		// Continue if file has already been downloaded.
-		if _, err := os.Stat(f); err == nil {
-			continue
-		}
+// CreateWrk creates the necessary WrkDir directories.
+func (p Port) CreateWrk() error {
+	if err := os.MkdirAll(path.Join(WrkDir, p.Pkgfile.Name, "pkg"),
+		0777); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(path.Join(WrkDir, p.Pkgfile.Name, "src"),
+		0777); err != nil {
+		return err
+	}
 
-		// Create partial file.
-		o, err := os.Create(f + ".partial")
-		if err != nil {
-			return err
-		}
-		defer o.Close()
+	return nil
+}
 
-		// Download partial file.
-		res, err := grab.Get(s)
-		if err != nil {
-			return err
-		}
-		defer res.Body.Close()
-		if res.StatusCode != http.StatusOK {
-			return fmt.Errorf("bad status: %s", res.Status)
-		}
+// CleanWrk removes the necessary WrkDir directories.
+/*func (p Port) CleanWrk() error {
+	if err := os.RemoveAll(path.Join(config.WrkDir,
+		p.Pkgfile.Name)); err != nil {
+		return err
+	}
 
-		// Write the download body to the partial file.
-		_, err = io.Copy(o, res.Body)
-		if err != nil {
-			return err
-		}
-		o.Close()
-
-		// Remove partial postfix.
-		if err := os.Rename(f+".partial", f); err != nil {
-			return err
-		}
+	// Temp directory used by some functions.
+	if err := os.RemoveAll("/tmp/prt"); err != nil {
+		return err
 	}
 
 	return nil
@@ -91,84 +78,6 @@ func (p Port) checkSignature() error {
 		}
 		return fmt.Errorf("pkgmk signature %s: verification failed",
 			p.getBaseDir())
-	}
-
-	return nil
-}
-
-// cleanWrk removes the necessary WrkDir directories.
-func (p Port) cleanWrk() error {
-	if err := os.RemoveAll(path.Join(config.WrkDir,
-		p.Pkgfile.Name)); err != nil {
-		return err
-	}
-
-	// Temp directory used by some functions.
-	if err := os.RemoveAll("/tmp/prt"); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// createWrk creates the necessary WrkDir directories.
-func (p port) createWrk() error {
-	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name), 0777); err !=
-		nil {
-		return err
-	}
-	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "pkg"), 0777); err != nil {
-		return err
-	}
-	if err := os.Mkdir(path.Join(config.WrkDir, p.Pkgfile.Name, "src"), 0777); err != nil {
-		return err
-	}
-
-	// Temp directory used by some functions.
-	// TODO: Is this needed?
-	if err := os.Mkdir("/tmp/prt", 0777); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// download downloads a port sources.
-func (p port) download(v bool) error {
-	sl := p.Pkgfile.Source
-	sort.Sort(byBase(sl))
-
-	// Download sources.
-	for _, s := range sl {
-		f := path.Join(config.SrcDir, path.Base(s))
-
-		// Continue if file has already been downloaded.
-		if _, err := os.Stat(f); err == nil {
-			continue
-		}
-
-		// Continue if file is not an URL.
-		r := regexp.MustCompile("^(http|https|ftp|file)://")
-		if !r.MatchString(s) {
-			continue
-		}
-
-		// TODO: Can I use some Go package for this?
-		cmd := exec.Command("curl", "-L", "-#", "--fail",
-			"--ftp-pasv", "-C", "-", "-o", f+".partial", s)
-		if v {
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-		}
-
-		printi("Downloading " + path.Base(s))
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("pkgmk download %s: Could not download source",
-				path.Base(s))
-		}
-
-		// Remove .partial on completion.
-		os.Rename(f+".partial", f)
 	}
 
 	return nil
