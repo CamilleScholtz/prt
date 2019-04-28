@@ -99,7 +99,7 @@ func (f *Pkgfile) Parse(source ...bool) error {
 						return err
 					}
 
-					f.Source = v["source"].Value.([]string)
+					f.Source = v["source"].List
 				}
 
 				// Since `source` should be the last meaningfull value in a

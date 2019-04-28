@@ -11,6 +11,7 @@ import (
 )
 
 // graphCommand generates a dependency grap.
+// TODO: Replace current port name "." with the actual name.
 func graphCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()

@@ -11,8 +11,9 @@ import (
 	"github.com/onodera-punpun/prt/tar"
 )
 
-// unpackCommand unpacks port sources
 // TODO: Use https://github.com/mholt/archiver.
+
+// unpackCommand unpacks port sources
 func unpackCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
