@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"mvdan.cc/sh/shell"
+	"mvdan.cc/sh/v3/shell"
 )
 
 // A Pkgfile is a type describing the `Pkgfile` file of a port. This file
@@ -93,8 +93,8 @@ func (f *Pkgfile) Parse(source ...bool) error {
 				f.Release = strings.TrimSpace(kv[1])
 			case "source":
 				if len(source) > 0 {
-					v, err := shell.SourceFile(context.TODO(), path.Join(
-						f.Location.Full(), "Pkgfile"))
+					v, err := shell.SourceFile(context.TODO(), path.Join(f.
+						Location.Full(), "Pkgfile"))
 					if err != nil {
 						return err
 					}
