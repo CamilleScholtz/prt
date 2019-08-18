@@ -50,9 +50,9 @@ type Pkgfile struct {
 // and because it's simply too hard too parse.
 //
 // If you want to expand BASH variables pass a bool as a parameter. This will
-// force the use of a bash interpreter to get the `source` BASH array of a
-// `Pkgfile`, this is relatively slow.
-func (f *Pkgfile) Parse(source ...bool) error {
+// force the use of a bash interpreter to get the variables in `Pkgfile`, this
+// is relatively slow.
+func (f *Pkgfile) Parse(strict ...bool) error {
 	r, err := os.Open(path.Join(f.Location.Full(), "Pkgfile"))
 	if err != nil {
 		return fmt.Errorf("could not open `%s/Pkgfile`", f.Location.Full())
@@ -82,6 +82,10 @@ func (f *Pkgfile) Parse(source ...bool) error {
 					kv[1]), ",", "", -1))
 			}
 		} else {
+			if len(strict) > 0 {
+				break
+			}
+
 			kv := strings.SplitN(i, "=", 2)
 
 			switch kv[0] {
@@ -91,23 +95,28 @@ func (f *Pkgfile) Parse(source ...bool) error {
 				f.Version = strings.TrimSpace(kv[1])
 			case "release":
 				f.Release = strings.TrimSpace(kv[1])
-			case "source":
-				if len(source) > 0 {
-					v, err := shell.SourceFile(context.TODO(), path.Join(f.
-						Location.Full(), "Pkgfile"))
-					if err != nil {
-						return err
-					}
 
-					f.Source = v["source"].List
-				}
-
-				// Since `source` should be the last meaningfull value in a
-				// `Pkgfile`, we will stop walking.
+				// Since `release` should be the last meaningfull value in a
+				// `Pkgfile`, we will stop walking. There is `source` as well
+				// hover, we will only parse this if the `strict` parameter has
+				// been given.
 				return nil
 			}
 		}
 	}
+
+	// We will only end up here if the `strict` paramenter has been given. We
+	// will parse the `Pkgfile` using a bash interpreter.
+	v, err := shell.SourceFile(context.TODO(), path.Join(f.Location.Full(),
+		"Pkgfile"))
+	if err != nil {
+		return fmt.Errorf("could not interpret `%s/Pkgfile`", f.Location.Full())
+	}
+
+	f.Name = v["name"].Str
+	f.Version = v["version"].Str
+	f.Release = v["release"].Str
+	f.Source = v["source"].List
 
 	return nil
 }
