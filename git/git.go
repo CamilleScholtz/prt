@@ -53,7 +53,7 @@ func (r Repo) Clone() error {
 // Diff checks a repo for differences.
 func (r Repo) Diff() ([]string, error) {
 	cmd := exec.Command("git", "diff", "--name-status", "--diff-filter",
-		"ACDMR", "origin/"+r.Branch)
+		"ACDM", "origin/"+r.Branch)
 	cmd.Dir = r.Location
 	bb := new(bytes.Buffer)
 	cmd.Stdout = bb
@@ -70,11 +70,12 @@ func (r Repo) Diff() ([]string, error) {
 
 	// Make output pretty.
 	// TODO: This prints Deleted when it should be Added.
+	// TODO: Enable Renamed.
 	d = strings.Replace(d, "A\t", "Added ", -1)
 	d = strings.Replace(d, "C\t", "Copied ", -1)
 	d = strings.Replace(d, "D\t", "Deleted ", -1)
 	d = strings.Replace(d, "M\t", "Modiefied ", -1)
-	d = strings.Replace(d, "R\t", "Renamed ", -1)
+	//d = strings.Replace(d, "R\t", "Renamed ", -1)
 	dl := strings.Split(d, "\n")
 	sort.Strings(dl)
 
