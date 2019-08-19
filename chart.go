@@ -10,9 +10,9 @@ import (
 	"github.com/onodera-punpun/prt/ports"
 )
 
-// graphCommand generates a dependency grap.
+// chartCommand generates a dependency grap.
 // TODO: Replace current port name "." with the actual name.
-func graphCommand(input []string) error {
+func chartCommand(input []string) error {
 	// Define valid arguments.
 	o := optparse.New()
 	//argd := o.Bool("duplicate", 'd', false)
@@ -28,10 +28,10 @@ func graphCommand(input []string) error {
 
 	// Print help.
 	if *argh {
-		fmt.Println("Usage: prt graph [arguments]")
+		fmt.Println("Usage: prt chart [arguments]")
 		fmt.Println("")
 		fmt.Println("arguments:")
-		fmt.Println("  -d,   --duplicate       graph duplicates as well")
+		fmt.Println("  -d,   --duplicate       display duplicates as well")
 		fmt.Println("  -n,   --no-alias        disable aliasing")
 		fmt.Println("  -t,   --type            filetype to use")
 		fmt.Println("  -h,   --help            print help and exit")
@@ -61,7 +61,7 @@ func graphCommand(input []string) error {
 	}
 	defer f.Close()
 
-	// Prettify graph.
+	// Prettify chart.
 	fmt.Fprintf(f, "digraph G {\n")
 	fmt.Fprintf(f, "\tgraph [\n")
 	fmt.Fprintf(f, "\t\t%s=\"%s\"\n", "tcenter", "true")
@@ -85,7 +85,7 @@ func graphCommand(input []string) error {
 	fmt.Fprintf(f, "\t]\n\n")
 
 	pal, _ := colorful.SoftPalette(128)
-	graphRecurse(&p, 0, f, pal)
+	chartRecurse(&p, 0, f, pal)
 
 	fmt.Fprintf(f, "}")
 
@@ -94,7 +94,7 @@ func graphCommand(input []string) error {
 		return nil
 	}
 
-	// Convert to graph.
+	// Convert to chart.
 	cmd := exec.Command("dot", p.Pkgfile.Name+".dot", "-T", *argt, "-o", p.
 		Pkgfile.Name+"."+*argt)
 	if err := cmd.Run(); err != nil {
@@ -109,23 +109,23 @@ func graphCommand(input []string) error {
 	return nil
 }
 
-var graphCheck []*ports.Port
+var chartCheck []*ports.Port
 
-func graphRecurse(p *ports.Port, l int, f *os.File, pal []colorful.Color) {
+func chartRecurse(p *ports.Port, l int, f *os.File, pal []colorful.Color) {
 outer:
 	for _, d := range p.Depends {
 		// Continue if already checked.
-		for _, c := range graphCheck {
+		for _, c := range chartCheck {
 			if c.Pkgfile.Name == d.Pkgfile.Name {
 				continue outer
 			}
 		}
-		graphCheck = append(graphCheck, d)
+		chartCheck = append(chartCheck, d)
 
 		fmt.Fprintf(f, "\tnode [color=\"%s\"]\n", pal[l].Hex())
 		fmt.Fprintf(f, "\t\"%s\"->\"%s\"\n", p.Location.Base(), d.Location.
 			Base())
 
-		graphRecurse(d, l+1, f, pal)
+		chartRecurse(d, l+1, f, pal)
 	}
 }
