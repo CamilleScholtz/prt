@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"strings"
 
-	"mvdan.cc/sh/v3/shell"
+	"mvdan.cc/sh/v3/interp"
+	"mvdan.cc/sh/v3/syntax"
 )
 
 // A Pkgfile is a type describing the `Pkgfile` file of a port. This file
@@ -107,16 +109,21 @@ func (f *Pkgfile) Parse(strict ...bool) error {
 
 	// We will only end up here if the `strict` paramenter has been given. We
 	// will parse the `Pkgfile` using a bash interpreter.
-	v, err := shell.SourceFile(context.TODO(), path.Join(f.Location.Full(),
+	r.Seek(0, io.SeekStart)
+	p, err := syntax.NewParser().Parse(r, path.Join(f.Location.Full(),
 		"Pkgfile"))
 	if err != nil {
 		return fmt.Errorf("could not interpret `%s/Pkgfile`", f.Location.Full())
 	}
+	i, _ := interp.New()
+	if err := i.Run(context.TODO(), p); err != nil {
+		return fmt.Errorf("could not interpret `%s/Pkgfile`", f.Location.Full())
+	}
 
-	f.Name = v["name"].Str
-	f.Version = v["version"].Str
-	f.Release = v["release"].Str
-	f.Source = v["source"].List
+	f.Name = i.Vars["name"].Str
+	f.Version = i.Vars["version"].Str
+	f.Release = i.Vars["release"].Str
+	f.Source = i.Vars["source"].List
 
 	return nil
 }

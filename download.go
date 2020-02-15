@@ -79,8 +79,8 @@ func downloadCommand(input []string) error {
 			c = 0
 			for i, r := range rl {
 				if r.IsComplete() {
-					// TODO: A more descriptive error message.
 					if err := r.Err(); err != nil {
+						// TODO: A more descriptive error message.
 						return err
 					}
 
@@ -91,7 +91,7 @@ func downloadCommand(input []string) error {
 					light(path.Base(r.Filename)))
 				fmt.Printf("%s%s%s of %s\n", cursor.ClearEntireLine(), dark(
 					config.IndentChar), humanize.Bytes(uint64(r.
-					BytesComplete())), humanize.Bytes(uint64(r.Size)))
+					BytesComplete())), humanize.Bytes(uint64(r.Size())))
 			}
 
 			// Move cursor two lines of for each download.
