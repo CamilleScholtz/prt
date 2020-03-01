@@ -91,7 +91,7 @@ func downloadCommand(input []string) error {
 					light(path.Base(r.Filename)))
 				fmt.Printf("%s%s%s of %s\n", cursor.ClearEntireLine(), dark(
 					config.IndentChar), humanize.Bytes(uint64(r.
-					BytesComplete())), humanize.Bytes(uint64(r.Size())))
+					BytesComplete())), humanize.Bytes(uint64(r.Size)))
 			}
 
 			// Move cursor two lines of for each download.
